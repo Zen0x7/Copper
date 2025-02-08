@@ -93,13 +93,13 @@ namespace copper::components::validator {
                                 std::string error_message = "Attribute " + rule.first + " must be an array.";
                                 response->insert_or_push(rule.first, error_message);
                             } else {
-                                if (auto channels = value.as_object().at(rule.first).as_array(); channels.empty()) {
+                                if (auto elements = value.as_object().at(rule.first).as_array(); elements.empty()) {
                                     std::string error_message = "Attribute " + rule.first + " cannot be empty.";
                                     response->insert_or_push(rule.first, error_message);
                                 } else {
                                     size_t i = 0;
-                                    for (const auto& channel : channels) {
-                                        if (!channel.is_string()) {
+                                    for (const auto& element : elements) {
+                                        if (!element.is_string()) {
                                             std::string error_message = "Attribute " + rule.first + " at position "
                                                                         + std::to_string(i) + " must be string.";
                                             response->insert_or_push(rule.first, error_message);
@@ -116,7 +116,6 @@ namespace copper::components::validator {
 
         response->success = response->errors.empty();
 
-        return response;
-    }
+        return response; }
 
 }
