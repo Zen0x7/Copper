@@ -29,7 +29,7 @@ namespace copper::components::expression {
         instance(std::string regex, const std::vector<std::string> &arguments);
         std::vector<std::string> get_arguments() const;
         std::string get_regex() const;
-        std::shared_ptr<result> query(const std::string &input) const;
+        boost::shared_ptr<result> query(const std::string &input) const;
     };
 
     boost::shared_ptr<instance> from_string(const std::string &input);

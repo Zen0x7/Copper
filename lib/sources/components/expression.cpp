@@ -27,7 +27,7 @@ namespace copper::components::expression {
 
     std::string instance::get_regex() const { return regex_; }
 
-    std::shared_ptr<result> instance::query(const std::string &input) const {
+    boost::shared_ptr<result> instance::query(const std::string &input) const {
         std::unordered_map<std::string, std::string> _bindings;
         const std::regex _pattern(regex_);
         bool _matches = false;
@@ -40,7 +40,7 @@ namespace copper::components::expression {
                 ++_iterator;
             }
         }
-        return std::make_shared<result>(_matches, _bindings); }
+        return boost::make_shared<result>(_matches, _bindings); }
 
     boost::shared_ptr<instance> from_string(const std::string &input) {
         std::size_t _open = input.find('{');

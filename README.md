@@ -136,3 +136,32 @@ auto string = random::string(32);
 assert(string.length() == 32);
 ```
 
+### Expression
+
+#### Location
+
+> copper/components/expression.hpp
+
+#### API
+
+```cpp
+boost::shared_ptr<instance> from_string(const std::string &input);
+boost::shared_ptr<result> instance::query(const std::string &input);
+bool result::matches();
+std::string result::get(const std::string &name);
+```
+
+#### Usage
+
+```cpp
+#include <copper/components/expression.hpp>
+
+auto expression = expression::from_string("/users/{user}");
+
+auto result = expression->query("/users/7");
+
+assert(result->matches());
+assert(result->get("user") == "7");
+```
+
+
