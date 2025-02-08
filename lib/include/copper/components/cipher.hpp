@@ -255,8 +255,7 @@ namespace copper::components::cipher {
         delete[] output_buffer;
         EVP_CIPHER_CTX_free(ctx);
 
-        return output;
-    }
+        return output; }
 
     /**
      * Decrypt using AES 256 CBC
