@@ -25,3 +25,6 @@ jobs:
         with:
           push: ${{ github.ref == 'refs/heads/master' }}
           tags: iantorres/copperix:latest
+          build-args: |
+            CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
+            CODECOV_REPO=${{ secrets.CODECOV_REPO }}
