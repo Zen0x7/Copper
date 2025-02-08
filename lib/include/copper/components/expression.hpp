@@ -33,4 +33,5 @@ namespace copper::components::expression {
     };
 
     boost::shared_ptr<instance> from_string(const std::string &input);
-}  // namespace components::expressions
+
+}  // namespace copper::components::expressions
