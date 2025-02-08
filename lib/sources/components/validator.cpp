@@ -5,14 +5,14 @@
 
 namespace copper::components::validator {
 
-    void validator_response::insert_or_push(const std::string &key, const std::string &message) {
+    void instance::insert_or_push(const std::string &key, const std::string &message) {
         if (!this->errors.contains(key)) this->errors[key] = boost::json::array({});
 
         this->errors.at(key).as_array().emplace_back(message);
     }
 
-    boost::shared_ptr<validator_response> make(const std::map<std::string, std::string>& rules, const boost::json::value& value) {
-        auto response = boost::make_shared<validator_response>();
+    boost::shared_ptr<instance> make(const std::map<std::string, std::string>& rules, const boost::json::value& value) {
+        auto response = boost::make_shared<instance>();
 
         for (auto& rule : rules) {
             if (rule.first == "*") {

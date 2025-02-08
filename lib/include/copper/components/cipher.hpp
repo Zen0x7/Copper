@@ -14,9 +14,9 @@
 namespace copper::components::cipher {
 
     /**
-     * Generate SHA256 secret key
+     * Generate SHA256 key
      *
-     * @return
+     * @return std::string Output
      */
     static std::string generate_sha_256() {
         unsigned char bytes[32];
@@ -32,7 +32,7 @@ namespace copper::components::cipher {
         } else {
             // LCOV_EXCL_STOP
             std::stringstream ss;
-            for (const auto byte : bytes) {
+            for (const auto byte: bytes) {
                 ss << byte;
             }
             return base64::encode(ss.str());
@@ -44,7 +44,7 @@ namespace copper::components::cipher {
      *
      * @param input
      * @param app_key
-     * @return
+     * @return std::string Output
      */
     static std::string hmac(const std::string &input, const std::string &app_key) {
         std::string result;
@@ -138,7 +138,8 @@ namespace copper::components::cipher {
 
     /**
      * Generate AES Initialization Vector
-     * @return
+     *
+     * @return std::pair<std::string, std::string> Pair of secret and initialization vector
      */
     static std::pair<std::string, std::string> generate_aes_key_iv() {
         std::pair<std::string, std::string> key_iv;
@@ -178,8 +179,9 @@ namespace copper::components::cipher {
      * 
      * @param input 
      * @param key 
-     * @param iv 
-     * @return 
+     * @param iv
+     *
+     * @return std::string Output
      */
     static std::string encrypt_aes_256_cbc(const std::string &input, const std::string &key,
                                            const std::string &iv) {
@@ -255,6 +257,14 @@ namespace copper::components::cipher {
 
         return output; }
 
+    /**
+     * Decrypt using AES 256 CBC
+     *
+     * @param input
+     * @param key
+     * @param iv
+     * @return std::string Output
+     */
     static std::string decrypt_aes_256_cbc(const std::string &input, const std::string &key,
                                            const std::string &iv) {
         std::string output;
@@ -328,4 +338,5 @@ namespace copper::components::cipher {
         EVP_CIPHER_CTX_free(ctx);
 
         return output; }
+
 }  // namespace copper::components::cipher
