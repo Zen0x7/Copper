@@ -22,6 +22,7 @@ namespace copper::components::cipher {
         unsigned char bytes[32];
         std::string hex_key;
         if (RAND_bytes(bytes, sizeof(bytes)) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -29,6 +30,7 @@ namespace copper::components::cipher {
             error_output.append(error_message);
             throw std::runtime_error(error_output.c_str());
         } else {
+            // LCOV_EXCL_STOP
             std::stringstream ss;
             for (const auto byte : bytes) {
                 ss << byte;
@@ -50,6 +52,7 @@ namespace copper::components::cipher {
         EVP_PKEY *pkey = EVP_PKEY_new_mac_key(
                 EVP_PKEY_HMAC, NULL, reinterpret_cast<const unsigned char *>(app_key.data()), 32);
         if (!pkey) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -57,9 +60,11 @@ namespace copper::components::cipher {
             error_output.append(error_message);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         EVP_MD_CTX *ctx = EVP_MD_CTX_new();
         if (!ctx) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -68,11 +73,13 @@ namespace copper::components::cipher {
             EVP_PKEY_free(pkey);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         std::size_t len;
         unsigned char md[EVP_MAX_MD_SIZE];
 
         if (EVP_DigestSignInit(ctx, NULL, EVP_sha256(), NULL, pkey) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -82,8 +89,10 @@ namespace copper::components::cipher {
             EVP_PKEY_free(pkey);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         if (EVP_DigestSignUpdate(ctx, input.c_str(), input.size()) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -93,8 +102,10 @@ namespace copper::components::cipher {
             EVP_PKEY_free(pkey);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         if (EVP_DigestSignFinal(ctx, NULL, &len) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -104,8 +115,10 @@ namespace copper::components::cipher {
             EVP_PKEY_free(pkey);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         if (EVP_DigestSignFinal(ctx, md, &len) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -115,13 +128,13 @@ namespace copper::components::cipher {
             EVP_PKEY_free(pkey);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         EVP_MD_CTX_free(ctx);
         EVP_PKEY_free(pkey);
 
         result.assign(reinterpret_cast<char *>(md), len);
-        return result;
-    }
+        return result; }
 
     /**
      * Generate AES Initialization Vector
@@ -132,6 +145,7 @@ namespace copper::components::cipher {
 
         std::vector<unsigned char> key(32);
         if (RAND_bytes(key.data(), key.size()) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -139,10 +153,13 @@ namespace copper::components::cipher {
             error_output.append(error_message);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
+
         key_iv.first.assign(key.begin(), key.end());
 
         std::vector<unsigned char> iv(EVP_MAX_IV_LENGTH);
         if (RAND_bytes(iv.data(), iv.size()) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -150,10 +167,11 @@ namespace copper::components::cipher {
             error_output.append(error_message);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
+
         key_iv.second.assign(iv.begin(), iv.end());
 
-        return key_iv;
-    }
+        return key_iv; }
 
     /**
      * Encrypt using AES 256 CBC
@@ -169,6 +187,7 @@ namespace copper::components::cipher {
 
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
         if (!ctx) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -176,11 +195,13 @@ namespace copper::components::cipher {
             error_output.append(error_message);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL,
                                reinterpret_cast<const unsigned char *>(key.c_str()),
                                reinterpret_cast<const unsigned char *>(iv.c_str()))
             != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -188,8 +209,8 @@ namespace copper::components::cipher {
             error_output.append(error_message);
             EVP_CIPHER_CTX_free(ctx);
             throw std::runtime_error(error_output.c_str());
-            return output;
         }
+        // LCOV_EXCL_STOP
 
         int length;
         int output_length;
@@ -200,6 +221,7 @@ namespace copper::components::cipher {
                               reinterpret_cast<const unsigned char *>(input.c_str()),
                               input.size())
             != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -208,9 +230,12 @@ namespace copper::components::cipher {
             EVP_CIPHER_CTX_free(ctx);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
+
         output_length = length;
 
         if (EVP_EncryptFinal_ex(ctx, output_buffer + length, &length) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -219,6 +244,8 @@ namespace copper::components::cipher {
             EVP_CIPHER_CTX_free(ctx);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
+
         output_length += length;
 
         output.assign(reinterpret_cast<char *>(output_buffer), output_length);
@@ -226,8 +253,7 @@ namespace copper::components::cipher {
         delete[] output_buffer;
         EVP_CIPHER_CTX_free(ctx);
 
-        return output;
-    }
+        return output; }
 
     static std::string decrypt_aes_256_cbc(const std::string &input, const std::string &key,
                                            const std::string &iv) {
@@ -235,6 +261,7 @@ namespace copper::components::cipher {
 
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
         if (!ctx) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -242,11 +269,13 @@ namespace copper::components::cipher {
             error_output.append(error_message);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL,
                                reinterpret_cast<const unsigned char *>(key.c_str()),
                                reinterpret_cast<const unsigned char *>(iv.c_str()))
             != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -255,6 +284,7 @@ namespace copper::components::cipher {
             EVP_CIPHER_CTX_free(ctx);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
 
         int length;
         int input_length;
@@ -265,6 +295,7 @@ namespace copper::components::cipher {
                               reinterpret_cast<const unsigned char *>(input.c_str()),
                               input.size())
             != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -273,9 +304,12 @@ namespace copper::components::cipher {
             EVP_CIPHER_CTX_free(ctx);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
+
         input_length = length;
 
         if (EVP_DecryptFinal_ex(ctx, input_buffer + length, &length) != 1) {
+            // LCOV_EXCL_START
             unsigned long error_code = ERR_get_error();
             char error_message[256];
             ERR_error_string_n(error_code, error_message, sizeof(error_message));
@@ -284,6 +318,8 @@ namespace copper::components::cipher {
             EVP_CIPHER_CTX_free(ctx);
             throw std::runtime_error(error_output.c_str());
         }
+        // LCOV_EXCL_STOP
+
         input_length += length;
 
         output.assign(reinterpret_cast<char *>(input_buffer), input_length);
