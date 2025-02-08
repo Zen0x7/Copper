@@ -28,3 +28,4 @@ jobs:
           build-args: |
             CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
             CODECOV_REPO=${{ secrets.CODECOV_REPO }}
+            COMMIT_SHA=${{ github.sha }}
