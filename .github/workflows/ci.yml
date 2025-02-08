@@ -23,4 +23,5 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v6
         with:
-          push: false
+          push: ${{ github.ref == 'refs/heads/master' }}
+          tags: iantorres/copperix:latest
