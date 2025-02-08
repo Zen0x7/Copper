@@ -10,11 +10,19 @@ find_package(OpenSSL REQUIRED)
 link_directories(${OPENSSL_LIBRARIES})
 include_directories(${OPENSSL_INCLUDE_DIR})
 
+find_package(
+        Boost 1.87.0
+        COMPONENTS json thread program_options random coroutine charconv
+        REQUIRED
+)
+
 include(FetchContent)
 include_directories(lib/include)
 
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/lib/sources/*.cpp")
 file(GLOB_RECURSE TESTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cc")
+
+include_directories(${Boost_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 --coverage")
@@ -33,10 +41,10 @@ if (BUILD_TESTS)
 
     enable_testing()
     add_executable(tests ${TESTS} ${SOURCES})
-    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES})
+    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
     include(GoogleTest)
     gtest_discover_tests(tests)
 endif ()
 
 add_executable(copper main.cpp ${SOURCES})
-target_link_libraries(copper ${OPENSSL_LIBRARIES})
+target_link_libraries(copper ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
