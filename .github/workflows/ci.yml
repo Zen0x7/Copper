@@ -27,4 +27,11 @@ jobs:
           cd ..
           lcov --capture --directory . --output-file coverage.info
           lcov --list coverage.info
-          ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -f coverage.info --slug=${{ secrets.CODECOV_REPO }} --sha ${{ github.sha }}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          fail_ci_if_error: true
+          files: ./coverage.info
