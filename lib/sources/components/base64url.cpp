@@ -19,8 +19,7 @@ namespace copper::components::base64url {
         if (padding)
             while (output.size() % 4 != 0) output.push_back('=');
 
-        return output;
-    }
+        return output; }
 
     std::string decode(const std::string &input) {
         std::string output;
@@ -35,7 +34,6 @@ namespace copper::components::base64url {
                 value_b -= 8;
             }
         }
-        return output;
-    }
+        return output; }
 
 }  // namespace copper::components::base64url

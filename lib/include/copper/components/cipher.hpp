@@ -22,6 +22,12 @@ namespace copper::components::cipher {
         unsigned char bytes[32];
         std::string hex_key;
         if (RAND_bytes(bytes, sizeof(bytes)) != 1) {
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
+            throw std::runtime_error(error_output.c_str());
         } else {
             std::stringstream ss;
             for (const auto byte : bytes) {
@@ -29,7 +35,6 @@ namespace copper::components::cipher {
             }
             return base64::encode(ss.str());
         }
-        return "";
     }
 
     /**
@@ -164,16 +169,25 @@ namespace copper::components::cipher {
 
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
         if (!ctx) {
-            std::cerr << "Error creating EVP_CIPHER_CTX" << std::endl;
-            return output;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
+            throw std::runtime_error(error_output.c_str());
         }
 
         if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL,
                                reinterpret_cast<const unsigned char *>(key.c_str()),
                                reinterpret_cast<const unsigned char *>(iv.c_str()))
             != 1) {
-            std::cerr << "Error initializing AES-256-CBC encryption" << std::endl;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_CIPHER_CTX_free(ctx);
+            throw std::runtime_error(error_output.c_str());
             return output;
         }
 
@@ -221,17 +235,25 @@ namespace copper::components::cipher {
 
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
         if (!ctx) {
-            std::cerr << "Error creating EVP_CIPHER_CTX" << std::endl;
-            return output;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
+            throw std::runtime_error(error_output.c_str());
         }
 
         if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL,
                                reinterpret_cast<const unsigned char *>(key.c_str()),
                                reinterpret_cast<const unsigned char *>(iv.c_str()))
             != 1) {
-            std::cerr << "Error initializing AES-256-CBC decryption" << std::endl;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_CIPHER_CTX_free(ctx);
-            return output;
+            throw std::runtime_error(error_output.c_str());
         }
 
         int length;
@@ -269,6 +291,5 @@ namespace copper::components::cipher {
         delete[] input_buffer;
         EVP_CIPHER_CTX_free(ctx);
 
-        return output;
-    }
+        return output; }
 }  // namespace copper::components::cipher
