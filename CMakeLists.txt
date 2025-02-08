@@ -6,9 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(BUILD_TESTS "Build tests cases" ON)
 
+find_package(OpenSSL REQUIRED)
+link_directories(${OPENSSL_LIBRARIES})
+include_directories(${OPENSSL_INCLUDE_DIR})
+
 include(FetchContent)
 include_directories(lib/include)
-
 
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/lib/sources/*.cpp")
 file(GLOB_RECURSE TESTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cc")
@@ -30,9 +33,10 @@ if (BUILD_TESTS)
 
     enable_testing()
     add_executable(tests ${TESTS} ${SOURCES})
-    target_link_libraries(tests GTest::gtest_main)
+    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES})
     include(GoogleTest)
     gtest_discover_tests(tests)
 endif ()
 
 add_executable(copper main.cpp ${SOURCES})
+target_link_libraries(copper ${OPENSSL_LIBRARIES})
