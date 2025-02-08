@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <copper/components/random.hpp>
 
+#include <copper/components/random.hpp>
 
 TEST(Components_Random, String) {
     using namespace copper::components;
