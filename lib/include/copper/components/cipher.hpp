@@ -12,6 +12,12 @@
 #include <vector>
 
 namespace copper::components::cipher {
+
+    /**
+     * Generate SHA256 secret key
+     *
+     * @return
+     */
     static std::string generate_sha_256() {
         unsigned char bytes[32];
         std::string hex_key;
@@ -26,52 +32,83 @@ namespace copper::components::cipher {
         return "";
     }
 
+    /**
+     * Get HMAC value of input
+     *
+     * @param input
+     * @param app_key
+     * @return
+     */
     static std::string hmac(const std::string &input, const std::string &app_key) {
         std::string result;
 
         EVP_PKEY *pkey = EVP_PKEY_new_mac_key(
                 EVP_PKEY_HMAC, NULL, reinterpret_cast<const unsigned char *>(app_key.data()), 32);
         if (!pkey) {
-            std::cerr << "Error creating EVP_PKEY" << std::endl;
-            return result;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
+            throw std::runtime_error(error_output.c_str());
         }
 
         EVP_MD_CTX *ctx = EVP_MD_CTX_new();
         if (!ctx) {
-            std::cerr << "Error creating EVP_MD_CTX" << std::endl;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_PKEY_free(pkey);
-            return result;
+            throw std::runtime_error(error_output.c_str());
         }
 
         std::size_t len;
         unsigned char md[EVP_MAX_MD_SIZE];
 
         if (EVP_DigestSignInit(ctx, NULL, EVP_sha256(), NULL, pkey) != 1) {
-            std::cerr << "Error initializing signing" << std::endl;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_MD_CTX_free(ctx);
             EVP_PKEY_free(pkey);
-            return result;
+            throw std::runtime_error(error_output.c_str());
         }
 
         if (EVP_DigestSignUpdate(ctx, input.c_str(), input.size()) != 1) {
-            std::cerr << "Error updating signing" << std::endl;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_MD_CTX_free(ctx);
             EVP_PKEY_free(pkey);
-            return result;
+            throw std::runtime_error(error_output.c_str());
         }
 
         if (EVP_DigestSignFinal(ctx, NULL, &len) != 1) {
-            std::cerr << "Error finalizing signing" << std::endl;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_MD_CTX_free(ctx);
             EVP_PKEY_free(pkey);
-            return result;
+            throw std::runtime_error(error_output.c_str());
         }
 
         if (EVP_DigestSignFinal(ctx, md, &len) != 1) {
-            std::cerr << "Error finalizing signing" << std::endl;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_MD_CTX_free(ctx);
             EVP_PKEY_free(pkey);
-            return result;
+            throw std::runtime_error(error_output.c_str());
         }
 
         EVP_MD_CTX_free(ctx);
@@ -81,36 +118,54 @@ namespace copper::components::cipher {
         return result;
     }
 
+    /**
+     * Generate AES Initialization Vector
+     * @return
+     */
     static std::pair<std::string, std::string> generate_aes_key_iv() {
         std::pair<std::string, std::string> key_iv;
 
-        // Generate AES key
-        std::vector<unsigned char> aesKey(32);
-        if (RAND_bytes(aesKey.data(), aesKey.size()) != 1) {
-            std::cerr << "Error generating AES key" << std::endl;
-            return key_iv;
+        std::vector<unsigned char> key(32);
+        if (RAND_bytes(key.data(), key.size()) != 1) {
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
+            throw std::runtime_error(error_output.c_str());
         }
-        key_iv.first.assign(aesKey.begin(), aesKey.end());
+        key_iv.first.assign(key.begin(), key.end());
 
-        // Generate IV (Initialization Vector)
         std::vector<unsigned char> iv(EVP_MAX_IV_LENGTH);
         if (RAND_bytes(iv.data(), iv.size()) != 1) {
-            std::cerr << "Error generating IV" << std::endl;
-            return key_iv;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
+            throw std::runtime_error(error_output.c_str());
         }
         key_iv.second.assign(iv.begin(), iv.end());
 
         return key_iv;
     }
 
-    static std::string encrypt_aes_256_cbc(const std::string &plaintext, const std::string &key,
+    /**
+     * Encrypt using AES 256 CBC
+     * 
+     * @param input 
+     * @param key 
+     * @param iv 
+     * @return 
+     */
+    static std::string encrypt_aes_256_cbc(const std::string &input, const std::string &key,
                                            const std::string &iv) {
-        std::string ciphertext;
+        std::string output;
 
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
         if (!ctx) {
             std::cerr << "Error creating EVP_CIPHER_CTX" << std::endl;
-            return ciphertext;
+            return output;
         }
 
         if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL,
@@ -119,50 +174,55 @@ namespace copper::components::cipher {
             != 1) {
             std::cerr << "Error initializing AES-256-CBC encryption" << std::endl;
             EVP_CIPHER_CTX_free(ctx);
-            return ciphertext;
+            return output;
         }
 
-        // Provide plaintext to be encrypted
-        int len;
-        int ciphertextLen;
-        unsigned char *ciphertextBuf
-                = new unsigned char[plaintext.size() + EVP_CIPHER_block_size(EVP_aes_256_cbc())];
+        int length;
+        int output_length;
+        unsigned char *output_buffer
+                = new unsigned char[input.size() + EVP_CIPHER_block_size(EVP_aes_256_cbc())];
 
-        if (EVP_EncryptUpdate(ctx, ciphertextBuf, &len,
-                              reinterpret_cast<const unsigned char *>(plaintext.c_str()),
-                              plaintext.size())
+        if (EVP_EncryptUpdate(ctx, output_buffer, &length,
+                              reinterpret_cast<const unsigned char *>(input.c_str()),
+                              input.size())
             != 1) {
-            std::cerr << "Error performing AES-256-CBC encryption" << std::endl;
-            delete[] ciphertextBuf;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_CIPHER_CTX_free(ctx);
-            return ciphertext;
+            throw std::runtime_error(error_output.c_str());
         }
-        ciphertextLen = len;
+        output_length = length;
 
-        if (EVP_EncryptFinal_ex(ctx, ciphertextBuf + len, &len) != 1) {
-            std::cerr << "Error finalizing AES-256-CBC encryption" << std::endl;
-            delete[] ciphertextBuf;
+        if (EVP_EncryptFinal_ex(ctx, output_buffer + length, &length) != 1) {
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_CIPHER_CTX_free(ctx);
-            return ciphertext;
+            throw std::runtime_error(error_output.c_str());
         }
-        ciphertextLen += len;
+        output_length += length;
 
-        ciphertext.assign(reinterpret_cast<char *>(ciphertextBuf), ciphertextLen);
+        output.assign(reinterpret_cast<char *>(output_buffer), output_length);
 
-        delete[] ciphertextBuf;
+        delete[] output_buffer;
         EVP_CIPHER_CTX_free(ctx);
 
-        return ciphertext;
+        return output;
     }
 
-    static std::string decrypt_aes_256_cbc(const std::string &ciphertext, const std::string &key,
+    static std::string decrypt_aes_256_cbc(const std::string &input, const std::string &key,
                                            const std::string &iv) {
-        std::string decryptedData;
+        std::string output;
 
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
         if (!ctx) {
             std::cerr << "Error creating EVP_CIPHER_CTX" << std::endl;
-            return decryptedData;
+            return output;
         }
 
         if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL,
@@ -171,38 +231,44 @@ namespace copper::components::cipher {
             != 1) {
             std::cerr << "Error initializing AES-256-CBC decryption" << std::endl;
             EVP_CIPHER_CTX_free(ctx);
-            return decryptedData;
+            return output;
         }
 
-        int len;
-        int plaintextLen;
-        unsigned char *plaintextBuf
-                = new unsigned char[ciphertext.size() + EVP_CIPHER_block_size(EVP_aes_256_cbc())];
+        int length;
+        int input_length;
+        unsigned char *input_buffer
+                = new unsigned char[input.size() + EVP_CIPHER_block_size(EVP_aes_256_cbc())];
 
-        if (EVP_DecryptUpdate(ctx, plaintextBuf, &len,
-                              reinterpret_cast<const unsigned char *>(ciphertext.c_str()),
-                              ciphertext.size())
+        if (EVP_DecryptUpdate(ctx, input_buffer, &length,
+                              reinterpret_cast<const unsigned char *>(input.c_str()),
+                              input.size())
             != 1) {
-            std::cerr << "Error performing AES-256-CBC decryption" << std::endl;
-            delete[] plaintextBuf;
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_CIPHER_CTX_free(ctx);
-            return decryptedData;
+            throw std::runtime_error(error_output.c_str());
         }
-        plaintextLen = len;
+        input_length = length;
 
-        if (EVP_DecryptFinal_ex(ctx, plaintextBuf + len, &len) != 1) {
-            std::cerr << "Error finalizing AES-256-CBC decryption" << std::endl;
-            delete[] plaintextBuf;
+        if (EVP_DecryptFinal_ex(ctx, input_buffer + length, &length) != 1) {
+            unsigned long error_code = ERR_get_error();
+            char error_message[256];
+            ERR_error_string_n(error_code, error_message, sizeof(error_message));
+            std::string error_output = "OpenSSL error: ";
+            error_output.append(error_message);
             EVP_CIPHER_CTX_free(ctx);
-            return decryptedData;
+            throw std::runtime_error(error_output.c_str());
         }
-        plaintextLen += len;
+        input_length += length;
 
-        decryptedData.assign(reinterpret_cast<char *>(plaintextBuf), plaintextLen);
+        output.assign(reinterpret_cast<char *>(input_buffer), input_length);
 
-        delete[] plaintextBuf;
+        delete[] input_buffer;
         EVP_CIPHER_CTX_free(ctx);
 
-        return decryptedData;
+        return output;
     }
 }  // namespace copper::components::cipher
