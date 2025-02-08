@@ -7,11 +7,18 @@ namespace copper::components::base64 {
 
     /**
      * Converts from string to Base64
+     *
+     * @param input
+     * @param padding
+     * @return std::string Encoded output
      */
     std::string encode(const std::string &input, bool padding = true);
 
     /**
      * Converts from Base64 to string
+     *
+     * @param input
+     * @return std::string Decoded output
      */
     std::string decode(const std::string &input);
 

@@ -4,6 +4,7 @@
 #include <string>
 
 namespace copper::components::base64url {
+
     /**
      * Converts from string to Base64url
      *

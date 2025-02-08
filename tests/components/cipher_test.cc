@@ -28,7 +28,6 @@ TEST(Components_Cipher, Generate_HMAC_Using_Random_Key) {
 
 TEST(Components_Cipher, Encrypt_And_Decrypt_Using_Existing_Key) {
     using namespace copper::components;
-    auto [a, b] = cipher::generate_aes_key_iv();
     const std::string secret_key = base64::decode("TsBen/ynU6jtihMXGRT3ZAtzTSiQGzyk9dkgY03WAn0=");
     const std::string secret_iv = base64::decode("nt27vWC02To2ZzqXKaP7yw==");
     const std::string expected_encrypted = "2h8OT3N+7G8UEEV+RixbsQ==";
