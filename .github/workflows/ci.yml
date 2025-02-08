@@ -6,26 +6,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+
+    container:
+      image: iantorres/boosted:1.87.0-debug
+
     steps:
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          push: ${{ github.ref == 'refs/heads/master' }}
-          tags: iantorres/copperix:latest
-          build-args: |
-            CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
-            CODECOV_REPO=${{ secrets.CODECOV_REPO }}
-            COMMIT_SHA=${{ github.sha }}
+      - uses: actions/checkout@v4
+      - run: |
+          apt update
+          apt install -y lcov
+          curl -Os https://cli.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          mkdir build
+          cd build
+          cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+          make
+          cd ../bin
+          ./tests
+          cd ..
+          lcov --capture --directory . --output-file coverage.info
+          lcov --list coverage.info
+          ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -f coverage.info --slug=${{ secrets.CODECOV_REPO }} --sha ${{ github.sha }}
