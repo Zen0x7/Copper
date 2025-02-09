@@ -3,9 +3,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid.hpp>
 
-namespace copper::components::validator {
+namespace copper::components {
 
-    void instance::insert_or_push(
+    void validator::insert_or_push(
             const std::string &key,
             const std::string &message
     ) {
@@ -15,15 +15,15 @@ namespace copper::components::validator {
     }
 
     boost::shared_ptr<
-            instance
-    > make(
+            validator
+    > validator_make(
             const std::map<
                     std::string,
                     std::string
             > &rules,
             const boost::json::value &value
     ) {
-        auto response = boost::make_shared<instance>();
+        auto response = boost::make_shared<validator>();
 
         for (auto &rule: rules) {
             if (rule.first == "*") {

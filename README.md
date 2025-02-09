@@ -127,7 +127,7 @@ std::map<std::string, std::string> rules = {
 std::string json = R"({"username":"zen0x7"})"
 auto value = boost::json::parse(json);
 
-auto response = validator::make(rules, value);
+auto response = validator_make(rules, value);
 
 assert(response->success);
 ```

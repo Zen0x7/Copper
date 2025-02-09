@@ -48,7 +48,7 @@ namespace copper::components {
                                 {"exp", "is_number"},
                         };
 
-                        if (auto instance = validator::make(rules, payload); instance->success) {
+                        if (auto instance = validator_make(rules, payload); instance->success) {
                             const std::string id{payload.as_object().at("sub").as_string()};
                             const std::string type{payload.as_object().at("typ").as_string()};
                             auto expires_at_ = payload.as_object().at("exp").as_int64();
