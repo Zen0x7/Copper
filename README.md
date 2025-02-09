@@ -2,6 +2,10 @@
 
 [![codecov](https://codecov.io/gh/Zen0x7/Copper/branch/master/graph/badge.svg?token=XENML1H9VV)](https://codecov.io/gh/Zen0x7/Copper)
 
+## Requirements
+
+- Boost 1.87.0
+
 ## Components
 
 ### Base64
@@ -224,4 +228,55 @@ assert(result.value().type == "user");
 
 *See more examples in the [test cases](/tests/components/authenticator_test.cc).*
 
+### MIME Type
+
+Provides MIME recognition algorithm.
+
+#### Location
+
+> copper/components/filesystem/mime_type.hpp
+
+#### API
+
+```cpp
+boost::beast::string_view get(boost::beast::string_view path);
+```
+
+#### Usage
+
+```cpp
+#include <copper/components/filesystem/mime_type.hpp>
+
+auto value = filesystem::mime_type::get("app.json");
+
+assert(value == "application/json");
+```
+
+*See more examples in the [test cases](/tests/components/filesystem/mime_type_test.cc).*
+
+### Normalized Path
+
+Provides MIME recognition algorithm.
+
+#### Location
+
+> copper/components/filesystem/normalized_path.hpp
+
+#### API
+
+```cpp
+std::string get(boost::beast::string_view base, boost::beast::string_view path);
+```
+
+#### Usage
+
+```cpp
+#include <copper/components/filesystem/normalized_path.hpp>
+
+auto value = filesystem::normalized_path::get("/srv/app", "/manifest.json");
+
+assert(value == "/srv/app/manifest.json");
+```
+
+*See more examples in the [test cases](/tests/components/filesystem/normalized_path_test.cc).*
 
