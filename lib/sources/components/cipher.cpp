@@ -114,8 +114,7 @@ namespace copper::components {
         EVP_PKEY_free(pkey);
 
         result.assign(reinterpret_cast<char *>(md), len);
-        return result;
-    }
+        return result; }
 
     std::pair<
             std::string,
@@ -151,8 +150,7 @@ namespace copper::components {
 
         key_iv.second.assign(iv.begin(), iv.end());
 
-        return key_iv;
-    }
+        return key_iv; }
 
     std::string cipher_encrypt(
             const std::string &input,
@@ -229,8 +227,7 @@ namespace copper::components {
         delete[] output_buffer;
         EVP_CIPHER_CTX_free(ctx);
 
-        return output;
-    }
+        return output; }
 
     std::string cipher_decrypt(
             const std::string &input,
@@ -307,6 +304,5 @@ namespace copper::components {
         delete[] input_buffer;
         EVP_CIPHER_CTX_free(ctx);
 
-        return output;
-    }
+        return output; }
 }

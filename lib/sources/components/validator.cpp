@@ -127,7 +127,6 @@ namespace copper::components {
 
         response->success = response->errors.empty();
 
-        return response;
-    }
+        return response; }
 
 }
