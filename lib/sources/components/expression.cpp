@@ -1,7 +1,7 @@
 #include <copper/components/expression.hpp>
 
-namespace copper::components::expression {
-    result::result(
+namespace copper::components {
+    expression_result::expression_result(
             const bool matches,
             const std::unordered_map<
                     std::string,
@@ -10,16 +10,16 @@ namespace copper::components::expression {
     )
             : matches_(matches), bindings_(bindings) {}
 
-    bool result::matches() const { return matches_; }
+    bool expression_result::matches() const { return matches_; }
 
     std::unordered_map<
             std::string,
             std::string
-    > result::get_bindings() const {
+    > expression_result::get_bindings() const {
         return bindings_;
     }
 
-    std::string result::get(
+    std::string expression_result::get(
             const std::string &name
     ) const {
         if (bindings_.contains(name)) return bindings_.at(name);
@@ -32,7 +32,7 @@ namespace copper::components::expression {
     }
     // LCOV_EXCL_STOP
 
-    instance::instance(
+    expression::expression(
             std::string regex,
             const std::vector<std::string> &arguments
     ) : regex_(std::move(regex)),
@@ -40,13 +40,13 @@ namespace copper::components::expression {
 
     std::vector<
             std::string
-    > instance::get_arguments() const { return arguments_; }
+    > expression::get_arguments() const { return arguments_; }
 
-    std::string instance::get_regex() const { return regex_; }
+    std::string expression::get_regex() const { return regex_; }
 
     boost::shared_ptr<
-            result
-    > instance::query(
+            expression_result
+    > expression::query(
             const std::string &input
     ) const {
         std::unordered_map<std::string, std::string> _bindings;
@@ -61,12 +61,12 @@ namespace copper::components::expression {
                 ++_iterator;
             }
         }
-        return boost::make_shared<result>(_matches, _bindings);
+        return boost::make_shared<expression_result>(_matches, _bindings);
     }
 
     boost::shared_ptr<
-            instance
-    > from_string(
+            expression
+    > expression_make(
             const std::string &input
     ) {
         std::size_t _open = input.find('{');
@@ -77,7 +77,7 @@ namespace copper::components::expression {
         std::string _regex;
 
         if (_open == std::string::npos && _close == std::string::npos)
-            return boost::make_shared<instance>(input, _arguments);
+            return boost::make_shared<expression>(input, _arguments);
 
         while (_open != std::string::npos && _close != std::string::npos) {
             _regex.append(input.substr(_position, _open - _position));
@@ -102,7 +102,7 @@ namespace copper::components::expression {
 
         if (_position != input.size()) _regex.append(input.substr(_position, input.size() - _position));
 
-        return boost::make_shared<instance>(_regex, _arguments);
+        return boost::make_shared<expression>(_regex, _arguments);
     }
 }  // namespace components::expressions
 

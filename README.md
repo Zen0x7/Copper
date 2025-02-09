@@ -145,7 +145,7 @@ Provides random data generation algorithms.
 #### API
 
 ```cpp
-std::string random(int size);
+std::string random_string(int size);
 ```
 
 #### Usage
@@ -153,7 +153,7 @@ std::string random(int size);
 ```cpp
 #include <copper/components/random.hpp>
 
-auto string = random::string(32);
+auto string = random_string(32);
 
 assert(string.length() == 32);
 ```
@@ -182,7 +182,7 @@ std::string result::get(const std::string &name);
 ```cpp
 #include <copper/components/expression.hpp>
 
-auto expression = expression::from_string("/users/{user}");
+auto expression = expression_make("/users/{user}");
 
 auto result = expression->query("/users/7");
 
@@ -203,9 +203,9 @@ Provides JWT issue and decoding algorithms.
 #### API
 
 ```cpp
-boost::optional<result> from_bearer(const std::string &bearer, const std::string &app_key);
+boost::optional<result> authentication_from_bearer(const std::string &bearer, const std::string &app_key);
 
-std::string to_bearer(boost::uuids::uuid id, const std::string &app_key, const std::string &type = "App\\Models\\User");
+std::string authentication_to_bearer(boost::uuids::uuid id, const std::string &app_key, const std::string &type = "App\\Models\\User");
 ```
 
 #### Usage
@@ -234,20 +234,20 @@ Provides MIME recognition algorithm.
 
 #### Location
 
-> copper/components/filesystem/mime_type.hpp
+> copper/components/mime_type.hpp
 
 #### API
 
 ```cpp
-boost::beast::string_view get(boost::beast::string_view path);
+boost::beast::string_view mime_type(boost::beast::string_view path);
 ```
 
 #### Usage
 
 ```cpp
-#include <copper/components/filesystem/mime_type.hpp>
+#include <copper/components/mime_type.hpp>
 
-auto value = filesystem::mime_type("app.json");
+auto value = mime_type("app.json");
 
 assert(value == "application/json");
 ```
@@ -260,20 +260,20 @@ Provides MIME recognition algorithm.
 
 #### Location
 
-> copper/components/filesystem/normalized_path.hpp
+> copper/components/normalized_path.hpp
 
 #### API
 
 ```cpp
-std::string get(boost::beast::string_view base, boost::beast::string_view path);
+std::string normalized_path(boost::beast::string_view base, boost::beast::string_view path);
 ```
 
 #### Usage
 
 ```cpp
-#include <copper/components/filesystem/normalized_path.hpp>
+#include <copper/components/normalized_path.hpp>
 
-auto value = filesystem::normalized_path("/srv/app", "/manifest.json");
+auto value = normalized_path("/srv/app", "/manifest.json");
 
 assert(value == "/srv/app/manifest.json");
 ```
@@ -286,22 +286,22 @@ Provides error reporting with stacktrace.
 
 #### Location
 
-> copper/components/failures/report.hpp
+> copper/components/report.hpp
 
 #### API
 
 ```cpp
-void fail(boost::beast::error_code ec, char const* what)
+void report(boost::beast::error_code ec, char const* what)
 ```
 
 #### Usage
 
 ```cpp
-#include <copper/components/failures/report.hpp>
+#include <copper/components/report.hpp>
 
 boost::system::error_code ec;
 
-failures::report(ec, "All OK");
+report(ec, "All OK");
 ```
 
 *See more examples in the [test cases](/tests/components/report_test.cc).*

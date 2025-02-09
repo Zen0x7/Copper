@@ -7,9 +7,9 @@
 
 #include <boost/smart_ptr.hpp>
 
-namespace copper::components::expression {
+namespace copper::components {
 
-    class result : public std::enable_shared_from_this<result> {
+    class expression_result : public std::enable_shared_from_this<expression_result> {
         /**
          * Matches flag
          */
@@ -31,7 +31,7 @@ namespace copper::components::expression {
          * @param matches
          * @param bindings
          */
-        result(
+        expression_result(
                 bool matches,
                 const std::unordered_map<
                         std::string,
@@ -67,7 +67,7 @@ namespace copper::components::expression {
         ) const;
     };
 
-    class instance : public std::enable_shared_from_this<instance> {
+    class expression : public std::enable_shared_from_this<expression> {
 
         /**
          * Regex expression
@@ -89,7 +89,7 @@ namespace copper::components::expression {
          * @param regex
          * @param arguments
          */
-        instance(
+        expression(
                 std::string regex,
                 const std::vector<
                         std::string
@@ -112,13 +112,13 @@ namespace copper::components::expression {
         std::string get_regex() const;
 
         /**
-         * Retrieves a result
+         * Retrieves a expression_result
          *
          * @param input
          * @return
          */
         boost::shared_ptr<
-                result
+                expression_result
         > query(
                 const std::string &input
         ) const;
@@ -131,8 +131,8 @@ namespace copper::components::expression {
      * @return
      */
     boost::shared_ptr<
-            instance
-    > from_string(
+            expression
+    > expression_make(
             const std::string &input
     );
 

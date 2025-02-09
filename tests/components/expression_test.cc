@@ -5,13 +5,13 @@
 TEST(Components_Expression, Assertions) {
     using namespace copper::components;
 
-    const auto _expression = expression::from_string("/u/{x}/d");
+    const auto _expression = expression_make("/u/{x}/d");
 
     ASSERT_FALSE(_expression->get_arguments().empty());
     ASSERT_EQ(_expression->get_arguments().size(), 1);
     ASSERT_EQ(_expression->get_arguments().at(0), "x");
 
-    const auto _non_expression = expression::from_string("/ping");
+    const auto _non_expression = expression_make("/ping");
     ASSERT_TRUE(_non_expression->get_arguments().empty());
     ASSERT_EQ(_non_expression->get_regex(), "/ping");
 
