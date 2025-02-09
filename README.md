@@ -6,6 +6,8 @@
 
 ### Base64
 
+Provides optimized Base64 encode and decode algorithms.
+
 #### Location
 
 > copper/components/base64.hpp
@@ -28,7 +30,11 @@ auto decoded = base64::decode(encoded);
 assert(decoded.data() == "hello");
 ```
 
+*See more examples in the [test cases](/tests/components/base64_test.cc).*
+
 ### Base64url
+
+Provides optimized Base64url encode and decode algorithms.
 
 #### Location
 
@@ -52,7 +58,11 @@ auto decoded = base64url::decode(encoded);
 assert(decoded == "hello");
 ```
 
+*See more examples in the [test cases](/tests/components/base64url_test.cc).*
+
 ### Cipher
+
+Provides HMAC and AES-256-CBC encryption and decryption algorithms.
 
 #### Location
 
@@ -84,7 +94,11 @@ assert(encrypted != input);
 assert(decrypted == input);
 ```
 
+*See more examples in the [test cases](/tests/components/cipher_test.cc).*
+
 ### Validator
+
+Provides JSON structure validation algorithms.
 
 #### Location
 
@@ -114,7 +128,11 @@ auto response = validator::make(rules, value);
 assert(response->success);
 ```
 
+*See more examples in the [test cases](/tests/components/validator_test.cc).*
+
 ### Random
+
+Provides random data generation algorithms.
 
 #### Location
 
@@ -136,7 +154,11 @@ auto string = random::string(32);
 assert(string.length() == 32);
 ```
 
+*See more examples in the [test cases](/tests/components/random_test.cc).*
+
 ### Expression
+
+Provides regular expression matching and parameter binding extraction algorithms.
 
 #### Location
 
@@ -163,5 +185,45 @@ auto result = expression->query("/users/7");
 assert(result->matches());
 assert(result->get("user") == "7");
 ```
+
+*See more examples in the [test cases](/tests/components/expression_test.cc).*
+
+### Authenticator
+
+Provides JWT issue and decoding algorithms.
+
+#### Location
+
+> copper/components/authenticator.hpp
+
+#### API
+
+```cpp
+boost::optional<result> from_bearer(const std::string &bearer, const std::string &app_key);
+
+std::string to_bearer(boost::uuids::uuid id, const std::string &app_key, const std::string &type = "App\\Models\\User");
+```
+
+#### Usage
+
+```cpp
+#include <copper/components/authenticator.hpp>
+
+auto expression = expression::from_string("/users/{user}");
+
+const boost::uuids::uuid id = boost::uuids::random_generator()();
+
+const std::string app_key = "sRgrihyQrBq59ltyxPW/azh9BzVN+vuA/K48BS7nJaw=";
+
+const std::string bearer = authenticator::to_bearer(id, base64::decode(app_key), "user");
+
+auto result = authenticator::from_bearer(bearer, base64::decode(app_key));
+
+assert(result.has_value())
+assert(result.value().id == id)
+assert(result.value().type == "user");
+```
+
+*See more examples in the [test cases](/tests/components/authenticator_test.cc).*
 
 
