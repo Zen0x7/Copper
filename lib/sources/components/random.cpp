@@ -13,9 +13,9 @@ namespace copper::components {
         output.reserve(size);
 
         boost::random::random_device device;
-        boost::random::uniform_int_distribution<> distribution(0, base64url::chars.size() - 1);
+        boost::random::uniform_int_distribution<> distribution(0, base64url_chars.size() - 1);
 
-        for (int i = 0; i < size; i++) output.push_back(base64url::chars[distribution(device)]);
+        for (int i = 0; i < size; i++) output.push_back(base64url_chars[distribution(device)]);
 
         return output;
     }

@@ -2,7 +2,7 @@
 
 namespace copper::components {
 
-    std::string cipher::generate_sha_256() {
+    std::string cipher_generate_sha_256() {
         unsigned char bytes[32];
         std::string hex_key;
         if (RAND_bytes(bytes, sizeof(bytes)) != 1) {
@@ -19,11 +19,11 @@ namespace copper::components {
             for (const auto byte: bytes) {
                 ss << byte;
             }
-            return base64::encode(ss.str());
+            return base64_encode(ss.str());
         }
     }
 
-    std::string cipher::hmac(
+    std::string cipher_hmac(
             const std::string &input,
             const std::string &app_key
     ) {
@@ -120,7 +120,7 @@ namespace copper::components {
     std::pair<
             std::string,
             std::string
-    > cipher::generate_aes_key_iv() {
+    > cipher_generate_aes_key_iv() {
         std::pair<std::string, std::string> key_iv;
 
         std::vector<unsigned char> key(32);
@@ -154,7 +154,7 @@ namespace copper::components {
         return key_iv;
     }
 
-    std::string cipher::encrypt_aes_256_cbc(
+    std::string cipher_encrypt(
             const std::string &input,
             const std::string &key,
             const std::string &iv
@@ -232,7 +232,7 @@ namespace copper::components {
         return output;
     }
 
-    std::string cipher::decrypt_aes_256_cbc(
+    std::string cipher_decrypt(
             const std::string &input,
             const std::string &key,
             const std::string &iv

@@ -1,7 +1,7 @@
 #include <copper/components/base64.hpp>
 
-namespace copper::components::base64 {
-    std::string encode(
+namespace copper::components {
+    std::string base64_encode(
             const std::string &input,
             bool padding
     ) {
@@ -13,11 +13,11 @@ namespace copper::components::base64 {
             value = (value << 8) + character;
             value_b += 8;
             while (value_b >= 0) {
-                output.push_back(chars[(value >> value_b) & 0x3F]);
+                output.push_back(base64_chars[(value >> value_b) & 0x3F]);
                 value_b -= 6;
             }
         }
-        if (value_b > -6) output.push_back(chars[((value << 8) >> (value_b + 8)) & 0x3F]);
+        if (value_b > -6) output.push_back(base64_chars[((value << 8) >> (value_b + 8)) & 0x3F]);
 
         if (padding)
             while (output.size() % 4 != 0) output.push_back('=');
@@ -25,7 +25,7 @@ namespace copper::components::base64 {
         return output;
     }
 
-    std::string decode(
+    std::string base64_decode(
             const std::string &input
     ) {
         std::string output;
@@ -33,7 +33,7 @@ namespace copper::components::base64 {
         int value_b = -8;
         for (const char character: input) {
             if (character == '=') break;
-            value = (value << 6) + map[character];
+            value = (value << 6) + base64_map[character];
             value_b += 6;
             if (value_b >= 0) {
                 output.push_back(static_cast<char>((value >> value_b) & 0xFF));

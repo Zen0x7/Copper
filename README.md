@@ -19,8 +19,8 @@ Provides optimized Base64 encode and decode algorithms.
 #### API
 
 ```cpp
-std::string encode(const std::string &input, bool padding = true);
-std::string decode(const std::string &input);
+std::string base64_encode(const std::string &input, bool padding = true);
+std::string base64_decode(const std::string &input);
 ```
 
 #### Usage
@@ -28,8 +28,8 @@ std::string decode(const std::string &input);
 ```cpp
 #include <copper/components/base64.hpp>
 
-auto encoded = base64::encode("hello");
-auto decoded = base64::decode(encoded); 
+auto encoded = base64_encode("hello");
+auto decoded = base64_decode(encoded); 
 
 assert(decoded.data() == "hello");
 ```
@@ -47,8 +47,8 @@ Provides optimized Base64url encode and decode algorithms.
 #### API
 
 ```cpp
-std::string encode(const std::string &input, bool padding = true);
-std::string decode(const std::string &input);
+std::string base64url_encode(const std::string &input, bool padding = true);
+std::string base64url_decode(const std::string &input);
 ```
 
 #### Usage
@@ -56,8 +56,8 @@ std::string decode(const std::string &input);
 ```cpp
 #include <copper/components/base64url.hpp>
 
-auto encoded = base64url::encode("hello");
-auto decoded = base64url::decode(encoded); 
+auto encoded = base64url_encode("hello");
+auto decoded = base64url_decode(encoded); 
 
 assert(decoded == "hello");
 ```
@@ -75,11 +75,11 @@ Provides HMAC and AES-256-CBC encryption and decryption algorithms.
 #### API
 
 ```cpp
-std::string generate_sha_256();
-std::string hmac(const std::string &input, const std::string &app_key);
-std::pair<std::string, std::string> generate_aes_key_iv(const std::string &input, const std::string &app_key);
-std::string encrypt_aes_256_cbc(const std::string &input, const std::string &key, const std::string &iv);
-std::string decrypt_aes_256_cbc(const std::string &input, const std::string &key, const std::string &iv);
+std::string cipher_generate_sha_256();
+std::string ciper_hmac(const std::string &input, const std::string &app_key);
+std::pair<std::string, std::string> cipher_generate_aes_key_iv(const std::string &input, const std::string &app_key);
+std::string cipher_encrypt(const std::string &input, const std::string &key, const std::string &iv);
+std::string cipher_decrypt(const std::string &input, const std::string &key, const std::string &iv);
 ```
 
 #### Usage
@@ -87,12 +87,12 @@ std::string decrypt_aes_256_cbc(const std::string &input, const std::string &key
 ```cpp
 #include <copper/components/cipher.hpp>
 
-auto [secret, iv] = cipher::generate_aes_key_iv();
+auto [secret, iv] = cipher_generate_aes_key_iv();
 
 auto input = "hello";
 
-auto encrypted = base64::encode(cipher::encrypt_aes_256_cbc(input, secret, iv));
-auto decrypted = cipher::decrypt_aes_256_cbc(base64::decode(encrypted), secret, iv);
+auto encrypted = base64::encode(cipher_encrypt(input, secret, iv));
+auto decrypted = cipher_decrypt(base64::decode(encrypted), secret, iv);
 
 assert(encrypted != input);
 assert(decrypted == input);

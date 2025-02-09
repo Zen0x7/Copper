@@ -11,14 +11,14 @@
 #include <string>
 #include <vector>
 
-namespace copper::components::cipher {
+namespace copper::components {
 
     /**
      * Generate SHA256 key
      *
      * @return std::string Output
      */
-    std::string generate_sha_256();
+    std::string cipher_generate_sha_256();
 
     /**
      * Get HMAC value of input
@@ -27,7 +27,7 @@ namespace copper::components::cipher {
      * @param app_key
      * @return std::string Output
      */
-    std::string hmac(
+    std::string cipher_hmac(
             const std::string &input,
             const std::string &app_key
     );
@@ -40,10 +40,10 @@ namespace copper::components::cipher {
     std::pair<
             std::string,
             std::string
-    > generate_aes_key_iv();
+    > cipher_generate_aes_key_iv();
 
     /**
-     * Encrypt using AES 256 CBC
+     * Encrypt
      * 
      * @param input 
      * @param key 
@@ -51,21 +51,21 @@ namespace copper::components::cipher {
      *
      * @return std::string Output
      */
-    std::string encrypt_aes_256_cbc(
+    std::string cipher_encrypt(
             const std::string &input,
             const std::string &key,
             const std::string &iv
     );
 
     /**
-     * Decrypt using AES 256 CBC
+     * Decrypt
      *
      * @param input
      * @param key
      * @param iv
      * @return std::string Output
      */
-    std::string decrypt_aes_256_cbc(
+    std::string cipher_decrypt(
             const std::string &input,
             const std::string &key,
             const std::string &iv

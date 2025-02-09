@@ -34,10 +34,10 @@ namespace copper::components {
             if (parts.size() == 3) {
                 std::string merged = parts[0] + "." + parts[1];
                 if (const std::string signature_
-                            = base64url::encode(cipher::hmac(merged, app_key), false);
+                            = base64url_encode(cipher_hmac(merged, app_key), false);
                         signature_ == parts[2]) {
                     boost::system::error_code ec;
-                    auto payload = boost::json::parse(base64url::decode(parts[1]), ec);
+                    auto payload = boost::json::parse(base64url_decode(parts[1]), ec);
 
                     if (!ec) {
                         std::map<std::string, std::string> rules = {
@@ -100,10 +100,10 @@ namespace copper::components {
                 {"iat", iat},
                 {"exp", exp},
         };
-        const std::string header_ = base64url::encode(serialize(header), false);
-        const std::string payload_ = base64url::encode(serialize(payload), false);
+        const std::string header_ = base64url_encode(serialize(header), false);
+        const std::string payload_ = base64url_encode(serialize(payload), false);
         const std::string signature_
-                = base64url::encode(cipher::hmac(header_ + "." + payload_, app_key), false);
+                = base64url_encode(cipher_hmac(header_ + "." + payload_, app_key), false);
         return header_ + "." + payload_ + "." + signature_;
     }
 
