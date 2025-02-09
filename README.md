@@ -209,8 +209,6 @@ std::string to_bearer(boost::uuids::uuid id, const std::string &app_key, const s
 ```cpp
 #include <copper/components/authenticator.hpp>
 
-auto expression = expression::from_string("/users/{user}");
-
 const boost::uuids::uuid id = boost::uuids::random_generator()();
 
 const std::string app_key = "sRgrihyQrBq59ltyxPW/azh9BzVN+vuA/K48BS7nJaw=";
