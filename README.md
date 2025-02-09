@@ -247,12 +247,12 @@ boost::beast::string_view get(boost::beast::string_view path);
 ```cpp
 #include <copper/components/filesystem/mime_type.hpp>
 
-auto value = filesystem::mime_type::get("app.json");
+auto value = filesystem::mime_type("app.json");
 
 assert(value == "application/json");
 ```
 
-*See more examples in the [test cases](/tests/components/filesystem/mime_type_test.cc).*
+*See more examples in the [test cases](/tests/components/mime_type_test.cc).*
 
 ### Normalized Path
 
@@ -273,12 +273,12 @@ std::string get(boost::beast::string_view base, boost::beast::string_view path);
 ```cpp
 #include <copper/components/filesystem/normalized_path.hpp>
 
-auto value = filesystem::normalized_path::get("/srv/app", "/manifest.json");
+auto value = filesystem::normalized_path("/srv/app", "/manifest.json");
 
 assert(value == "/srv/app/manifest.json");
 ```
 
-*See more examples in the [test cases](/tests/components/filesystem/normalized_path_test.cc).*
+*See more examples in the [test cases](/tests/components/normalized_path_test.cc).*
 
 ### Failure Report
 
@@ -304,5 +304,5 @@ boost::system::error_code ec;
 failures::report(ec, "All OK");
 ```
 
-*See more examples in the [test cases](/tests/components/failures/report_test.cc).*
+*See more examples in the [test cases](/tests/components/report_test.cc).*
 

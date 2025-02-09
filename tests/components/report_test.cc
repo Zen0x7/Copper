@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <copper/components/failures/report.hpp>
+#include <copper/components/report.hpp>
 
 
 TEST(Components_Failure_Report, Print) {
@@ -8,5 +8,5 @@ TEST(Components_Failure_Report, Print) {
 
     boost::system::error_code ec;
 
-    failure::fail(ec, "OK");
+    report(ec, "OK");
 }

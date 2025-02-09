@@ -40,7 +40,7 @@ if (BUILD_TESTS)
     fetchcontent_makeavailable(googletest)
 
     enable_testing()
-    add_executable(tests ${TESTS} ${SOURCES})
+    add_executable(tests ${SOURCES} ${TESTS})
     target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
     include(GoogleTest)
     gtest_discover_tests(tests)
