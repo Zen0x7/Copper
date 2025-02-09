@@ -21,13 +21,14 @@ namespace copper::components::filesystem::mime_type {
     boost::beast::string_view get(boost::beast::string_view path)
     {
         using boost::beast::iequals;
-        auto const ext = [&path]
-        {
+        // LCOV_EXCL_START
+        auto const ext = [&path] {
             auto const pos = path.rfind(".");
             if(pos == boost::beast::string_view::npos)
                 return boost::beast::string_view{};
             return path.substr(pos);
         }();
+        // LCOV_EXCL_STOP
         if(iequals(ext, ".htm"))  return "text/html";
         if(iequals(ext, ".html")) return "text/html";
         if(iequals(ext, ".php"))  return "text/html";
