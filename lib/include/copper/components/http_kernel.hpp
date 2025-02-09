@@ -19,15 +19,21 @@
 #endif
 
 namespace copper::components::http_kernel {
-    template <class Body, class Allocator>
+
+    template<class Body, class Allocator>
     boost::beast::http::message_generator handle(
             boost::beast::string_view doc_root,
-            boost::beast::http::request<Body, boost::beast::http::basic_fields<Allocator>>&& req)
-    {
+            boost::beast::http::request<
+                    Body,
+                    boost::beast::http::basic_fields<
+                            Allocator
+                    >
+            > &&req
+    ) {
         auto const bad_request =
-                [&req](boost::beast::string_view why)
-                {
-                    boost::beast::http::response<boost::beast::http::string_body> res{boost::beast::http::status::bad_request, req.version()};
+                [&req](boost::beast::string_view why) {
+                    boost::beast::http::response<boost::beast::http::string_body> res{
+                            boost::beast::http::status::bad_request, req.version()};
                     res.set(boost::beast::http::field::server, HTTP_SERVER_HEADER_CONTENT);
                     res.set(boost::beast::http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
@@ -37,9 +43,9 @@ namespace copper::components::http_kernel {
                 };
 
         auto const not_found =
-                [&req](boost::beast::string_view target)
-                {
-                    boost::beast::http::response<boost::beast::http::string_body> res{boost::beast::http::status::not_found, req.version()};
+                [&req](boost::beast::string_view target) {
+                    boost::beast::http::response<boost::beast::http::string_body> res{
+                            boost::beast::http::status::not_found, req.version()};
                     res.set(boost::beast::http::field::server, HTTP_SERVER_HEADER_CONTENT);
                     res.set(boost::beast::http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
@@ -49,9 +55,9 @@ namespace copper::components::http_kernel {
                 };
 
         auto const server_error =
-                [&req](boost::beast::string_view what)
-                {
-                    boost::beast::http::response<boost::beast::http::string_body> res{boost::beast::http::status::internal_server_error, req.version()};
+                [&req](boost::beast::string_view what) {
+                    boost::beast::http::response<boost::beast::http::string_body> res{
+                            boost::beast::http::status::internal_server_error, req.version()};
                     res.set(boost::beast::http::field::server, HTTP_SERVER_HEADER_CONTENT);
                     res.set(boost::beast::http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
@@ -60,34 +66,34 @@ namespace copper::components::http_kernel {
                     return res;
                 };
 
-        if( req.method() != boost::beast::http::verb::get &&
+        if (req.method() != boost::beast::http::verb::get &&
             req.method() != boost::beast::http::verb::head)
             return bad_request("Unknown HTTP-method");
 
-        if( req.target().empty() ||
+        if (req.target().empty() ||
             req.target()[0] != '/' ||
             req.target().find("..") != boost::beast::string_view::npos)
             return bad_request("Illegal request-target");
 
         std::string path = normalized_path(doc_root, req.target());
-        if(req.target().back() == '/')
+        if (req.target().back() == '/')
             path.append("index.html");
 
         boost::beast::error_code ec;
         boost::beast::http::file_body::value_type body;
         body.open(path.c_str(), boost::beast::file_mode::scan, ec);
 
-        if(ec == boost::beast::errc::no_such_file_or_directory)
+        if (ec == boost::beast::errc::no_such_file_or_directory)
             return not_found(req.target());
 
-        if(ec)
+        if (ec)
             return server_error(ec.message());
 
         auto const size = body.size();
 
-        if(req.method() == boost::beast::http::verb::head)
-        {
-            boost::beast::http::response<boost::beast::http::empty_body> res{boost::beast::http::status::ok, req.version()};
+        if (req.method() == boost::beast::http::verb::head) {
+            boost::beast::http::response<boost::beast::http::empty_body> res{boost::beast::http::status::ok,
+                                                                             req.version()};
             res.set(boost::beast::http::field::server, HTTP_SERVER_HEADER_CONTENT);
             res.set(boost::beast::http::field::content_type, mime_type(path));
             res.content_length(size);

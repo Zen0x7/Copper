@@ -18,5 +18,7 @@ namespace copper::components {
      * @param path
      * @return std::string Output
      */
-    boost::beast::string_view mime_type(boost::beast::string_view path);
+    boost::beast::string_view mime_type(
+            boost::beast::string_view path
+    );
 }

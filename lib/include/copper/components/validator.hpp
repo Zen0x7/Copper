@@ -25,7 +25,10 @@ namespace copper::components::validator {
          * @param key
          * @param message
          */
-        void insert_or_push(const std::string &key, const std::string &message);
+        void insert_or_push(
+                const std::string &key,
+                const std::string &message
+        );
 
         /**
          * Constructor
@@ -40,7 +43,15 @@ namespace copper::components::validator {
      * @param value
      * @return boost::shared_ptr<instance> Instance
      */
-    boost::shared_ptr<instance> make(const std::map<std::string, std::string> &rules, const boost::json::value &value);
+    boost::shared_ptr<
+            instance
+    > make(
+            const std::map<
+                    std::string,
+                    std::string
+            > &rules,
+            const boost::json::value &value
+    );
 
 }  // namespace copper::components::validator
 

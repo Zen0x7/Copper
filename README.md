@@ -211,22 +211,22 @@ std::string to_bearer(boost::uuids::uuid id, const std::string &app_key, const s
 #### Usage
 
 ```cpp
-#include <copper/components/authenticator.hpp>
+#include <copper/components/authentication.hpp>
 
 const boost::uuids::uuid id = boost::uuids::random_generator()();
 
 const std::string app_key = "sRgrihyQrBq59ltyxPW/azh9BzVN+vuA/K48BS7nJaw=";
 
-const std::string bearer = authenticator::to_bearer(id, base64::decode(app_key), "user");
+const std::string bearer = authentication_to_bearer(id, base64::decode(app_key), "user");
 
-auto result = authenticator::from_bearer(bearer, base64::decode(app_key));
+auto result = authentication_from_bearer(bearer, base64::decode(app_key));
 
 assert(result.has_value())
 assert(result.value().id == id)
 assert(result.value().type == "user");
 ```
 
-*See more examples in the [test cases](/tests/components/authenticator_test.cc).*
+*See more examples in the [test cases](/tests/components/authentication_test.cc).*
 
 ### MIME Type
 

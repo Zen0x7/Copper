@@ -6,23 +6,54 @@
 
 namespace copper::components {
 
-    class websocket_session : public boost::enable_shared_from_this<websocket_session>
-    {
-        boost::beast::websocket::stream<boost::beast::tcp_stream> ws_;
+    class websocket_session : public boost::enable_shared_from_this<websocket_session> {
+
+        /**
+         * Stream
+         */
+        boost::beast::websocket::stream<
+                boost::beast::tcp_stream
+        > ws_;
+
+        /**
+         * Buffer
+         */
         boost::beast::flat_buffer buffer_;
 
     public:
-        explicit websocket_session(boost::asio::ip::tcp::socket&& socket) : ws_(std::move(socket))
-        { }
 
-        template<class Body, class Allocator>
-        void do_accept(boost::beast::http::request<Body, boost::beast::http::basic_fields<Allocator>> req)
-        {
+        /**
+         * Constructor
+         *
+         * @param socket
+         */
+        explicit websocket_session(
+                boost::asio::ip::tcp::socket &&socket
+        );
+
+        /**
+         * Invoke accept
+         *
+         * @tparam Body
+         * @tparam Allocator
+         * @param req
+         */
+        template<
+                class Body,
+                class Allocator
+        >
+        void do_accept(
+                boost::beast::http::request<
+                        Body,
+                        boost::beast::http::basic_fields<
+                                Allocator
+                        >
+                > req
+        ) {
             ws_.set_option(boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::server));
 
             ws_.set_option(boost::beast::websocket::stream_base::decorator(
-                    [](boost::beast::websocket::response_type& res)
-                    {
+                    [](boost::beast::websocket::response_type &res) {
                         res.set(boost::beast::http::field::server,
                                 std::string(BOOST_BEAST_VERSION_STRING) +
                                 " advanced-server");
@@ -32,43 +63,40 @@ namespace copper::components {
         }
 
     private:
-        void on_accept(boost::beast::error_code ec)
-        {
-            if(ec)
-                return report(ec, "accept");
 
-            do_read();
-        }
+        /**
+         * Accept callback
+         *
+         * @param ec
+         */
+        void on_accept(
+                boost::beast::error_code ec
+        );
 
-        void do_read()
-        {
-            ws_.async_read(buffer_, boost::beast::bind_front_handler(&websocket_session::on_read, shared_from_this()));
-        }
+        /**
+         * Invoke read
+         */
+        void do_read();
 
-        void on_read(boost::beast::error_code ec, std::size_t bytes_transferred)
-        {
-            boost::ignore_unused(bytes_transferred);
+        /**
+         * Read callback
+         *
+         * @param ec
+         * @param bytes_transferred
+         */
+        void on_read(
+                boost::beast::error_code ec,
+                std::size_t bytes_transferred
+        );
 
-            if(ec == boost::beast::websocket::error::closed)
-                return;
-
-            if(ec)
-                report(ec, "read");
-
-            ws_.text(ws_.got_text());
-            ws_.async_write(buffer_.data(),boost::beast::bind_front_handler(&websocket_session::on_write, shared_from_this()));
-        }
-
-        void on_write(boost::beast::error_code ec, std::size_t bytes_transferred)
-        {
-            boost::ignore_unused(bytes_transferred);
-
-            if(ec)
-                return report(ec, "write");
-
-            buffer_.consume(buffer_.size());
-
-            do_read();
-        }
+        /**
+         * Write callback
+         * @param ec
+         * @param bytes_transferred
+         */
+        void on_write(
+                boost::beast::error_code ec,
+                std::size_t bytes_transferred
+        );
     };
 }

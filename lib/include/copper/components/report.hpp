@@ -18,5 +18,8 @@
 #endif
 
 namespace copper::components {
-    void report(boost::beast::error_code ec, char const* what);
+    void report(
+            boost::beast::error_code ec,
+            char const *what
+    );
 }

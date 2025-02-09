@@ -10,27 +10,130 @@
 namespace copper::components::expression {
 
     class result : public std::enable_shared_from_this<result> {
+        /**
+         * Matches flag
+         */
         bool matches_;
-        std::unordered_map<std::string, std::string> bindings_;
+
+        /**
+         * Bindings
+         */
+        std::unordered_map<
+                std::string,
+                std::string
+        > bindings_;
 
     public:
-        result(bool matches, const std::unordered_map<std::string, std::string> &bindings);
+
+        /**
+         * Constructor
+         *
+         * @param matches
+         * @param bindings
+         */
+        result(
+                bool matches,
+                const std::unordered_map<
+                        std::string,
+                        std::string
+                > &bindings
+        );
+
+        /**
+         * Retrieves if matches
+         *
+         * @return
+         */
         bool matches() const;
-        std::unordered_map<std::string, std::string> get_bindings() const;
-        std::string get(const std::string &name) const;
+
+        /**
+         * Retrieves the bindings
+         *
+         * @return
+         */
+        std::unordered_map<
+                std::string,
+                std::string
+        > get_bindings() const;
+
+        /**
+         * Retrieves the value of attribute
+         *
+         * @param name
+         * @return
+         */
+        std::string get(
+                const std::string &name
+        ) const;
     };
 
     class instance : public std::enable_shared_from_this<instance> {
+
+        /**
+         * Regex expression
+         */
         std::string regex_;
-        std::vector<std::string> arguments_;
+
+        /**
+         * Arguments
+         */
+        std::vector<
+                std::string
+        > arguments_;
 
     public:
-        instance(std::string regex, const std::vector<std::string> &arguments);
-        std::vector<std::string> get_arguments() const;
+
+        /**
+         * Constructor
+         *
+         * @param regex
+         * @param arguments
+         */
+        instance(
+                std::string regex,
+                const std::vector<
+                        std::string
+                > &arguments
+        );
+
+        /**
+         * Retrieves arguments
+         *
+         * @return
+         */
+        std::vector<
+                std::string
+        > get_arguments() const;
+
+        /**
+         * Retrieves regex expression
+         * @return
+         */
         std::string get_regex() const;
-        boost::shared_ptr<result> query(const std::string &input) const;
+
+        /**
+         * Retrieves a result
+         *
+         * @param input
+         * @return
+         */
+        boost::shared_ptr<
+                result
+        > query(
+                const std::string &input
+        ) const;
     };
 
-    boost::shared_ptr<instance> from_string(const std::string &input);
+    /**
+     * Factory
+     *
+     * @param input
+     * @return
+     */
+    boost::shared_ptr<
+            instance
+    > from_string(
+            const std::string &input
+    );
 
 }  // namespace copper::components::expressions

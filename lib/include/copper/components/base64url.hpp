@@ -12,7 +12,10 @@ namespace copper::components::base64url {
      * @param padding
      * @return std::string Encoded output
      */
-    std::string encode(const std::string &input, bool padding = true);
+    std::string encode(
+            const std::string &input,
+            bool padding = true
+    );
 
     /**
      * Converts from Base64url to string
@@ -20,7 +23,9 @@ namespace copper::components::base64url {
      * @param input
      * @return std::string Decoded output
      */
-    std::string decode(const std::string &input);
+    std::string decode(
+            const std::string &input
+    );
 
     /**
      * Chars used on Base64url encode

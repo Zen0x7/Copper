@@ -5,16 +5,27 @@
 
 namespace copper::components::validator {
 
-    void instance::insert_or_push(const std::string &key, const std::string &message) {
+    void instance::insert_or_push(
+            const std::string &key,
+            const std::string &message
+    ) {
         if (!this->errors.contains(key)) this->errors[key] = boost::json::array({});
 
         this->errors.at(key).as_array().emplace_back(message);
     }
 
-    boost::shared_ptr<instance> make(const std::map<std::string, std::string>& rules, const boost::json::value& value) {
+    boost::shared_ptr<
+            instance
+    > make(
+            const std::map<
+                    std::string,
+                    std::string
+            > &rules,
+            const boost::json::value &value
+    ) {
         auto response = boost::make_shared<instance>();
 
-        for (auto& rule : rules) {
+        for (auto &rule: rules) {
             if (rule.first == "*") {
                 if (!value.is_object()) {
                     const std::string error_message = "Message must be an JSON object.";
@@ -38,7 +49,7 @@ namespace copper::components::validator {
                     }
                     scoped_rules.push_back(rule.second.substr(start));
 
-                    for (auto& scoped_rule : scoped_rules) {
+                    for (auto &scoped_rule: scoped_rules) {
                         if (scoped_rule == "is_string") {
                             if (!value.as_object().at(rule.first).is_string()) {
                                 std::string error_message = "Attribute " + rule.first + " must be string.";
@@ -52,7 +63,7 @@ namespace copper::components::validator {
                                 try {
                                     boost::lexical_cast<boost::uuids::uuid>(
                                             value.as_object().at(rule.first).as_string().data());
-                                } catch (boost::bad_lexical_cast& exp) {
+                                } catch (boost::bad_lexical_cast &exp) {
                                     std::string error_message = "Attribute " + rule.first + " must be uuid.";
                                     response->insert_or_push(rule.first, error_message);
                                 }
@@ -98,7 +109,7 @@ namespace copper::components::validator {
                                     response->insert_or_push(rule.first, error_message);
                                 } else {
                                     size_t i = 0;
-                                    for (const auto& element : elements) {
+                                    for (const auto &element: elements) {
                                         if (!element.is_string()) {
                                             std::string error_message = "Attribute " + rule.first + " at position "
                                                                         + std::to_string(i) + " must be string.";
@@ -116,6 +127,7 @@ namespace copper::components::validator {
 
         response->success = response->errors.empty();
 
-        return response; }
+        return response;
+    }
 
 }
