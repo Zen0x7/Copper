@@ -280,3 +280,29 @@ assert(value == "/srv/app/manifest.json");
 
 *See more examples in the [test cases](/tests/components/filesystem/normalized_path_test.cc).*
 
+### Failure Report
+
+Provides error reporting with stacktrace.
+
+#### Location
+
+> copper/components/failures/report.hpp
+
+#### API
+
+```cpp
+void fail(boost::beast::error_code ec, char const* what)
+```
+
+#### Usage
+
+```cpp
+#include <copper/components/failures/report.hpp>
+
+boost::system::error_code ec;
+
+failures::report(ec, "All OK");
+```
+
+*See more examples in the [test cases](/tests/components/failures/report_test.cc).*
+
