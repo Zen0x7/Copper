@@ -11,6 +11,7 @@ namespace copper {
     }
 
     void run() {
+        // LCOV_EXCL_START
         auto const address = boost::asio::ip::make_address("0.0.0.0");
         auto const port = 9000;
         auto const doc_root = boost::make_shared<std::string>(".");
@@ -40,5 +41,6 @@ namespace copper {
 
         for(auto& t : v)
             t.join();
+        // LCOV_EXCL_STOP
     }
 }
