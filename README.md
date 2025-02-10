@@ -280,7 +280,7 @@ assert(value == "/srv/app/manifest.json");
 
 *See more examples in the [test cases](/tests/components/normalized_path_test.cc).*
 
-### Failure Report
+### Report
 
 Provides error reporting with stacktrace.
 
