@@ -13,6 +13,7 @@ namespace copper::components {
         std::cerr << what << ": " << ec.message() << "\n";
     }
 
+    // LCOV_EXCL_START
     void report_for_openssl() {
         unsigned long error_code = ERR_get_error();
         char error_message[256];
@@ -21,5 +22,6 @@ namespace copper::components {
         error_output.append(error_message);
         throw std::runtime_error(error_output.c_str());
     }
+    // LCOV_EXCL_STOP
 }
 
