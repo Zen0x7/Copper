@@ -22,7 +22,7 @@ namespace copper::components::http_kernel {
 
     template<class Body, class Allocator>
     boost::beast::http::message_generator handle(
-            boost::beast::string_view doc_root,
+            boost::beast::string_view,
             boost::beast::http::request<
                     Body,
                     boost::beast::http::basic_fields<

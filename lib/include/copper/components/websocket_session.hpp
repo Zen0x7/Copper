@@ -17,7 +17,7 @@ namespace copper::components {
             Stream& stream,
             boost::beast::flat_buffer& buffer,
             boost::beast::http::request<boost::beast::http::string_body> req,
-            boost::beast::string_view doc_root)
+            boost::beast::string_view)
     {
         auto cs = co_await boost::asio::this_coro::cancellation_state;
         auto ws = boost::beast::websocket::stream<Stream&>{ stream };
