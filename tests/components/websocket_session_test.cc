@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <copper/components/tcp_listener.hpp>
+#include <copper/components/certificates.hpp>
+#include <copper/components/task_group.hpp>
+#include <copper/components/listener.hpp>
+#include <copper/components/signal_handler.hpp>
 
 
 TEST(Components_WebSocket_Session, Client) {
@@ -8,58 +12,77 @@ TEST(Components_WebSocket_Session, Client) {
 
     auto const address = boost::asio::ip::make_address("0.0.0.0");
     auto const port = 9000;
-    auto const doc_root = boost::make_shared<std::string>(".");
-    auto const threads = 1;
+    auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
+    auto const doc_root = std::string_view{"."};
 
-    boost::asio::io_context ioc{threads};
-    boost::asio::io_context client_ioc{threads};
+    boost::asio::io_context ioc;
 
-    auto listener = boost::make_shared<tcp_listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, doc_root);
+    boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
 
-    listener->run();
+    load_server_certificate(ctx);
 
-    std::thread thread([&]() {
-        ioc.run();
-    });
+    task_group task_group{ioc.get_executor()};
 
-    thread.detach();
+    boost::asio::co_spawn(
+            boost::asio::make_strand(ioc),
+            listener(task_group, ctx, endpoint, doc_root),
+            task_group.adapt(
+                    [](std::exception_ptr e) {
+                        if (e) {
+                            try {
+                                std::rethrow_exception(e);
+                            }
+                            catch (std::exception &e) {
+                                std::cerr << "Error in listener: " << e.what() << "\n";
+                            }
+                        }
+                    }));
 
-    sleep(1);
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), signal_handler(task_group), boost::asio::detached);
 
-    boost::asio::ip::tcp::resolver resolver(client_ioc);
-    boost::beast::tcp_stream stream(client_ioc);
+    boost::asio::io_context client_ioc;
 
-    std::string host = "0.0.0.0";
-    auto const results = resolver.resolve(host, "9000");
-    stream.connect(results);
-
-    boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws{ioc};
-
-    auto ep = boost::asio::connect(ws.next_layer(), results);
-
-    host += ':' + std::to_string(ep.port());
-
-    ws.set_option(boost::beast::websocket::stream_base::decorator(
-            [](boost::beast::websocket::request_type &req) {
-                req.set(boost::beast::http::field::user_agent, "Copper");
-            }));
-
-    ws.handshake(host, "/");
-
-    ws.write(boost::asio::buffer(std::string("hello")));
-
-    boost::beast::flat_buffer buffer;
-
-    ws.read(buffer);
-
-    ws.close(boost::beast::websocket::close_code::normal);
-
-    std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
 
     try {
+        std::thread thread([&]() {
+            try {
+                ioc.run();
+            } catch (std::exception &e) {
+
+            }
+        });
+
+        thread.detach();
+
+        sleep(3);
+
+        boost::asio::ip::tcp::resolver resolver(client_ioc);
+
+        std::string host = "127.0.0.1";
+        auto const results = resolver.resolve(host, "9000");
+
+        boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws{client_ioc};
+
+        auto ep = boost::asio::connect(ws.next_layer(), results);
+
+        host += ':' + std::to_string(ep.port());
+
+        ws.set_option(boost::beast::websocket::stream_base::decorator(
+                [](boost::beast::websocket::request_type &req) {
+                    req.set(boost::beast::http::field::user_agent, "Copper");
+                }));
+
+        ws.handshake(host, "/");
+        ws.write(boost::asio::buffer(std::string("hello")));
+        boost::beast::flat_buffer buffer;
+        ws.read(buffer);
+        ws.close(boost::beast::websocket::close_code::normal);
+        std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
+        task_group.emit(boost::asio::cancellation_type::all);
+        sleep(1);
         ioc.stop();
         thread.join();
-    } catch (std::exception &e) {
+    } catch (std::exception const &e) {
 
     }
 }

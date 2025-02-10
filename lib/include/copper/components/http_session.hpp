@@ -18,115 +18,46 @@
 
 namespace copper::components {
 
-    class http_session : public boost::enable_shared_from_this<http_session> {
+    template<typename Stream>
+    boost::asio::awaitable<void, boost::asio::strand<boost::asio::io_context::executor_type>>
+    http_session_run(
+            Stream& stream,
+            boost::beast::flat_buffer& buffer,
+            boost::beast::string_view doc_root)
+    {
+        auto cs = co_await boost::asio::this_coro::cancellation_state;
 
-        /**
-         * Stream
-         */
-        boost::beast::tcp_stream stream_;
+        while(!cs.cancelled())
+        {
+            boost::beast::http::request_parser<boost::beast::http::string_body> parser;
+            parser.body_limit(10000);
 
-        /**
-         * Buffer
-         */
-        boost::beast::flat_buffer buffer_;
+            auto [ec, _] =
+                    co_await boost::beast::http::async_read(stream, buffer, parser, boost::asio::as_tuple);
 
-        /**
-         * Root path
-         */
-        boost::shared_ptr<
-                std::string const
-        > doc_root_;
+            if(ec == boost::beast::http::error::end_of_stream)
+                co_return;
 
-        /**
-         * Queue limit
-         */
-        static constexpr std::size_t queue_limit = 64;
+            if(boost::beast::websocket::is_upgrade(parser.get()))
+            {
+                // The websocket::stream uses its own timeout settings.
+                boost::beast::get_lowest_layer(stream).expires_never();
 
-        /**
-         * Response queue
-         */
-        std::queue<
-                boost::beast::http::message_generator
-        > response_queue_;
+                co_await websocket_session_run(
+                        stream, buffer, parser.release(), doc_root);
 
-        /**
-         * Parser
-         */
-        boost::optional<
-                boost::beast::http::request_parser<
-                        boost::beast::http::string_body
-                >
-        > parser_;
+                co_return;
+            }
 
-    public:
+            auto res = http_kernel::handle(doc_root, parser.release());
 
-        /**
-         * Constructor
-         *
-         * @param socket
-         * @param doc_root
-         */
-        http_session(
-                boost::asio::ip::tcp::socket &&socket,
-                boost::shared_ptr<
-                        std::string const
-                > const &doc_root
-        );
+            if(!res.keep_alive())
+            {
+                co_await boost::beast::async_write(stream, std::move(res));
+                co_return;
+            }
 
-        /**
-         * Run
-         */
-        void run();
-
-    private:
-
-        /**
-         * Invoke read
-         */
-        void do_read();
-
-        /**
-         * Read callback
-         *
-         * @param ec
-         * @param bytes_transferred
-         */
-        void on_read(
-                boost::beast::error_code ec,
-                std::size_t bytes_transferred
-        );
-
-        /**
-         * Write
-         *
-         * @param response
-         */
-        void queue_write(
-                boost::beast::http::message_generator response
-        );
-
-        /**
-         * Invoke write
-         */
-        void do_write();
-
-        /**
-         * Write callback
-         *
-         * @param keep_alive
-         * @param ec
-         * @param bytes_transferred
-         */
-        void on_write(
-                bool keep_alive,
-                boost::beast::error_code ec,
-                std::size_t bytes_transferred
-        );
-
-        /**
-         * Close
-         */
-        void do_close();
-    };
-
+            co_await boost::beast::async_write(stream, std::move(res));
+        }
+    }
 }
