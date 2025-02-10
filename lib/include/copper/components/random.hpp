@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace copper::components::random {
+namespace copper::components {
 
     /**
      * Generate a random string
@@ -10,6 +10,8 @@ namespace copper::components::random {
      * @param size
      * @return
      */
-    std::string string(int size = 16);
+    std::string random_string(
+            int size = 16
+    );
 
-}  // namespace copper::components::strong
+}  // namespace copper::component

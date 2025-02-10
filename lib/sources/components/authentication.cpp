@@ -1,4 +1,4 @@
-#include <copper/components/authenticator.hpp>
+#include <copper/components/authentication.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/json.hpp>
@@ -9,9 +9,14 @@
 #include <copper/components/cipher.hpp>
 #include <copper/components/validator.hpp>
 
-namespace copper::components::authenticator {
+namespace copper::components {
 
-    boost::optional<result> from_bearer(const std::string &bearer, const std::string &app_key) {
+    boost::optional<
+            authentication_result
+    > authentication_from_bearer(
+            const std::string &bearer,
+            const std::string &app_key
+    ) {
         if (bearer != "") {
             std::string token = boost::starts_with(bearer, "Bearer ") ? bearer.substr(7) : bearer;
 
@@ -29,10 +34,10 @@ namespace copper::components::authenticator {
             if (parts.size() == 3) {
                 std::string merged = parts[0] + "." + parts[1];
                 if (const std::string signature_
-                            = base64url::encode(cipher::hmac(merged, app_key), false);
+                            = base64url_encode(cipher_hmac(merged, app_key), false);
                         signature_ == parts[2]) {
                     boost::system::error_code ec;
-                    auto payload = boost::json::parse(base64url::decode(parts[1]), ec);
+                    auto payload = boost::json::parse(base64url_decode(parts[1]), ec);
 
                     if (!ec) {
                         std::map<std::string, std::string> rules = {
@@ -43,7 +48,7 @@ namespace copper::components::authenticator {
                                 {"exp", "is_number"},
                         };
 
-                        if (auto instance = validator::make(rules, payload); instance->success) {
+                        if (auto instance = validator_make(rules, payload); instance->success) {
                             const std::string id{payload.as_object().at("sub").as_string()};
                             const std::string type{payload.as_object().at("typ").as_string()};
                             auto expires_at_ = payload.as_object().at("exp").as_int64();
@@ -60,7 +65,7 @@ namespace copper::components::authenticator {
                             }
                             // LCOV_EXCL_STOP
 
-                            return result{
+                            return authentication_result {
                                     .id = id_,
                                     .type = type,
                             };
@@ -69,9 +74,14 @@ namespace copper::components::authenticator {
                 }
             }
         }
-        return boost::none; }
+        return boost::none;
+    }
 
-    std::string to_bearer(const boost::uuids::uuid id, const std::string &app_key, const std::string &type) {
+    std::string authentication_to_bearer(
+            const boost::uuids::uuid id,
+            const std::string &app_key,
+            const std::string &type
+    ) {
         const boost::json::object header = {
                 {"alg", "HS256"},
                 {"typ", "JWT"},
@@ -90,10 +100,11 @@ namespace copper::components::authenticator {
                 {"iat", iat},
                 {"exp", exp},
         };
-        const std::string header_ = base64url::encode(serialize(header), false);
-        const std::string payload_ = base64url::encode(serialize(payload), false);
+        const std::string header_ = base64url_encode(serialize(header), false);
+        const std::string payload_ = base64url_encode(serialize(payload), false);
         const std::string signature_
-                = base64url::encode(cipher::hmac(header_ + "." + payload_, app_key), false);
-        return header_ + "." + payload_ + "." + signature_; }
+                = base64url_encode(cipher_hmac(header_ + "." + payload_, app_key), false);
+        return header_ + "." + payload_ + "." + signature_;
+    }
 
 }  // namespace copper::components::authenticator

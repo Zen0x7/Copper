@@ -9,6 +9,8 @@
 
 namespace copper {
     std::string get_version();
+
+    void run();
 }
 
 #endif // COPPER_APP_HPP

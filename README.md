@@ -19,8 +19,8 @@ Provides optimized Base64 encode and decode algorithms.
 #### API
 
 ```cpp
-std::string encode(const std::string &input, bool padding = true);
-std::string decode(const std::string &input);
+std::string base64_encode(const std::string &input, bool padding = true);
+std::string base64_decode(const std::string &input);
 ```
 
 #### Usage
@@ -28,8 +28,8 @@ std::string decode(const std::string &input);
 ```cpp
 #include <copper/components/base64.hpp>
 
-auto encoded = base64::encode("hello");
-auto decoded = base64::decode(encoded); 
+auto encoded = base64_encode("hello");
+auto decoded = base64_decode(encoded); 
 
 assert(decoded.data() == "hello");
 ```
@@ -47,8 +47,8 @@ Provides optimized Base64url encode and decode algorithms.
 #### API
 
 ```cpp
-std::string encode(const std::string &input, bool padding = true);
-std::string decode(const std::string &input);
+std::string base64url_encode(const std::string &input, bool padding = true);
+std::string base64url_decode(const std::string &input);
 ```
 
 #### Usage
@@ -56,8 +56,8 @@ std::string decode(const std::string &input);
 ```cpp
 #include <copper/components/base64url.hpp>
 
-auto encoded = base64url::encode("hello");
-auto decoded = base64url::decode(encoded); 
+auto encoded = base64url_encode("hello");
+auto decoded = base64url_decode(encoded); 
 
 assert(decoded == "hello");
 ```
@@ -75,11 +75,11 @@ Provides HMAC and AES-256-CBC encryption and decryption algorithms.
 #### API
 
 ```cpp
-std::string generate_sha_256();
-std::string hmac(const std::string &input, const std::string &app_key);
-std::pair<std::string, std::string> generate_aes_key_iv(const std::string &input, const std::string &app_key);
-std::string encrypt_aes_256_cbc(const std::string &input, const std::string &key, const std::string &iv);
-std::string decrypt_aes_256_cbc(const std::string &input, const std::string &key, const std::string &iv);
+std::string cipher_generate_sha_256();
+std::string ciper_hmac(const std::string &input, const std::string &app_key);
+std::pair<std::string, std::string> cipher_generate_aes_key_iv(const std::string &input, const std::string &app_key);
+std::string cipher_encrypt(const std::string &input, const std::string &key, const std::string &iv);
+std::string cipher_decrypt(const std::string &input, const std::string &key, const std::string &iv);
 ```
 
 #### Usage
@@ -87,12 +87,12 @@ std::string decrypt_aes_256_cbc(const std::string &input, const std::string &key
 ```cpp
 #include <copper/components/cipher.hpp>
 
-auto [secret, iv] = cipher::generate_aes_key_iv();
+auto [secret, iv] = cipher_generate_aes_key_iv();
 
 auto input = "hello";
 
-auto encrypted = base64::encode(cipher::encrypt_aes_256_cbc(input, secret, iv));
-auto decrypted = cipher::decrypt_aes_256_cbc(base64::decode(encrypted), secret, iv);
+auto encrypted = base64::encode(cipher_encrypt(input, secret, iv));
+auto decrypted = cipher_decrypt(base64::decode(encrypted), secret, iv);
 
 assert(encrypted != input);
 assert(decrypted == input);
@@ -127,7 +127,7 @@ std::map<std::string, std::string> rules = {
 std::string json = R"({"username":"zen0x7"})"
 auto value = boost::json::parse(json);
 
-auto response = validator::make(rules, value);
+auto response = validator_make(rules, value);
 
 assert(response->success);
 ```
@@ -145,7 +145,7 @@ Provides random data generation algorithms.
 #### API
 
 ```cpp
-std::string random(int size);
+std::string random_string(int size);
 ```
 
 #### Usage
@@ -153,7 +153,7 @@ std::string random(int size);
 ```cpp
 #include <copper/components/random.hpp>
 
-auto string = random::string(32);
+auto string = random_string(32);
 
 assert(string.length() == 32);
 ```
@@ -182,7 +182,7 @@ std::string result::get(const std::string &name);
 ```cpp
 #include <copper/components/expression.hpp>
 
-auto expression = expression::from_string("/users/{user}");
+auto expression = expression_make("/users/{user}");
 
 auto result = expression->query("/users/7");
 
@@ -203,30 +203,30 @@ Provides JWT issue and decoding algorithms.
 #### API
 
 ```cpp
-boost::optional<result> from_bearer(const std::string &bearer, const std::string &app_key);
+boost::optional<result> authentication_from_bearer(const std::string &bearer, const std::string &app_key);
 
-std::string to_bearer(boost::uuids::uuid id, const std::string &app_key, const std::string &type = "App\\Models\\User");
+std::string authentication_to_bearer(boost::uuids::uuid id, const std::string &app_key, const std::string &type = "App\\Models\\User");
 ```
 
 #### Usage
 
 ```cpp
-#include <copper/components/authenticator.hpp>
+#include <copper/components/authentication.hpp>
 
 const boost::uuids::uuid id = boost::uuids::random_generator()();
 
 const std::string app_key = "sRgrihyQrBq59ltyxPW/azh9BzVN+vuA/K48BS7nJaw=";
 
-const std::string bearer = authenticator::to_bearer(id, base64::decode(app_key), "user");
+const std::string bearer = authentication_to_bearer(id, base64::decode(app_key), "user");
 
-auto result = authenticator::from_bearer(bearer, base64::decode(app_key));
+auto result = authentication_from_bearer(bearer, base64::decode(app_key));
 
 assert(result.has_value())
 assert(result.value().id == id)
 assert(result.value().type == "user");
 ```
 
-*See more examples in the [test cases](/tests/components/authenticator_test.cc).*
+*See more examples in the [test cases](/tests/components/authentication_test.cc).*
 
 ### MIME Type
 
@@ -234,25 +234,25 @@ Provides MIME recognition algorithm.
 
 #### Location
 
-> copper/components/filesystem/mime_type.hpp
+> copper/components/mime_type.hpp
 
 #### API
 
 ```cpp
-boost::beast::string_view get(boost::beast::string_view path);
+boost::beast::string_view mime_type(boost::beast::string_view path);
 ```
 
 #### Usage
 
 ```cpp
-#include <copper/components/filesystem/mime_type.hpp>
+#include <copper/components/mime_type.hpp>
 
-auto value = filesystem::mime_type::get("app.json");
+auto value = mime_type("app.json");
 
 assert(value == "application/json");
 ```
 
-*See more examples in the [test cases](/tests/components/filesystem/mime_type_test.cc).*
+*See more examples in the [test cases](/tests/components/mime_type_test.cc).*
 
 ### Normalized Path
 
@@ -260,49 +260,49 @@ Provides MIME recognition algorithm.
 
 #### Location
 
-> copper/components/filesystem/normalized_path.hpp
+> copper/components/normalized_path.hpp
 
 #### API
 
 ```cpp
-std::string get(boost::beast::string_view base, boost::beast::string_view path);
+std::string normalized_path(boost::beast::string_view base, boost::beast::string_view path);
 ```
 
 #### Usage
 
 ```cpp
-#include <copper/components/filesystem/normalized_path.hpp>
+#include <copper/components/normalized_path.hpp>
 
-auto value = filesystem::normalized_path::get("/srv/app", "/manifest.json");
+auto value = normalized_path("/srv/app", "/manifest.json");
 
 assert(value == "/srv/app/manifest.json");
 ```
 
-*See more examples in the [test cases](/tests/components/filesystem/normalized_path_test.cc).*
+*See more examples in the [test cases](/tests/components/normalized_path_test.cc).*
 
-### Failure Report
+### Report
 
 Provides error reporting with stacktrace.
 
 #### Location
 
-> copper/components/failures/report.hpp
+> copper/components/report.hpp
 
 #### API
 
 ```cpp
-void fail(boost::beast::error_code ec, char const* what)
+void report(boost::beast::error_code ec, char const* what)
 ```
 
 #### Usage
 
 ```cpp
-#include <copper/components/failures/report.hpp>
+#include <copper/components/report.hpp>
 
 boost::system::error_code ec;
 
-failures::report(ec, "All OK");
+report(ec, "All OK");
 ```
 
-*See more examples in the [test cases](/tests/components/failures/report_test.cc).*
+*See more examples in the [test cases](/tests/components/report_test.cc).*
 

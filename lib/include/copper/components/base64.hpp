@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-namespace copper::components::base64 {
+namespace copper::components {
 
     /**
      * Converts from string to Base64
@@ -12,7 +12,10 @@ namespace copper::components::base64 {
      * @param padding
      * @return std::string Encoded output
      */
-    std::string encode(const std::string &input, bool padding = true);
+    std::string base64_encode(
+            const std::string &input,
+            bool padding = true
+    );
 
     /**
      * Converts from Base64 to string
@@ -20,17 +23,19 @@ namespace copper::components::base64 {
      * @param input
      * @return std::string Decoded output
      */
-    std::string decode(const std::string &input);
+    std::string base64_decode(
+            const std::string &input
+    );
 
     /**
      * Chars used on Base64 encode
      */
-    const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     /**
      * Map of chars used on Base64 decode
      */
-    inline std::map<char, int> map = {
+    inline std::map<char, int> base64_map = {
             {'A', 0},
             {'B', 1},
             {'C', 2},

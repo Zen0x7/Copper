@@ -2,7 +2,7 @@
 #include <copper/app.hpp>
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    std::cout << copper::get_version() << std::endl;
+    std::cout << "Running version " << copper::get_version() << std::endl;
+    copper::run();
     return 0;
 }

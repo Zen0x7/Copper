@@ -4,12 +4,12 @@
 
 TEST(Components_Random, String) {
     using namespace copper::components;
-    const std::string one = random::string(16);
-    const std::string two = random::string(32);
-    const std::string three = random::string(64);
-    const std::string four = random::string(16);
-    const std::string five = random::string(32);
-    const std::string six = random::string(64);
+    const std::string one = random_string(16);
+    const std::string two = random_string(32);
+    const std::string three = random_string(64);
+    const std::string four = random_string(16);
+    const std::string five = random_string(32);
+    const std::string six = random_string(64);
 
     ASSERT_NE(one, two);
     ASSERT_NE(two, three);
