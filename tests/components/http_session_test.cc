@@ -78,7 +78,7 @@ TEST(Components_TCP_Listener, Client) {
 
     try {
         task_group.emit(boost::asio::cancellation_type::all);
-
+        ioc.stop();
         thread.join();
     } catch (...) {
 
