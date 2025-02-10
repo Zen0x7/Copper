@@ -3,7 +3,7 @@
 #include <copper/components/report.hpp>
 
 
-TEST(Components_Failure_Report, Print) {
+TEST(Components_Report, Call) {
     using namespace copper::components;
 
     boost::system::error_code ec;
