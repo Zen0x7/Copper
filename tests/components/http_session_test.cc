@@ -58,7 +58,7 @@ TEST(Components_TCP_Listener, Client) {
         boost::asio::ip::tcp::resolver resolver(client_ioc);
         boost::beast::tcp_stream stream(client_ioc);
 
-        auto const host = "0.0.0.0";
+        auto const host = "127.0.0.1";
         auto const results = resolver.resolve(host, "9001");
         stream.connect(results);
 
@@ -82,6 +82,8 @@ TEST(Components_TCP_Listener, Client) {
         boost::beast::http::read(stream, buffer, res);
 
         task_group.emit(boost::asio::cancellation_type::all);
+        sleep(1);
+        ioc.stop();
         thread.join();
     } catch (std::exception const &e) {
 
