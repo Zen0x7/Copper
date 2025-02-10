@@ -33,7 +33,6 @@ TEST(Components_WebSocket_Session, Client) {
     auto const results = resolver.resolve(host, "9000");
     stream.connect(results);
 
-    // These objects perform our I/O
     boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws{ioc};
 
     auto ep = boost::asio::connect(ws.next_layer(), results);
@@ -47,7 +46,6 @@ TEST(Components_WebSocket_Session, Client) {
 
     ws.handshake(host, "/");
 
-    // Send the message
     ws.write(boost::asio::buffer(std::string("hello")));
 
     boost::beast::flat_buffer buffer;
