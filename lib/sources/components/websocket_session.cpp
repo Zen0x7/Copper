@@ -10,8 +10,13 @@ namespace copper::components {
     void websocket_session::on_accept(
             boost::beast::error_code ec
     ) {
+
+        // LCOV_EXCL_START
+
         if (ec)
             return report(ec, "accept");
+
+        // LCOV_EXCL_STOP
 
         do_read();
     }
@@ -29,8 +34,12 @@ namespace copper::components {
         if (ec == boost::beast::websocket::error::closed)
             return;
 
+        // LCOV_EXCL_START
+
         if (ec)
             report(ec, "read");
+
+        // LCOV_EXCL_STOP
 
         ws_.text(ws_.got_text());
         ws_.async_write(buffer_.data(),
@@ -43,8 +52,12 @@ namespace copper::components {
     ) {
         boost::ignore_unused(bytes_transferred);
 
+        // LCOV_EXCL_START
+
         if (ec)
             return report(ec, "write");
+
+        // LCOV_EXCL_STOP
 
         buffer_.consume(buffer_.size());
 

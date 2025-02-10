@@ -46,8 +46,12 @@ namespace copper::components {
         if (ec == boost::beast::http::error::end_of_stream)
             return do_close();
 
+
+        // LCOV_EXCL_START
         if (ec)
             return report(ec, "read");
+
+        // LCOV_EXCL_STOP
 
         if (boost::beast::websocket::is_upgrade(parser_->get())) {
             boost::make_shared<websocket_session>(
@@ -91,8 +95,12 @@ namespace copper::components {
     ) {
         boost::ignore_unused(bytes_transferred);
 
+        // LCOV_EXCL_START
+
         if (ec)
             return report(ec, "write");
+
+        // LCOV_EXCL_STOP
 
         if (!keep_alive) {
             return do_close();

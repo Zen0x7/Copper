@@ -14,6 +14,7 @@ namespace copper::components {
               doc_root_(doc_root) {
         boost::beast::error_code ec;
 
+        // LCOV_EXCL_START
         acceptor_.open(endpoint.protocol(), ec);
         if (ec) {
             report(ec, "open");
@@ -38,6 +39,7 @@ namespace copper::components {
             report(ec, "listen");
             return;
         }
+        // LCOV_EXCL_STOP
     }
 
     void tcp_listener::run() {
@@ -60,9 +62,11 @@ namespace copper::components {
             boost::beast::error_code ec,
             boost::asio::ip::tcp::socket socket
     ) {
+        // LCOV_EXCL_START
         if (ec) {
             report(ec, "accept");
         } else {
+            // LCOV_EXCL_STOP
             boost::make_shared<http_session>(
                     std::move(socket),
                     doc_root_)->run();

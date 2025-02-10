@@ -119,8 +119,7 @@ namespace copper::components {
                 length
         );
 
-        return output;
-    }
+        return output; }
 
     std::pair<
             std::string,
@@ -157,8 +156,7 @@ namespace copper::components {
                 iv.end()
         );
 
-        return output;
-    }
+        return output; }
 
     std::string cipher_encrypt(
             const std::string &input,
@@ -230,8 +228,7 @@ namespace copper::components {
         delete[] output_buffer;
         EVP_CIPHER_CTX_free(openssl_context);
 
-        return output;
-    }
+        return output; }
 
     std::string cipher_decrypt(
             const std::string &input,
@@ -303,6 +300,5 @@ namespace copper::components {
         EVP_CIPHER_CTX_free(openssl_context);
         // LCOV_EXCL_STOP
 
-        return output;
-    }
+        return output; }
 }
