@@ -39,8 +39,8 @@ namespace copper::components {
             report(ec, "listen");
             return;
         }
-        // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
 
     void tcp_listener::run() {
         boost::asio::dispatch(
