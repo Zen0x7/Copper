@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <copper/components/tcp_listener.hpp>
 #include <copper/components/certificates.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/components/listener.hpp>
