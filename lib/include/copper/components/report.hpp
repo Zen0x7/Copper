@@ -22,4 +22,6 @@ namespace copper::components {
             boost::beast::error_code ec,
             char const *what
     );
+
+    void report_for_openssl();
 }
