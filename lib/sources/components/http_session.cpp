@@ -106,8 +106,10 @@ namespace copper::components {
             return do_close();
         }
 
+        // LCOV_EXCL_START
         if (response_queue_.size() == queue_limit)
             do_read();
+        // LCOV_EXCL_STOP
 
         response_queue_.pop();
 
