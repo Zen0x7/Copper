@@ -99,12 +99,14 @@ load_server_certificate(boost::asio::ssl::context& ctx)
             "QMUk26jPTIVTLfXmmwU0u8vUkpR7LQKkwwIBAg==\n"
             "-----END DH PARAMETERS-----\n";
 
+    // LCOV_EXCL_START
     ctx.set_password_callback(
             [](std::size_t,
                boost::asio::ssl::context_base::password_purpose)
             {
                 return "test";
             });
+    // LCOV_EXCL_STOP
 
     ctx.set_options(
             boost::asio::ssl::context::default_workarounds |
