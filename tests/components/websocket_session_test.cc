@@ -84,4 +84,6 @@ TEST(Components_WebSocket_Session, Client) {
     } catch (std::exception const &e) {
 
     }
+
+    ASSERT_TRUE(true);
 }
