@@ -3,100 +3,56 @@
 #include <boost/beast.hpp>
 
 #include <copper/components/report.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/beast.hpp>
+#include <boost/beast/ssl.hpp>
+#include <boost/scope/scope_exit.hpp>
 
 namespace copper::components {
 
-    class websocket_session : public boost::enable_shared_from_this<websocket_session> {
+    template<typename Stream>
+    boost::asio::awaitable<void, boost::asio::strand<boost::asio::io_context::executor_type>>
+    websocket_session_run(
+            Stream& stream,
+            boost::beast::flat_buffer& buffer,
+            boost::beast::http::request<boost::beast::http::string_body> req,
+            boost::beast::string_view)
+    {
+        auto cs = co_await boost::asio::this_coro::cancellation_state;
+        auto ws = boost::beast::websocket::stream<Stream&>{ stream };
 
-        /**
-         * Stream
-         */
-        boost::beast::websocket::stream<
-                boost::beast::tcp_stream
-        > ws_;
+        ws.set_option(
+                boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::server));
 
-        /**
-         * Buffer
-         */
-        boost::beast::flat_buffer buffer_;
+        ws.set_option(boost::beast::websocket::stream_base::decorator(
+                [](boost::beast::websocket::response_type& res)
+                {
+                    res.set(boost::beast::http::field::server, "Copper");
+                }));
 
-    public:
+        co_await ws.async_accept(req);
 
-        /**
-         * Constructor
-         *
-         * @param socket
-         */
-        explicit websocket_session(
-                boost::asio::ip::tcp::socket &&socket
-        );
+        while(!cs.cancelled())
+        {
+            auto [ec, _] = co_await ws.async_read(buffer, boost::asio::as_tuple);
 
-        /**
-         * Invoke accept
-         *
-         * @tparam Body
-         * @tparam Allocator
-         * @param req
-         */
-        template<
-                class Body,
-                class Allocator
-        >
-        void do_accept(
-                boost::beast::http::request<
-                        Body,
-                        boost::beast::http::basic_fields<
-                                Allocator
-                        >
-                > req
-        ) {
-            ws_.set_option(boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::server));
+            if(ec == boost::beast::websocket::error::closed || ec == boost::asio::ssl::error::stream_truncated)
+                co_return;
 
-            ws_.set_option(boost::beast::websocket::stream_base::decorator(
-                    // LCOV_EXCL_START
-                    [](boost::beast::websocket::response_type &res) {
-                    // LCOV_EXCL_STOP
-                        res.set(boost::beast::http::field::server,"Copper");
-                    }));
+            if(ec)
+                throw boost::system::system_error{ ec };
 
-            ws_.async_accept(req, boost::beast::bind_front_handler(&websocket_session::on_accept, shared_from_this()));
+            ws.text(ws.got_text());
+            co_await ws.async_write(buffer.data());
+
+            buffer.consume(buffer.size());
         }
 
-    private:
+        auto [ec] = co_await ws.async_close(
+                boost::beast::websocket::close_code::service_restart, boost::asio::as_tuple);
 
-        /**
-         * Accept callback
-         *
-         * @param ec
-         */
-        void on_accept(
-                boost::beast::error_code ec
-        );
-
-        /**
-         * Invoke read
-         */
-        void do_read();
-
-        /**
-         * Read callback
-         *
-         * @param ec
-         * @param bytes_transferred
-         */
-        void on_read(
-                boost::beast::error_code ec,
-                std::size_t bytes_transferred
-        );
-
-        /**
-         * Write callback
-         * @param ec
-         * @param bytes_transferred
-         */
-        void on_write(
-                boost::beast::error_code ec,
-                std::size_t bytes_transferred
-        );
-    };
+        if(ec && ec != boost::asio::ssl::error::stream_truncated)
+            throw boost::system::system_error{ ec };
+    }
 }
