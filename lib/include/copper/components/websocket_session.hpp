@@ -53,10 +53,10 @@ namespace copper::components {
             ws_.set_option(boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::server));
 
             ws_.set_option(boost::beast::websocket::stream_base::decorator(
+                    // LCOV_EXCL_START
                     [](boost::beast::websocket::response_type &res) {
-                        res.set(boost::beast::http::field::server,
-                                std::string(BOOST_BEAST_VERSION_STRING) +
-                                " advanced-server");
+                    // LCOV_EXCL_STOP
+                        res.set(boost::beast::http::field::server,"Copper");
                     }));
 
             ws_.async_accept(req, boost::beast::bind_front_handler(&websocket_session::on_accept, shared_from_this()));

@@ -43,11 +43,11 @@ namespace copper::components {
     ) {
         boost::ignore_unused(bytes_transferred);
 
+        // LCOV_EXCL_START
+        
         if (ec == boost::beast::http::error::end_of_stream)
             return do_close();
 
-
-        // LCOV_EXCL_START
         if (ec)
             return report(ec, "read");
 
