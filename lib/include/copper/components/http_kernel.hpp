@@ -50,8 +50,7 @@ namespace copper::components::http_kernel {
                     res.keep_alive(req.keep_alive());
                     res.body() = "The resource '" + std::string(target) + "' was not found.";
                     res.prepare_payload();
-                    return res;
-                };
+                    return res; };
 
         return not_found(req.target());
     }
