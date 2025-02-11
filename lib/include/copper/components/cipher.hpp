@@ -71,4 +71,4 @@ namespace copper::components {
             const std::string &iv
     );
 
-}  // namespace copper::components::cipher
+} // namespace copper::components

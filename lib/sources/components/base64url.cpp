@@ -41,4 +41,4 @@ namespace copper::components {
         }
         return output; }
 
-}  // namespace copper::components::base64url
+} // namespace copper::components::base64url

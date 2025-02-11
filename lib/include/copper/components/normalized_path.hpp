@@ -23,4 +23,5 @@ namespace copper::components {
             boost::beast::string_view base,
             boost::beast::string_view path
     );
-}
+
+} // namespace copper::component

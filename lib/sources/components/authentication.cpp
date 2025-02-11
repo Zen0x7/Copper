@@ -107,4 +107,4 @@ namespace copper::components {
         return header_ + "." + payload_ + "." + signature_;
     }
 
-}  // namespace copper::components::authenticator
+} // namespace copper::components::authenticator

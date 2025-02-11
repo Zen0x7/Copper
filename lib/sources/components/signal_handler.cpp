@@ -1,6 +1,7 @@
 #include <copper/components/signal_handler.hpp>
 
 namespace copper::components {
+
     boost::asio::awaitable<
             void,
             boost::asio::strand<
@@ -33,4 +34,5 @@ namespace copper::components {
             executor.get_inner_executor().context().stop();
         }
     }
-}
+
+} // namespace copper::component

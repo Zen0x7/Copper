@@ -23,5 +23,6 @@ namespace copper::components {
         throw std::runtime_error(error_output.c_str());
     }
     // LCOV_EXCL_STOP
-}
+
+} // namespace copper::component
 

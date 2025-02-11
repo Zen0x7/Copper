@@ -19,4 +19,5 @@ namespace copper::components {
 
         return output;
     }
-}
+
+} // namespace copper::component

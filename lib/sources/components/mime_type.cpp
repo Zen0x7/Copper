@@ -38,5 +38,4 @@ namespace copper::components {
         return "application/text";
     }
 
-
-}
+} // namespace copper::component

@@ -6,22 +6,66 @@
 #include <boost/scope/scope_exit.hpp>
 
 namespace copper::components {
+
     class task_group {
+
+        /**
+         * Mutex
+         */
         std::mutex mutex_;
+
+        /**
+         * Timer
+         */
         boost::asio::steady_timer timer_;
-        std::list<boost::asio::cancellation_signal> signals_;
+
+        /**
+         * Signals
+         */
+        std::list<
+                boost::asio::cancellation_signal
+        > signals_;
 
     public:
-        task_group(boost::asio::any_io_executor executor)
-                : timer_{std::move(executor), boost::asio::steady_timer::time_point::max()} {}
 
-        task_group(task_group const &) = delete;
+        /**
+         * Constructor
+         * @param executor
+         */
+        explicit task_group(
+                boost::asio::any_io_executor executor
+        ) : timer_{
+                std::move(executor),
+                boost::asio::steady_timer::time_point::max()
+        } {}
 
-        task_group(task_group &&) = delete;
+        /**
+         * Overload Constructor
+         */
+        task_group(
+                task_group const &
+        ) = delete;
 
-        template<typename CompletionToken>
-        auto
-        adapt(CompletionToken &&completion_token) {
+        /**
+         * Overload Constructor
+         */
+        task_group(
+                task_group &&
+        ) = delete;
+
+        /**
+         * Adapt
+         *
+         * @tparam CompletionToken
+         * @param completion_token
+         * @return
+         */
+        template<
+                typename CompletionToken
+        >
+        auto adapt(
+                CompletionToken &&completion_token
+        ) {
             auto guard = std::lock_guard{mutex_};
             auto signal = signals_.emplace(signals_.end());
 
@@ -37,17 +81,33 @@ namespace copper::components {
                                     })));
         }
 
-        void
-        emit(boost::asio::cancellation_type type) {
+        /**
+         * Emit cancellation signal
+         *
+         * @param type
+         */
+        void emit(
+                boost::asio::cancellation_type type
+        ) {
             auto guard = std::lock_guard{mutex_};
             for (auto &signal: signals_)
                 signal.emit(type);
         }
 
         // LCOV_EXCL_START
-        template<typename CompletionToken = boost::asio::default_completion_token_t<boost::asio::any_io_executor>>
-        auto
-        async_wait(CompletionToken &&completion_token = boost::asio::default_completion_token_t<boost::asio::any_io_executor>{}) {
+        /**
+         * Async wait
+         *
+         * @tparam CompletionToken
+         * @param completion_token
+         * @return
+         */
+        template<
+                typename CompletionToken = boost::asio::default_completion_token_t<boost::asio::any_io_executor>
+        >
+        auto async_wait(
+                CompletionToken &&completion_token = boost::asio::default_completion_token_t<boost::asio::any_io_executor>{}
+        ) {
             return boost::asio::async_compose<CompletionToken, void(boost::system::error_code)>(
                     [this, scheduled = false](
                             auto &&self, boost::system::error_code ec = {}) mutable {
@@ -77,4 +137,5 @@ namespace copper::components {
         }
         // LCOV_EXCL_STOP
     };
-}
+
+} // namespace copper::component

@@ -29,5 +29,6 @@ namespace copper::components {
         return result;
     }
 // LCOV_EXCL_STOP
-}
+
+} // namespace copper::component
 

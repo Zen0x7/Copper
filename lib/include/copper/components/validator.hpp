@@ -53,5 +53,5 @@ namespace copper::components {
             const boost::json::value &value
     );
 
-}  // namespace copper::components::validator
+} // namespace copper::components::validator
 
