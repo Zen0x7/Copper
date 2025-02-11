@@ -301,4 +301,5 @@ namespace copper::components {
         // LCOV_EXCL_STOP
 
         return output; }
-}
+
+} // namespace copper::component

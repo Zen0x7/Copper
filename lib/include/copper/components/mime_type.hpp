@@ -21,4 +21,5 @@ namespace copper::components {
     boost::beast::string_view mime_type(
             boost::beast::string_view path
     );
-}
+
+} // namespace copper::component

@@ -18,10 +18,21 @@
 #endif
 
 namespace copper::components {
+
+    /**
+     * Report
+     *
+     * @param ec
+     * @param what
+     */
     void report(
             boost::beast::error_code ec,
             char const *what
     );
 
+    /**
+     * Report for OpenSSL
+     */
     void report_for_openssl();
-}
+
+}  // namespace copper::component

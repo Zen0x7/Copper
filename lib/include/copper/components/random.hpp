@@ -14,4 +14,4 @@ namespace copper::components {
             int size = 16
     );
 
-}  // namespace copper::component
+} // namespace copper::component

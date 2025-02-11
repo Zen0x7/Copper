@@ -9,14 +9,29 @@
 
 #include <copper/components/http_session.hpp>
 
-using executor_type = boost::asio::strand<boost::asio::io_context::executor_type>;
-using stream_type   = typename boost::beast::tcp_stream::rebind_executor<boost::asio::strand<boost::asio::io_context::executor_type>>::other;
-using acceptor_type = typename boost::asio::ip::tcp::acceptor::rebind_executor<executor_type>::other;
-
 namespace copper::components {
-    boost::asio::awaitable<void, boost::asio::strand<boost::asio::io_context::executor_type>>
-    detect_session(
-            stream_type stream,
-            boost::asio::ssl::context& ctx,
-            boost::beast::string_view doc_root);
-}
+
+    /**
+     * Detect session protocol
+     *
+     * @param stream
+     * @param ctx
+     * @param doc_root
+     * @return boost::asio::awaitable<T, U> Callback
+     */
+    boost::asio::awaitable<
+            void,
+            boost::asio::strand<
+                    boost::asio::io_context::executor_type
+            >
+    > detect_session(
+            typename boost::beast::tcp_stream::rebind_executor<
+                    boost::asio::strand<
+                            boost::asio::io_context::executor_type
+                    >
+            >::other stream,
+            boost::asio::ssl::context &ctx,
+            boost::beast::string_view doc_root
+    );
+
+} // namespace copper::component

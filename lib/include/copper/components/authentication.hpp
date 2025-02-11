@@ -38,4 +38,4 @@ namespace copper::components {
             const std::string &type = "App\\Models\\User"
     );
 
-}  // namespace copper::components::authenticator
+} // namespace copper::components

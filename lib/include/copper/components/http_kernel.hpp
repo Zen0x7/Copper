@@ -20,7 +20,18 @@
 
 namespace copper::components::http_kernel {
 
-    template<class Body, class Allocator>
+    /**
+     * Kernel
+     *
+     * @tparam Body
+     * @tparam Allocator
+     * @param req
+     * @return
+     */
+    template<
+            class Body,
+            class Allocator
+    >
     boost::beast::http::message_generator handle(
             boost::beast::string_view,
             boost::beast::http::request<
@@ -34,7 +45,7 @@ namespace copper::components::http_kernel {
                 [&req](boost::beast::string_view target) {
                     boost::beast::http::response<boost::beast::http::string_body> res{
                             boost::beast::http::status::not_found, req.version()};
-                    res.set(boost::beast::http::field::server, HTTP_SERVER_HEADER_CONTENT);
+                    res.set(boost::beast::http::field::server, "Copper");
                     res.set(boost::beast::http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
                     res.body() = "The resource '" + std::string(target) + "' was not found.";
@@ -44,4 +55,4 @@ namespace copper::components::http_kernel {
         return not_found(req.target());
     }
 
-}
+} // namespace copper::component

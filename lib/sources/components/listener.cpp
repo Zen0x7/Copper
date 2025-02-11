@@ -3,7 +3,10 @@
 namespace copper::components {
 
     boost::asio::awaitable<
-            void, boost::asio::strand<boost::asio::io_context::executor_type>
+            void,
+            boost::asio::strand<
+                    boost::asio::io_context::executor_type
+                    >
     > listener(
             task_group &task_group,
             boost::asio::ssl::context &ctx,
@@ -12,7 +15,7 @@ namespace copper::components {
     ) {
         auto cs = co_await boost::asio::this_coro::cancellation_state;
         auto executor = co_await boost::asio::this_coro::executor;
-        auto acceptor = acceptor_type{executor, endpoint};
+        auto acceptor = typename boost::asio::ip::tcp::acceptor::rebind_executor<boost::asio::strand<boost::asio::io_context::executor_type>>::other{executor, endpoint};
 
         co_await boost::asio::this_coro::reset_cancellation_state(
                 boost::asio::enable_total_cancellation());
@@ -48,4 +51,5 @@ namespace copper::components {
                             }));
         }
     }
-}
+
+} // namespace copper::component

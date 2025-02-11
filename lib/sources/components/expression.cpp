@@ -104,5 +104,6 @@ namespace copper::components {
 
         return boost::make_shared<expression>(_regex, _arguments);
     }
+
 }  // namespace components::expressions
 

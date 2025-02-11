@@ -8,7 +8,11 @@ namespace copper::components {
                     boost::asio::io_context::executor_type
             >
     > detect_session(
-            stream_type stream,
+            typename boost::beast::tcp_stream::rebind_executor<
+                    boost::asio::strand<
+                            boost::asio::io_context::executor_type
+                    >
+            >::other stream,
             boost::asio::ssl::context &ctx,
             boost::beast::string_view doc_root
     ) {
@@ -48,4 +52,5 @@ namespace copper::components {
             stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send);
         }
     }
-}
+
+} // namespace copper::component

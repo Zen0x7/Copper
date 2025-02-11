@@ -122,6 +122,7 @@ load_server_certificate(boost::asio::ssl::context& ctx)
 
     ctx.use_tmp_dh(
             boost::asio::buffer(dh.data(), dh.size()));
+
 }
 
 #endif

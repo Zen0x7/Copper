@@ -102,4 +102,4 @@ namespace copper::components {
             {'_', 63}
     };
 
-}  // namespace copper::components::base64url
+} // namespace copper::components
