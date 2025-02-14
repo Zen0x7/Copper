@@ -7,6 +7,8 @@
 #include <copper/components/listener.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/components/signal_handler.hpp>
+#include <copper/components/state.hpp>
+#include <boost/redis/connection.hpp>
 
 namespace copper {
     std::string get_version() {
@@ -29,9 +31,11 @@ namespace copper {
 
         components::task_group task_group{ ioc.get_executor() };
 
+        auto state = boost::make_shared<components::state>();
+
         boost::asio::co_spawn(
                 boost::asio::make_strand(ioc),
-                components::listener(task_group, ctx, endpoint, doc_root),
+                components::listener(state, task_group, ctx, endpoint, doc_root),
                 task_group.adapt(
                         [](std::exception_ptr e)
                         {

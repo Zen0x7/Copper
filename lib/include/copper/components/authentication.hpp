@@ -2,11 +2,13 @@
 
 #include <boost/optional.hpp>
 #include <boost/uuid.hpp>
+
+#include <copper/components/uuid.hpp>
 #include <string>
 
 namespace copper::components {
     struct authentication_result {
-        boost::uuids::uuid id;
+        uuid id;
         std::string type;
     };
 

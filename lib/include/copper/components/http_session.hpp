@@ -36,6 +36,7 @@ namespace copper::components {
                     boost::asio::io_context::executor_type
             >
     > http_session_run(
+            shared<state> & state,
             Stream &stream,
             boost::beast::flat_buffer &buffer,
             boost::beast::string_view doc_root
@@ -56,12 +57,16 @@ namespace copper::components {
                 boost::beast::get_lowest_layer(stream).expires_never();
 
                 co_await websocket_session_run(
-                        stream, buffer, parser.release(), doc_root);
+                        state, stream, buffer, parser.release(), doc_root);
 
                 co_return;
             }
 
-            auto res = http_kernel::handle(doc_root, parser.release());
+            auto kernel = boost::make_shared<http_kernel>(state);
+
+            std::string ip = boost::beast::get_lowest_layer(stream).socket().remote_endpoint().address().to_string();
+
+            auto res = co_await kernel->invoke(doc_root, parser.release(), ip);
 
             if (!res.keep_alive()) {
                 co_await boost::beast::async_write(stream, std::move(res));

@@ -25,6 +25,7 @@ namespace copper::components {
                     boost::asio::io_context::executor_type
             >
     > detect_session(
+            shared<state> & state,
             typename boost::beast::tcp_stream::rebind_executor<
                     boost::asio::strand<
                             boost::asio::io_context::executor_type

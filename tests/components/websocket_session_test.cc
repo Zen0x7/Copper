@@ -3,6 +3,7 @@
 #include <copper/components/certificates.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/components/listener.hpp>
+#include <copper/components/state.hpp>
 #include <copper/components/signal_handler.hpp>
 
 
@@ -22,9 +23,12 @@ TEST(Components_WebSocket_Session, Client) {
 
     task_group task_group{ioc.get_executor()};
 
+
+    auto state_ = boost::make_shared<state>();
+
     boost::asio::co_spawn(
             boost::asio::make_strand(ioc),
-            listener(task_group, ctx, endpoint, doc_root),
+            listener(state_, task_group, ctx, endpoint, doc_root),
             task_group.adapt(
                     [](std::exception_ptr e) {
                         if (e) {
