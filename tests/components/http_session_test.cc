@@ -11,6 +11,7 @@
 #include <copper/components/http_controller.hpp>
 #include <copper/components/http_status_code.hpp>
 #include <copper/components/json.hpp>
+#include <copper/components/dotenv.hpp>
 #include <copper/components/chronos.hpp>
 
 #include <boost/beast.hpp>
@@ -50,6 +51,8 @@ public:
 };
 
 TEST(Components_TCP_Listener, Client) {
+
+    dotenv::init();
 
     auto const address = boost::asio::ip::make_address("0.0.0.0");
     auto const port = 9001;
@@ -143,8 +146,10 @@ TEST(Components_TCP_Listener, Client) {
         boost::beast::http::write(stream, options_up_request);
         boost::beast::http::read(stream, buffer, res);
 
-        boost::beast::http::write(stream, up_request);
-        boost::beast::http::read(stream, buffer, res);
+        for (int i = 0; i <= 5; i++) {
+            boost::beast::http::write(stream, up_request);
+            boost::beast::http::read(stream, buffer, res);
+        }
 
         boost::beast::http::write(stream, params_request);
         boost::beast::http::read(stream, buffer, res);

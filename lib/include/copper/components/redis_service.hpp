@@ -2,6 +2,7 @@
 
 #include <copper/components/shared.hpp>
 #include <copper/components/http_request.hpp>
+#include <copper/components/dotenv.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/redis.hpp>
@@ -22,7 +23,13 @@ namespace copper::components {
             co_return conn;
         }
     public:
-        redis_service(): redis_config_(boost::make_shared<boost::redis::config>()) {}
+        redis_service(): redis_config_(boost::make_shared<boost::redis::config>()) {
+
+            redis_config_->addr = boost::redis::address {
+                dotenv::getenv("REDIS_HOST", "127.0.0.1"),
+                dotenv::getenv("REDIS_PORT", "6379")
+            };
+        }
 
         boost::asio::awaitable<
                 int,
