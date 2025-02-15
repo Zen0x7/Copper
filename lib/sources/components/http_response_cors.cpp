@@ -8,14 +8,10 @@ namespace copper::components {
         http_response response {methods.empty() ? http_status_code::method_not_allowed : http_status_code::ok, request.version()};
         response.set(http_fields::content_type, "application/json");
 
-        if (methods.empty()) {
-            response.set(http_fields::access_control_allow_methods, "");
-        } else {
-            containers::vector_of<std::string> authorized_methods;
-            for (auto & verb : methods) authorized_methods.push_back(to_string(verb));
-            const auto methods_as_string = boost::join(authorized_methods, ",");
-            response.set(http_fields::access_control_allow_methods, methods_as_string);
-        }
+        containers::vector_of<std::string> authorized_methods;
+        for (auto & verb : methods) authorized_methods.push_back(to_string(verb));
+        const auto methods_as_string = boost::join(authorized_methods, ",");
+        response.set(http_fields::access_control_allow_methods, methods.empty() ? "" : methods_as_string);
 
         response.set(http_fields::access_control_allow_headers, "Accept,Authorization,Content-Type,X-Requested-With");
         const auto allowed_origins = dotenv::getenv("HTTP_ALLOWED_ORIGINS", "*");

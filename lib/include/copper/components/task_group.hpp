@@ -81,13 +81,12 @@ namespace copper::components {
                             boost::scope::make_scope_exit(
                                     [weak_self, signal]() {
 
-                                        if (auto self = weak_self.lock()) { // Verifica si la instancia sigue viva
+                                        if (auto self = weak_self.lock()) {
                                             auto guard = std::lock_guard{self->mutex_};
 
                                             self->signals_.erase(signal);
 
-                                            if (self->signals_.empty()) // Usamos empty() en vez de comparar con end()
-                                                self->timer_.cancel();
+                                            if (self->signals_.empty()) self->timer_.cancel();
                                         }
 
                                     })));

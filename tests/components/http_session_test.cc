@@ -45,6 +45,23 @@ public:
     }
 };
 
+class exception_controller final : public http_controller {
+public:
+    bool requires_limitation() const override { return false; }
+    int requests_per_minute() const override { return 5; }
+    http_response invoke(const http_request & request) override {
+        throw std::runtime_error("Something went wrong");
+        auto now = chronos::now();
+        const json::object data = {
+                { "message", "Request has been processed." },
+                {"data", "pong"},
+                { "timestamp", now },
+                {"status", 200}
+        };
+        return response(request, http_status_code::ok, serialize(data), "application/json", now);
+    }
+};
+
 class params_controller final : public http_controller {
 public:
     bool requires_limitation() const override { return true; }
@@ -86,6 +103,10 @@ TEST(Components_TCP_Listener, Client) {
 
     state_->get_router()->get_routes()->push_back(
             std::pair(http_router::factory(http_method::get, "/api/params/{name}"), boost::make_shared<params_controller>())
+    );
+
+    state_->get_router()->get_routes()->push_back(
+            std::pair(http_router::factory(http_method::get, "/api/exception"), boost::make_shared<exception_controller>())
     );
 
     boost::asio::co_spawn(
@@ -153,6 +174,10 @@ TEST(Components_TCP_Listener, Client) {
         req.set(http_fields::host, host);
         req.set(http_fields::user_agent, "Copper");
 
+        http_request exception_request{http_method::get, "/api/exception", 11};
+        req.set(http_fields::host, host);
+        req.set(http_fields::user_agent, "Copper");
+
         http_request params_request{http_method::get, "/api/params/{name}", 11};
         req.set(http_fields::host, host);
         req.set(http_fields::user_agent, "Copper");
@@ -176,8 +201,11 @@ TEST(Components_TCP_Listener, Client) {
             boost::beast::http::write(stream, up_request);
             boost::beast::http::read(stream, buffer, res);
             res.clear();
-
         }
+
+        boost::beast::http::write(stream, exception_request);
+        boost::beast::http::read(stream, buffer, res);
+        res.clear();
 
         boost::beast::http::write(stream, params_request);
         boost::beast::http::read(stream, buffer, res);
