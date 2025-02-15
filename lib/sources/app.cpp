@@ -58,7 +58,10 @@ namespace copper {
 
             boost::asio::ssl::context ctx{ boost::asio::ssl::context::tlsv12 };
 
-            load_server_certificate(ctx);
+            ctx.set_options(boost::asio::ssl::context::default_workarounds | boost::asio::ssl::context::single_dh_use);
+            ctx.use_certificate_chain_file(dotenv::getenv("APP_PUBLIC_KEY", "./certificates/public.pem"));
+                ctx.use_private_key_file( dotenv::getenv("APP_PRIVATE_KEY", "./certificates/private.pem"), boost::asio::ssl::context::pem);
+            ctx.use_tmp_dh_file(dotenv::getenv("APP_DH_PARAMS", "./certificates/params.pem"));
 
             auto task_group = boost::make_shared<components::task_group>(ioc.get_executor());
 
