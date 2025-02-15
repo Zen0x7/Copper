@@ -78,7 +78,24 @@ public:
     }
 };
 
-TEST(Components_TCP_Listener, Client) {
+class authenticated_controller final : public http_controller {
+public:
+    bool requires_limitation() const override { return false; }
+    int requests_per_minute() const override { return 5; }
+    bool requires_authentication() const override { return true; }
+    http_response invoke(const http_request & request) override {
+        auto now = chronos::now();
+        const json::object data = {
+                { "message", "Request has been processed." },
+                {"data", to_string(this->auth_id_) },
+                { "timestamp", now },
+                {"status", 200}
+        };
+        return response(request, http_status_code::ok, serialize(data), "application/json", now);
+    }
+};
+
+TEST(Components_HTTP_Session, Implementation) {
 
     dotenv::init();
 
@@ -107,6 +124,10 @@ TEST(Components_TCP_Listener, Client) {
 
     state_->get_router()->get_routes()->push_back(
             std::pair(http_router::factory(http_method::get, "/api/exception"), boost::make_shared<exception_controller>())
+    );
+
+    state_->get_router()->get_routes()->push_back(
+            std::pair(http_router::factory(http_method::get, "/api/auth"), boost::make_shared<authenticated_controller>())
     );
 
     boost::asio::co_spawn(
@@ -167,20 +188,28 @@ TEST(Components_TCP_Listener, Client) {
         req.set(http_fields::user_agent, "Copper");
 
         http_request options_up_request{http_method::options, "/api/up", 11};
-        req.set(http_fields::host, host);
-        req.set(http_fields::user_agent, "Copper");
+        options_up_request.set(http_fields::host, host);
+        options_up_request.set(http_fields::user_agent, "Copper");
 
         http_request up_request{http_method::get, "/api/up", 11};
-        req.set(http_fields::host, host);
-        req.set(http_fields::user_agent, "Copper");
+        up_request.set(http_fields::host, host);
+        up_request.set(http_fields::user_agent, "Copper");
 
         http_request exception_request{http_method::get, "/api/exception", 11};
-        req.set(http_fields::host, host);
-        req.set(http_fields::user_agent, "Copper");
+        exception_request.set(http_fields::host, host);
+        exception_request.set(http_fields::user_agent, "Copper");
+
+        http_request bad_request{http_method::get, "/api/../exception", 11};
+        bad_request.set(http_fields::host, host);
+        bad_request.set(http_fields::user_agent, "Copper");
+
+        http_request authenticated_request{http_method::get, "/api/auth", 11};
+        authenticated_request.set(http_fields::host, host);
+        authenticated_request.set(http_fields::user_agent, "Copper");
 
         http_request params_request{http_method::get, "/api/params/{name}", 11};
-        req.set(http_fields::host, host);
-        req.set(http_fields::user_agent, "Copper");
+        params_request.set(http_fields::host, host);
+        params_request.set(http_fields::user_agent, "Copper");
 
         http_request close_req{http_method::get, "/", 11};
         close_req.set(http_fields::host, host);
@@ -211,6 +240,13 @@ TEST(Components_TCP_Listener, Client) {
         boost::beast::http::read(stream, buffer, res);
         res.clear();
 
+        boost::beast::http::write(stream, bad_request);
+        boost::beast::http::read(stream, buffer, res);
+        res.clear();
+
+        boost::beast::http::write(stream, authenticated_request);
+        boost::beast::http::read(stream, buffer, res);
+        res.clear();
 
         boost::beast::http::write(stream, close_req);
         boost::beast::http::read(stream, buffer, res);

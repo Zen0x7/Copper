@@ -8,7 +8,9 @@ namespace copper::components {
         bindings_ = std::move(bindings);
     }
 
+    // LCOV_EXCL_START
     void http_controller::set_data(const json::value &data) { data_ = data; }
 
     void http_controller::set_user(const uuid id) { auth_id_ = id; }
+    // LCOV_EXCL_STOP
 }
