@@ -8,45 +8,50 @@ namespace copper::components {
         request.push("EXISTS", key);
         auto connection = co_await this->get_redis_connection();
         co_await connection->async_exec(request, response, boost::asio::deferred);
+        connection->cancel();
         co_return std::get<0>(response).value();
     }
 
     boost::asio::awaitable<int64_t, boost::asio::strand<boost::asio::io_context::executor_type>>
     redis_service::counter_of(const std::string &key) {
         boost::redis::request request;
-        boost::redis::response<int> response;
+        boost::redis::response<int64_t> response;
         request.push("GET", key);
         auto connection = co_await this->get_redis_connection();
         co_await connection->async_exec(request, response, boost::asio::deferred);
+        connection->cancel();
         co_return std::get<0>(response).value();
     }
 
     boost::asio::awaitable<int64_t, boost::asio::strand<boost::asio::io_context::executor_type>>
     redis_service::ttl_of(const std::string &key) {
         boost::redis::request request;
-        boost::redis::response<int> response;
+        boost::redis::response<int64_t> response;
         request.push("TTL", key);
         auto connection = co_await this->get_redis_connection();
         co_await connection->async_exec(request, response, boost::asio::deferred);
+        connection->cancel();
         co_return std::get<0>(response).value();
     }
 
     boost::asio::awaitable<void, boost::asio::strand<boost::asio::io_context::executor_type>>
     redis_service::increase(const std::string &key) {
         boost::redis::request request;
-        boost::redis::response<int> response;
+        boost::redis::response<std::string> response;
         request.push("INCR", key);
         auto connection = co_await this->get_redis_connection();
         co_await connection->async_exec(request, response, boost::asio::deferred);
+        connection->cancel();
     }
 
     boost::asio::awaitable<void, boost::asio::strand<boost::asio::io_context::executor_type>>
     redis_service::set(const std::string &key) {
         boost::redis::request request;
-        boost::redis::response<int> response;
+        boost::redis::response<std::string> response;
         request.push("SET", key, 1, "EX", 60);
         auto connection = co_await this->get_redis_connection();
         co_await connection->async_exec(request, response, boost::asio::deferred);
+        connection->cancel();
     }
 
     std::string redis_service::get_key_of(const http_request &request, const std::string &ip) {

@@ -1,13 +1,16 @@
 #pragma once
 
+#include <copper/components/shared.hpp>
+
 #include <mutex>
 #include <list>
 #include <boost/asio.hpp>
 #include <boost/scope/scope_exit.hpp>
+#include <iostream>
 
 namespace copper::components {
 
-    class task_group {
+    class task_group : public shared_enabled<task_group> {
 
         /**
          * Mutex
@@ -69,15 +72,24 @@ namespace copper::components {
             auto guard = std::lock_guard{mutex_};
             auto signal = signals_.emplace(signals_.end());
 
+            boost::weak_ptr<task_group> weak_self = shared_from_this();
+
             return boost::asio::bind_cancellation_slot(
                     signal->slot(),
                     boost::asio::consign(
                             std::forward<CompletionToken>(completion_token),
                             boost::scope::make_scope_exit(
-                                    [this, signal]() {
-                                        auto guard = std::lock_guard{mutex_};
-                                        if (signals_.erase(signal) == signals_.end())
-                                            timer_.cancel();
+                                    [weak_self, signal]() {
+
+                                        if (auto self = weak_self.lock()) { // Verifica si la instancia sigue viva
+                                            auto guard = std::lock_guard{self->mutex_};
+
+                                            self->signals_.erase(signal);
+
+                                            if (self->signals_.empty()) // Usamos empty() en vez de comparar con end()
+                                                self->timer_.cancel();
+                                        }
+
                                     })));
         }
 

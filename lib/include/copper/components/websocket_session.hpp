@@ -30,7 +30,7 @@ namespace copper::components {
                     boost::asio::io_context::executor_type
             >
     > websocket_session_run(
-            shared<state> & state,
+            shared<state> &  /* state */,
             Stream &stream,
             boost::beast::flat_buffer &buffer,
             boost::beast::http::request<

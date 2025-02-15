@@ -38,9 +38,9 @@ namespace copper::components {
                     std::stoi(dotenv::getenv("REDIS_CONNECTION_TIMEOUT", "60")),
             };
 
-            redis_config_->reconnect_wait_interval = std::chrono::seconds {
-                    std::stoi(dotenv::getenv("REDIS_RECONNECTION_WAIT_INTERVAL", "5")),
-            };
+//            redis_config_->reconnect_wait_interval = std::chrono::seconds {
+//                    std::stoi(dotenv::getenv("REDIS_RECONNECTION_WAIT_INTERVAL", "5")),
+//            };
 
             redis_config_->clientname = dotenv::getenv("REDIS_CLIENT_NAME", "Copper");
         }

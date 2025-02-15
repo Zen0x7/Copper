@@ -82,7 +82,7 @@ namespace copper::components {
                         boost::asio::io_context::executor_type
                 >
         > invoke(
-            boost::beast::string_view root,
+            boost::beast::string_view /* root */,
             const http_request & request,
             const std::string & ip
         ) const {

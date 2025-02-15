@@ -8,9 +8,11 @@
 #include <copper/components/task_group.hpp>
 #include <copper/components/signal_handler.hpp>
 #include <copper/components/state.hpp>
+#include <copper/components/shared.hpp>
 #include <boost/redis/connection.hpp>
 
 namespace copper {
+
     std::string get_version() {
         return "2.0.0";
     }
@@ -29,14 +31,14 @@ namespace copper {
 
         load_server_certificate(ctx);
 
-        components::task_group task_group{ ioc.get_executor() };
+        auto task_group = boost::make_shared<components::task_group>(ioc.get_executor());
 
         auto state = boost::make_shared<components::state>();
 
         boost::asio::co_spawn(
                 boost::asio::make_strand(ioc),
                 components::listener(state, task_group, ctx, endpoint, doc_root),
-                task_group.adapt(
+                task_group->adapt(
                         [](std::exception_ptr e)
                         {
                             if(e)
