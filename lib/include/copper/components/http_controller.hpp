@@ -30,6 +30,7 @@ namespace copper::components {
         shared<state> state_;
         uuid auth_id_;
 
+        // LCOV_EXCL_START
         virtual ~http_controller() = default;
 
         virtual http_response invoke(const http_request &request) = 0;
@@ -51,7 +52,7 @@ namespace copper::components {
         virtual bool requires_limitation() const { return false; }
 
         virtual int requests_per_minute() const { return 0; }
-
+        // LCOV_EXCL_STOP
 
         void set_state(const shared<state> &state);
 
