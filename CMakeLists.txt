@@ -47,10 +47,10 @@ if (BUILD_TESTS)
 
     enable_testing()
     add_executable(tests ${SOURCES} ${TESTS})
-    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt)
+    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt bcrypt)
     include(GoogleTest)
     gtest_discover_tests(tests)
 endif ()
 
 add_executable(copper main.cpp ${SOURCES})
-target_link_libraries(copper ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt)
+target_link_libraries(copper ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt bcrypt)

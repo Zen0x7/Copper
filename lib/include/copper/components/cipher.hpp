@@ -44,9 +44,9 @@ namespace copper::components {
 
     /**
      * Encrypt
-     * 
-     * @param input 
-     * @param key 
+     *
+     * @param input
+     * @param key
      * @param iv
      *
      * @return std::string Output
@@ -69,6 +69,15 @@ namespace copper::components {
             const std::string &input,
             const std::string &key,
             const std::string &iv
+    );
+
+    bool cipher_password_validator(
+            const std::string &input,
+            const std::string &hash
+    );
+
+    std::string cipher_password_hash(
+            const std::string &input
     );
 
 } // namespace copper::components
