@@ -17,7 +17,7 @@ namespace copper::components {
                     boost::asio::io_context::executor_type
             >
     > signal_handler(
-            shared<task_group> &task_group
+            shared<task_group> task_group
     );
 
 } // namespace copper::component
