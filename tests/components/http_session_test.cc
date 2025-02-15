@@ -5,10 +5,51 @@
 #include <copper/components/listener.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/signal_handler.hpp>
+#include <copper/components/http_method.hpp>
+#include <copper/components/http_response.hpp>
+#include <copper/components/http_fields.hpp>
+#include <copper/components/http_controller.hpp>
+#include <copper/components/http_status_code.hpp>
+#include <copper/components/json.hpp>
+#include <copper/components/chronos.hpp>
 
+#include <boost/beast.hpp>
+
+using namespace copper::components;
+
+class heartbeat_controller final : public http_controller {
+public:
+    bool requires_limitation() const override { return true; }
+    int requests_per_minute() const override { return 5; }
+    http_response invoke(const http_request & request) override {
+        auto now = chronos::now();
+        const json::object data = {
+                { "message", "Request has been processed." },
+                {"data", "pong"},
+                { "timestamp", now },
+                {"status", 200}
+        };
+        return response(request, http_status_code::ok, serialize(data), "application/json", now);
+    }
+};
+
+class params_controller final : public http_controller {
+public:
+    bool requires_limitation() const override { return true; }
+    int requests_per_minute() const override { return 5; }
+    http_response invoke(const http_request & request) override {
+        auto now = chronos::now();
+        const json::object data = {
+                { "message", "Request has been processed." },
+                {"data", this->bindings_.at("name") },
+                { "timestamp", now },
+                {"status", 200}
+        };
+        return response(request, http_status_code::ok, serialize(data), "application/json", now);
+    }
+};
 
 TEST(Components_TCP_Listener, Client) {
-    using namespace copper::components;
 
     auto const address = boost::asio::ip::make_address("0.0.0.0");
     auto const port = 9001;
@@ -24,6 +65,14 @@ TEST(Components_TCP_Listener, Client) {
     task_group task_group{ioc.get_executor()};
 
     auto state_ = boost::make_shared<state>();
+
+    state_->get_router()->get_routes()->push_back(
+            std::pair(http_router::factory(http_method::get, "/api/up"), boost::make_shared<heartbeat_controller>())
+    );
+
+    state_->get_router()->get_routes()->push_back(
+            std::pair(http_router::factory(http_method::get, "/api/params/{name}"), boost::make_shared<params_controller>())
+    );
 
     boost::asio::co_spawn(
             boost::asio::make_strand(ioc),
@@ -43,7 +92,6 @@ TEST(Components_TCP_Listener, Client) {
     boost::asio::co_spawn(boost::asio::make_strand(ioc), signal_handler(task_group), boost::asio::detached);
 
     boost::asio::io_context client_ioc;
-
 
     try {
         std::thread thread([&]() {
@@ -65,27 +113,47 @@ TEST(Components_TCP_Listener, Client) {
         auto const results = resolver.resolve(host, "9001");
         stream.connect(results);
 
-        boost::beast::http::request<boost::beast::http::string_body> req{boost::beast::http::verb::get, "/", 11};
-        req.set(boost::beast::http::field::host, host);
-        req.set(boost::beast::http::field::user_agent, "Copper");
+        http_request req{http_method::get, "/", 11};
+        req.set(http_fields::host, host);
+        req.set(http_fields::user_agent, "Copper");
 
-        boost::beast::http::request<boost::beast::http::string_body> close_req{boost::beast::http::verb::get, "/", 11};
-        close_req.set(boost::beast::http::field::host, host);
-        close_req.set(boost::beast::http::field::user_agent, "Copper");
-        close_req.set(boost::beast::http::field::connection, "close");
+        http_request options_up_request{http_method::options, "/api/up", 11};
+        req.set(http_fields::host, host);
+        req.set(http_fields::user_agent, "Copper");
+
+        http_request up_request{http_method::get, "/api/up", 11};
+        req.set(http_fields::host, host);
+        req.set(http_fields::user_agent, "Copper");
+
+        http_request params_request{http_method::get, "/api/params/{name}", 11};
+        req.set(http_fields::host, host);
+        req.set(http_fields::user_agent, "Copper");
+
+        http_request close_req{http_method::get, "/", 11};
+        close_req.set(http_fields::host, host);
+        close_req.set(http_fields::user_agent, "Copper");
+        close_req.set(http_fields::connection, "close");
 
         boost::beast::flat_buffer buffer;
         boost::beast::http::response<boost::beast::http::dynamic_body> res;
 
         boost::beast::http::write(stream, req);
         boost::beast::http::read(stream, buffer, res);
-        boost::beast::http::write(stream, req);
+
+        boost::beast::http::write(stream, options_up_request);
         boost::beast::http::read(stream, buffer, res);
+
+        boost::beast::http::write(stream, up_request);
+        boost::beast::http::read(stream, buffer, res);
+
+        boost::beast::http::write(stream, params_request);
+        boost::beast::http::read(stream, buffer, res);
+
         boost::beast::http::write(stream, close_req);
         boost::beast::http::read(stream, buffer, res);
 
         task_group.emit(boost::asio::cancellation_type::all);
-        sleep(1);
+        sleep(10);
         ioc.stop();
         thread.join();
     } catch (std::exception const &e) {

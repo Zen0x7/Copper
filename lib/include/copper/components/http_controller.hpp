@@ -32,7 +32,7 @@ namespace copper::components {
 
         virtual ~http_controller() = default;
 
-        virtual http_response invoke(const http_request &request);
+        virtual http_response invoke(const http_request &request) = 0;
 
         virtual void prepare(
                 http_request &request,
