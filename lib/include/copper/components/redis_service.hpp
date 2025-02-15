@@ -29,6 +29,20 @@ namespace copper::components {
                 dotenv::getenv("REDIS_HOST", "127.0.0.1"),
                 dotenv::getenv("REDIS_PORT", "6379")
             };
+
+            redis_config_->health_check_interval = std::chrono::seconds {
+                std::stoi(dotenv::getenv("REDIS_HEALTH_CHECK_INTERVAL", "60")),
+            };
+
+            redis_config_->connect_timeout = std::chrono::seconds {
+                    std::stoi(dotenv::getenv("REDIS_CONNECTION_TIMEOUT", "60")),
+            };
+
+            redis_config_->reconnect_wait_interval = std::chrono::seconds {
+                    std::stoi(dotenv::getenv("REDIS_RECONNECTION_WAIT_INTERVAL", "5")),
+            };
+
+            redis_config_->clientname = dotenv::getenv("REDIS_CLIENT_NAME", "Copper");
         }
 
         boost::asio::awaitable<

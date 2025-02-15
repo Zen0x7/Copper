@@ -1,4 +1,6 @@
 .idea
-bin
+bin/copper
+bin/tests
+bin/.env
 cmake-build-debug
 cmake-build-debug-coverage
