@@ -1,4 +1,6 @@
 #include <copper/components/listener.hpp>
+#include <copper/components/state.hpp>
+#include <boost/redis.hpp>
 
 namespace copper::components {
 
@@ -8,7 +10,8 @@ namespace copper::components {
                     boost::asio::io_context::executor_type
                     >
     > listener(
-            task_group &task_group,
+            shared<state> state,
+            shared<task_group> task_group,
             boost::asio::ssl::context &ctx,
             boost::asio::ip::tcp::endpoint endpoint,
             boost::beast::string_view doc_root
@@ -34,9 +37,10 @@ namespace copper::components {
             boost::asio::co_spawn(
                     std::move(socket_executor),
                     detect_session(
+                            state,
                             typename boost::beast::tcp_stream::rebind_executor<boost::asio::strand<boost::asio::io_context::executor_type>>::other
                             {std::move(socket)}, ctx, doc_root),
-                    task_group.adapt(
+                    task_group->adapt(
                             [](std::exception_ptr e) {
                                 if (e) {
                                     // LCOV_EXCL_START

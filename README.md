@@ -306,3 +306,45 @@ report(ec, "All OK");
 
 *See more examples in the [test cases](/tests/components/report_test.cc).*
 
+### Controller
+
+#### Location
+
+> copper/components/http_controller.hpp
+
+#### Usage
+
+```cpp
+#include <copper/components/http_controller.hpp>
+
+class pong_controller final : public http_controller {
+    public:
+        http_response invoke(const http_request & request) {
+            json::object response = {
+                    {"status": "OK"}
+            };
+            
+            return response(http_status_code::ok, serialize(response), "application/json")
+        } 
+};
+```
+
+### Router
+
+#### Location
+
+> copper/components/http_router.hpp
+
+#### Usage
+
+```cpp
+#include <copper/components/http_router.hpp>
+
+auto router = boost::make_shared<http_router>();
+
+router
+    ->get_routes()
+    ->push_back(
+        std::pair(http_router::factory(http_method::get, "/api/up"), boost::make_shared<heartbeat_controller>())
+    );
+```

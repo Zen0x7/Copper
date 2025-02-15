@@ -19,6 +19,12 @@ find_package(
 include(FetchContent)
 include_directories(lib/include)
 
+FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt
+        GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
+FetchContent_MakeAvailable(fmt)
+
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/lib/sources/*.cpp")
 file(GLOB_RECURSE TESTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cc")
 
@@ -41,10 +47,10 @@ if (BUILD_TESTS)
 
     enable_testing()
     add_executable(tests ${SOURCES} ${TESTS})
-    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
+    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt)
     include(GoogleTest)
     gtest_discover_tests(tests)
 endif ()
 
 add_executable(copper main.cpp ${SOURCES})
-target_link_libraries(copper ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(copper ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt)

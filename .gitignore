@@ -1,4 +1,9 @@
 .idea
-bin
+bin/certificates/public.pem
+bin/certificates/private.pem
+bin/certificates/params.pem
+bin/copper
+bin/tests
+bin/.env
 cmake-build-debug
 cmake-build-debug-coverage

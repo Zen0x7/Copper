@@ -10,7 +10,7 @@
 namespace copper {
     std::string get_version();
 
-    void run();
+    int run(int argc, const char * argv[]);
 }
 
 #endif // COPPER_APP_HPP

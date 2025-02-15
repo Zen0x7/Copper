@@ -8,6 +8,7 @@
 #include <boost/beast.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/scope/scope_exit.hpp>
+#include <copper/components/state.hpp>
 
 namespace copper::components {
 
@@ -29,6 +30,7 @@ namespace copper::components {
                     boost::asio::io_context::executor_type
             >
     > websocket_session_run(
+            shared<state> &  /* state */,
             Stream &stream,
             boost::beast::flat_buffer &buffer,
             boost::beast::http::request<

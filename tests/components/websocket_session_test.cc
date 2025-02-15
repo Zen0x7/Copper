@@ -3,6 +3,7 @@
 #include <copper/components/certificates.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/components/listener.hpp>
+#include <copper/components/state.hpp>
 #include <copper/components/signal_handler.hpp>
 
 
@@ -20,12 +21,15 @@ TEST(Components_WebSocket_Session, Client) {
 
     load_server_certificate(ctx);
 
-    task_group task_group{ioc.get_executor()};
+    auto  task_group_ = boost::make_shared<task_group>(ioc.get_executor());
+
+
+    auto state_ = boost::make_shared<state>();
 
     boost::asio::co_spawn(
             boost::asio::make_strand(ioc),
-            listener(task_group, ctx, endpoint, doc_root),
-            task_group.adapt(
+            listener(state_, task_group_, ctx, endpoint, doc_root),
+            task_group_->adapt(
                     [](std::exception_ptr e) {
                         if (e) {
                             try {
@@ -37,7 +41,7 @@ TEST(Components_WebSocket_Session, Client) {
                         }
                     }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), signal_handler(task_group), boost::asio::detached);
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), signal_handler(task_group_), boost::asio::detached);
 
     boost::asio::io_context client_ioc;
 
@@ -52,8 +56,6 @@ TEST(Components_WebSocket_Session, Client) {
         });
 
         thread.detach();
-
-        sleep(3);
 
         boost::asio::ip::tcp::resolver resolver(client_ioc);
 
@@ -77,8 +79,7 @@ TEST(Components_WebSocket_Session, Client) {
         ws.read(buffer);
         ws.close(boost::beast::websocket::close_code::normal);
         std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
-        task_group.emit(boost::asio::cancellation_type::all);
-        sleep(1);
+        task_group_->emit(boost::asio::cancellation_type::all);
         ioc.stop();
         thread.join();
     } catch (std::exception const &e) {
