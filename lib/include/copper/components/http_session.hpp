@@ -45,7 +45,7 @@ namespace copper::components {
 
         while (!cs.cancelled()) {
             boost::beast::http::request_parser<boost::beast::http::string_body> parser;
-            parser.body_limit(10000);
+            parser.body_limit(std::stoi(dotenv::getenv("HTTP_BODY_LIMIT", "10000")));
 
             auto [ec, _] =
                     co_await boost::beast::http::async_read(stream, buffer, parser, boost::asio::as_tuple);

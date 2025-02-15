@@ -17,11 +17,10 @@ namespace copper::components {
             std::cout << "Gracefully cancelling child tasks...\n";
             task_group->emit(boost::asio::cancellation_type::total);
 
-            // Wait a limited time for child tasks to gracefully cancell
             auto [ec] = co_await task_group->async_wait(
                     boost::asio::as_tuple(boost::asio::cancel_after(std::chrono::seconds{10})));
 
-            if (ec == boost::asio::error::operation_aborted) // Timeout occurred
+            if (ec == boost::asio::error::operation_aborted)
             {
                 std::cout << "Sending a terminal cancellation signal...\n";
                 task_group->emit(boost::asio::cancellation_type::terminal);

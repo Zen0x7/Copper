@@ -22,7 +22,7 @@ namespace copper {
         dotenv::init();
 
         auto const address = boost::asio::ip::make_address(dotenv::getenv("APP_HOST", "0.0.0.0"));
-        auto const port = 9000;
+        auto const port = (unsigned short) std::stoi(dotenv::getenv("APP_PORT", "9000"));
         auto const endpoint = boost::asio::ip::tcp::endpoint { address, port };
         auto const doc_root = std::string_view{ "."};
         auto const threads = std::max<int>(1, std::stoi(dotenv::getenv("APP_THREADS", "1")));
