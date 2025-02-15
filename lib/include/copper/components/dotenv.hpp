@@ -90,6 +90,8 @@
 ///
 /// \see https://github.com/laserpants/dotenv-cpp
 ///
+// LCOV_EXCL_START
+
 class dotenv {
 public:
     dotenv() = delete;
@@ -355,4 +357,6 @@ inline std::string dotenv::strip_quotes(const std::string& str) {
 
     return str;
 }
+
+// LCOV_EXCL_STOP
 
