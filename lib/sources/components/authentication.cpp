@@ -87,9 +87,9 @@ namespace copper::components {
         const auto now = std::chrono::system_clock::now();
         const auto expires_at = now + std::chrono::days(7);
         const auto iat
-                = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+                = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
         const auto exp
-                = std::chrono::duration_cast<std::chrono::seconds>(expires_at.time_since_epoch()).count();
+                = std::chrono::duration_cast<std::chrono::nanoseconds>(expires_at.time_since_epoch()).count();
         const boost::json::object payload = {
                 {"sub", id_},
                 {"typ", type},
