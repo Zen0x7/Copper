@@ -57,8 +57,6 @@ TEST(Components_WebSocket_Session, Client) {
 
         thread.detach();
 
-        sleep(3);
-
         boost::asio::ip::tcp::resolver resolver(client_ioc);
 
         std::string host = "127.0.0.1";

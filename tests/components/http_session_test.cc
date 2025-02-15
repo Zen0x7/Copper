@@ -24,7 +24,7 @@ boost::asio::awaitable<
         boost::asio::strand<
                 boost::asio::io_context::executor_type
         >
-> cancel(shared<task_group> &task_group) {
+> cancel() {
     auto executor = co_await boost::asio::this_coro::executor;
     executor.get_inner_executor().context().stop();
 }
@@ -197,7 +197,7 @@ TEST(Components_TCP_Listener, Client) {
 
         stream.close();
 
-        boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel(task_group_), boost::asio::detached);
+        boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel(), boost::asio::detached);
 
         first_thread.join();
         second_thread.join();
