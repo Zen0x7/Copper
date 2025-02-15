@@ -306,8 +306,6 @@ report(ec, "All OK");
 
 *See more examples in the [test cases](/tests/components/report_test.cc).*
 
-## WIP
-
 ### Controller
 
 #### Location
@@ -319,20 +317,14 @@ report(ec, "All OK");
 ```cpp
 #include <copper/components/http_controller.hpp>
 
-class pong_controller final : public copper::components::http_controller {
+class pong_controller final : public http_controller {
     public:
-        boost::beast::http::response<boost::beast::http::string_body> invoke(
-                const boost::beast::http::request<boost::beast::http::string_body> & request
-        ) {
-            boost::json::object response = {
+        http_response invoke(const http_request & request) {
+            json::object response = {
                     {"status": "OK"}
             };
             
-            return response(
-                    boost::beast::http::status::ok,
-                    serialize(response),
-                    "application/json"
-            )
+            return response(http_status_code::ok, serialize(response), "application/json")
         } 
 };
 ```
@@ -350,57 +342,9 @@ class pong_controller final : public copper::components::http_controller {
 
 auto router = boost::make_shared<http_router>();
 
-router->push("GET", boost::make_shared<app::controllers::pong_controller>())
-   ->rate(60, rate_limiter::per_minute);
-```
-
-### Settings
-
-#### Location
-
-> copper/components/settings.hpp
-
-#### Usage
-
-```cpp
-#include <copper/components/settings.hpp>
-
-auto settings = boost::make_shared<settings>();
-
-settings->http->enabled = true;
-settings->http->port = 9000;
-
-settings->http->ssl_public_key_path = "./certificates/public.pem";
-settings->http->ssl_private_key_path = "./certificates/private.pem";
-settings->http->ssl_password = "abc";
-
-settings->database->enabled = true;
-settings->database->host = "127.0.0.1";
-settings->database->username = "admin";
-settings->database->password = "password";
-```
-
-### Application
-
-#### Location
-
-> copper/components/application.hpp
-
-#### Usage
-
-```c++
-#include <copper/components/application.hpp>
-#include <copper/components/rate_limiter.hpp>
-
-auto router = boost::make_shared<http_router>();
-auto settings = boost::make_shared<settings>();
-
-// ...
-
-auto app = boost::make_shared<application>(
-        settings,
-        router
-);
-
-app->run();
+router
+    ->get_routes()
+    ->push_back(
+        std::pair(http_router::factory(http_method::get, "/api/up"), boost::make_shared<heartbeat_controller>())
+    );
 ```

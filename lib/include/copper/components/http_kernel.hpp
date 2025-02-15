@@ -161,41 +161,4 @@ namespace copper::components {
         }
     };
 
-
-    /**
-     * Kernel
-     *
-     * @tparam Body
-     * @tparam Allocator
-     * @param req
-     * @return
-     */
-    template<
-            class Body,
-            class Allocator
-    >
-    boost::beast::http::message_generator http_kernel_basic_handler(
-            shared<state> & state,
-            boost::beast::string_view,
-            boost::beast::http::request<
-                    Body,
-                    boost::beast::http::basic_fields<
-                            Allocator
-                    >
-            > &&req
-    ) {
-        auto const not_found =
-                [&req](boost::beast::string_view target) {
-                    boost::beast::http::response<boost::beast::http::string_body> res{
-                            boost::beast::http::status::not_found, req.version()};
-                    res.set(boost::beast::http::field::server, "Copper");
-                    res.set(boost::beast::http::field::content_type, "text/html");
-                    res.keep_alive(req.keep_alive());
-                    res.body() = "The resource '" + std::string(target) + "' was not found.";
-                    res.prepare_payload();
-                    return res; };
-
-        return not_found(req.target());
-    }
-
 } // namespace copper::component

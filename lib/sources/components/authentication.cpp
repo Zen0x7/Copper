@@ -8,6 +8,8 @@
 #include <copper/components/base64url.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/validator.hpp>
+#include <copper/components/containers.hpp>
+#include <copper/components/chronos.hpp>
 
 namespace copper::components {
 
@@ -20,7 +22,7 @@ namespace copper::components {
         if (bearer != "") {
             std::string token = boost::starts_with(bearer, "Bearer ") ? bearer.substr(7) : bearer;
 
-            std::vector<std::string> parts;
+            containers::vector_of<std::string> parts;
             std::size_t position = 0;
 
             while ((position = token.find('.')) != std::string::npos) {
@@ -33,14 +35,12 @@ namespace copper::components {
 
             if (parts.size() == 3) {
                 std::string merged = parts[0] + "." + parts[1];
-                if (const std::string signature_
-                            = base64url_encode(cipher_hmac(merged, app_key), false);
-                        signature_ == parts[2]) {
+                if (const std::string signature_ = base64url_encode(cipher_hmac(merged, app_key), false); signature_ == parts[2]) {
                     boost::system::error_code ec;
                     auto payload = boost::json::parse(base64url_decode(parts[1]), ec);
 
                     if (!ec) {
-                        std::map<std::string, std::string> rules = {
+                        containers::map_of_strings rules = {
                                 {"*",   "is_object"},
                                 {"sub", "is_uuid"},
                                 {"typ", "is_string"},
@@ -56,11 +56,7 @@ namespace copper::components {
                             auto id_ = boost::lexical_cast<boost::uuids::uuid>(id);
 
                             // LCOV_EXCL_START
-                            if (
-                                auto current_unix = std::chrono::duration_cast<std::chrono::seconds>(
-                                        std::chrono::system_clock::now().time_since_epoch()
-                                ).count();
-                                    current_unix > expires_at_) {
+                            if (auto current_unix = chronos::now(); current_unix > expires_at_) {
                                 return boost::none;
                             }
                             // LCOV_EXCL_STOP
