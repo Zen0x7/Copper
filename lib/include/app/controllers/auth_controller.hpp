@@ -25,7 +25,7 @@ namespace app::controllers {
             std::string password{data_.as_object().at("password").as_string()};
 
 
-            const auto user = state_->get_database()->get_user_by_email("iantorres@outlook.com");
+            const auto user = state_->get_database()->get_user_by_email(email);
 
             if (!user.has_value()) {
                 const copper::components::json::object errors = {

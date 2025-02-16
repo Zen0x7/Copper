@@ -32,6 +32,8 @@ namespace copper::components {
           params.password = dotenv::getenv("DATABASE_PASSWORD", "");
           params.database = dotenv::getenv("DATABASE_NAME", "copper");
           params.thread_safe = true;
+          params.initial_size = 10;
+          params.max_size = 100;
 
           pool_ = boost::make_shared<boost::mysql::connection_pool>(*thread_pool_, std::move(params));
         }
