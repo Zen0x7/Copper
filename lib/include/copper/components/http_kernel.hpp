@@ -144,6 +144,7 @@ namespace copper::components {
                     co_return route.value().controller_->invoke(request);
                 } catch (std::exception& exception) {
                     std::cout << exception.what() << std::endl;
+
                     co_return http_response_exception(request, now);
                 }
             }

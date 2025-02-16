@@ -1,6 +1,8 @@
 #include <copper/components/cipher.hpp>
 #include <copper/components/report.hpp>
 
+#include <bcrypt/BCrypt.hpp>
+
 #ifndef CIPHER_KEY_LENGTH
 #define CIPHER_KEY_LENGTH 32
 #endif
@@ -301,5 +303,13 @@ namespace copper::components {
         // LCOV_EXCL_STOP
 
         return output; }
+
+    bool cipher_password_validator(const std::string &input, const std::string &hash) {
+        return BCrypt::validatePassword(input, hash);
+    }
+
+    std::string cipher_password_hash(const std::string &input) {
+        return BCrypt::generateHash(input);
+    }
 
 } // namespace copper::component

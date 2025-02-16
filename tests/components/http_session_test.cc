@@ -114,6 +114,8 @@ TEST(Components_HTTP_Session, Implementation) {
 
     auto state_ = boost::make_shared<state>();
 
+    state_->get_database()->start();
+
     state_->get_router()->get_routes()->push_back(
             std::pair(http_router::factory(http_method::get, "/api/up"), boost::make_shared<heartbeat_controller>())
     );

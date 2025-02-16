@@ -2,6 +2,7 @@
 
 #include <copper/components/containers.hpp>
 #include <copper/components/shared.hpp>
+#include <copper/components/database.hpp>
 
 #include <copper/components/redis_service.hpp>
 
@@ -11,10 +12,12 @@ namespace copper::components {
     class state : public shared_enabled<state> {
         shared<http_router> router_;
         shared<redis_service> redis_;
+        shared<database> database_;
     public:
         state();
 
         shared<http_router> get_router();
         shared<redis_service> get_redis();
+        shared<database> get_database();
     };
 }
