@@ -194,6 +194,8 @@ TEST(Components_HTTP_Session, Implementation) {
     first_thread.detach();
     second_thread.detach();
 
+    sleep(3);
+
     boost::asio::ip::tcp::resolver resolver(client_ioc);
     boost::beast::tcp_stream stream(client_ioc);
     boost::asio::ip::tcp::resolver second_resolver(second_client_ioc);
@@ -321,8 +323,6 @@ TEST(Components_HTTP_Session, Implementation) {
     close_res.clear();
 
     boost::system::error_code ec;
-
-    sleep(10);
 
     stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     if (ec && ec != boost::system::errc::not_connected) {
