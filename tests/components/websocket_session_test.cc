@@ -23,7 +23,6 @@ TEST(Components_WebSocket_Session, Client) {
 
     auto  task_group_ = boost::make_shared<task_group>(ioc.get_executor());
 
-
     auto state_ = boost::make_shared<state>();
 
     boost::asio::co_spawn(
