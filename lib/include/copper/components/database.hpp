@@ -28,12 +28,14 @@ namespace copper::components {
             dotenv::getenv("DATABASE_HOST", "127.0.0.1"),
             std::stoi(dotenv::getenv("DATABASE_PORT", "3306"))
           );
-          params.username = dotenv::getenv("DATABASE_USER", "root");
-          params.password = dotenv::getenv("DATABASE_PASSWORD", "");
+          params.username = dotenv::getenv("DATABASE_USER", "user");
+          params.password = dotenv::getenv("DATABASE_PASSWORD", "user_password");
           params.database = dotenv::getenv("DATABASE_NAME", "copper");
           params.thread_safe = true;
           params.initial_size = 10;
           params.max_size = 100;
+
+          std::cout << "USER: " << params.username << " NAME: " << params.database << " PASSWORD: " << params.password << std::endl;
 
           pool_ = boost::make_shared<boost::mysql::connection_pool>(*thread_pool_, std::move(params));
         }
