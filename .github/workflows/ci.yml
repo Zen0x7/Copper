@@ -13,11 +13,20 @@ jobs:
 
 
     services:
-      # Label used to access the service container
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: copper
+          MYSQL_USER: user
+          MYSQL_PASSWORD: user_password
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
       redis:
-        # Docker Hub image
         image: bitnami/redis:latest
-        # Set health checks to wait until redis has started
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
@@ -43,6 +52,11 @@ jobs:
           lcov --capture --directory . --output-file coverage.info
           lcov --list coverage.info
         env:
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_USER: user
+          DATABASE_PASSWORD: user_password
+          DATABASE_NAME: copper
+          DATABASE_PORT: ${{ job.services.mysql.ports[3306] }}
           REDIS_HOST: redis
           REDIS_PORT: 6379
 
