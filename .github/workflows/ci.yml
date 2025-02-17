@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           apt update
-          apt install -y lcov iputils-ping
+          apt install -y lcov iputils-ping netcat-traditional
           ping -c 4 127.0.0.1
           ping -c 4 redis
           ping -c 4 mysql 
