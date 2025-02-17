@@ -35,7 +35,7 @@ namespace copper::components {
           params.initial_size = 10;
           params.max_size = 100;
 
-          std::cout << "USER: " << params.username << " NAME: " << params.database << " PASSWORD: " << params.password << std::endl;
+          std::cout << "USER: " << params.username << " NAME: " << params.database << " PASSWORD: " << params.password << " PORT: " << dotenv::getenv("DATABASE_PORT", "3306") << " HOST: " << dotenv::getenv("DATABASE_HOST", "3306") << std::endl;
 
           pool_ = boost::make_shared<boost::mysql::connection_pool>(*thread_pool_, std::move(params));
         }

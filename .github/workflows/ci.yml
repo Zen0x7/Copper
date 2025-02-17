@@ -38,6 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
+          ping 127.0.0.1
           apt update
           apt install -y lcov
           curl -Os https://cli.codecov.io/latest/linux/codecov
