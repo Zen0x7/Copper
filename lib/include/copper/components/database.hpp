@@ -21,5 +21,7 @@ namespace copper::components {
         void start();
 
         containers::optional_of<app::models::user> get_user_by_email(const std::string &email);
+
+        app::models::user get_user_by_id(uuid id);
     };
 }

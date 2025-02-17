@@ -74,7 +74,7 @@ namespace copper {
         state->get_database()->start();
 
         state
-          ->get_router()
+          ->get_http_router()
           ->push(components::http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>(), {
             .use_auth = true,
             .use_throttler = true,

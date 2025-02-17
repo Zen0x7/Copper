@@ -26,7 +26,7 @@
 namespace copper::components {
 
     containers::optional_of<http_kernel_result> http_kernel::find_on_routes(const http_request &request) const {
-      for (const auto & [route, controller] : *state_->get_router()->get_routes()) {
+      for (const auto & [route, controller] : *state_->get_http_router()->get_routes()) {
         if (auto [matches, bindings] = http_route_match(request.method(), request.target(), route); matches) {
           return http_kernel_result {
             .route_ = route,
@@ -41,7 +41,7 @@ namespace copper::components {
 
     containers::vector_of<http_method> http_kernel::get_available_methods(const http_request &request) const {
       containers::vector_of<http_method> methods;
-      for (const auto& [route, controller] : *state_->get_router()->get_routes()) {
+      for (const auto& [route, controller] : *state_->get_http_router()->get_routes()) {
         if (auto [matches, bindings] = http_route_find(request.target(), route); matches)
           methods.push_back(route.method_);
       }
@@ -60,7 +60,8 @@ namespace copper::components {
         route.value().controller_->set_start(now);
 
         if (route.value().controller_->config_.use_throttler) {
-          if (auto [limited, TTL] = co_await state_->get_redis()->is_alive(request, ip, route.value().controller_->config_.rpm); limited) {
+          if (auto [can, TTL] = co_await state_->get_cache()->can_invoke(request, ip,
+                                                                         route.value().controller_->config_.rpm); !can) {
             co_return http_response_too_many_requests(request, now, TTL);
           }
         }

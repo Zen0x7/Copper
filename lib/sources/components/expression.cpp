@@ -27,7 +27,7 @@ namespace copper::components {
         // LCOV_EXCL_START
         std::string error_output = "Expression error: Parameter ";
         error_output.append(name);
-        error_output.append(" doesn't exists.");
+        error_output.append(" doesn't has.");
         throw std::runtime_error(error_output.c_str());
     }
     // LCOV_EXCL_STOP
@@ -87,7 +87,7 @@ namespace copper::components {
             if (std::find(_arguments.begin(), _arguments.end(), _value) != _arguments.end()) {
                 std::string error_output = "Expression error: Argument ";
                 error_output.append(_value);
-                error_output.append(" already exists.");
+                error_output.append(" already has.");
                 throw std::runtime_error(error_output.c_str());
             }
             // LCOV_EXCL_STOP

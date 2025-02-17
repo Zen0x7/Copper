@@ -82,7 +82,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
   state_->get_database()->start();
 
-  state_->get_router()
+  state_->get_http_router()
     ->push(http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>(), {
       .use_throttler = true,
       .rpm = 5
