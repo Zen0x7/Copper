@@ -16,6 +16,8 @@
 #include <copper/components/shared.hpp>
 
 #include <app/controllers/auth_controller.hpp>
+#include <app/controllers/up_controller.hpp>
+#include <app/controllers/user_controller.hpp>
 
 #include <boost/beast.hpp>
 
@@ -30,24 +32,6 @@ boost::asio::awaitable<
   auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
 }
-
-class heartbeat_controller final : public http_controller {
-public:
-  bool requires_limitation() const override { return true; }
-
-  int requests_per_minute() const override { return 5; }
-
-  http_response invoke(const http_request &request) override {
-    auto now = chronos::now();
-    const json::object data = {
-      {"message",   "Request has been processed."},
-      {"data",      "pong"},
-      {"timestamp", now},
-      {"status",    200}
-    };
-    return response(request, http_status_code::ok, serialize(data), "application/json", now);
-  }
-};
 
 class exception_controller final : public http_controller {
 public:
@@ -86,26 +70,6 @@ public:
   }
 };
 
-class authenticated_controller final : public http_controller {
-public:
-  bool requires_limitation() const override { return false; }
-
-  int requests_per_minute() const override { return 5; }
-
-  bool requires_authentication() const override { return true; }
-
-  http_response invoke(const http_request &request) override {
-    auto now = chronos::now();
-    const json::object data = {
-      {"message",   "Request has been processed."},
-      {"data",      to_string(this->auth_id_)},
-      {"timestamp", now},
-      {"status",    200}
-    };
-    return response(request, http_status_code::ok, serialize(data), "application/json", now);
-  }
-};
-
 TEST(Components_HTTP_Session, Implementation) {
   dotenv::init();
 
@@ -127,7 +91,7 @@ TEST(Components_HTTP_Session, Implementation) {
   state_->get_database()->start();
 
   state_->get_router()->get_routes()->push_back(
-    std::pair(http_router::factory(http_method::get, "/api/up"), boost::make_shared<heartbeat_controller>())
+    std::pair(http_router::factory(http_method::get, "/api/up"), boost::make_shared<app::controllers::up_controller>())
   );
 
   state_->get_router()->get_routes()->push_back(
@@ -139,7 +103,7 @@ TEST(Components_HTTP_Session, Implementation) {
   );
 
   state_->get_router()->get_routes()->push_back(
-    std::pair(http_router::factory(http_method::get, "/api/user"), boost::make_shared<authenticated_controller>())
+    std::pair(http_router::factory(http_method::get, "/api/user"), boost::make_shared<app::controllers::user_controller>())
   );
 
   state_->get_router()->get_routes()->push_back(
