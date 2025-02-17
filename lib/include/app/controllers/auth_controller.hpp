@@ -60,7 +60,7 @@ namespace app::controllers {
           const std::string payload_ = copper::components::base64url_encode(serialize(payload));
           const std::string signature_ = copper::components::base64url_encode(
             copper::components::cipher_hmac(header_ + "." + payload_, dotenv::getenv("APP_KEY")));
-          std::string token = header_ + "." + payload_ + "." + signature_;
+          std::string token = "Bearer " + header_ + "." + payload_ + "." + signature_;
 
           const copper::components::json::object data = {
             {"message", "OK"},

@@ -237,7 +237,24 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();
       std::cout << "Success auth Request: " << response << std::endl << std::endl;
+
+      auto json_response = boost::json::parse(response.body());
+
       response.clear();
+
+      {
+        boost::beast::flat_buffer user_buffer;
+        boost::beast::http::response<boost::beast::http::string_body> user_response;
+        http_request user_request{http_method::get, "/api/user", 11};
+        user_request.set(http_fields::host, host);
+        user_request.set(http_fields::user_agent, "Copper");
+        user_request.set(http_fields::authorization, json_response.as_object().at("token").as_string());
+        boost::beast::http::write(stream, user_request);
+        boost::beast::http::read(stream, user_buffer, user_response);
+        user_buffer.clear();
+        std::cout << "Authenticated Request: " << user_response << std::endl << std::endl;
+        user_response.clear();
+      }
     }
 
     {
@@ -315,7 +332,7 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();
-      std::cout << "Authenticated Request: " << response << std::endl << std::endl;
+      std::cout << "User Request: " << response << std::endl << std::endl;
       response.clear();
     }
 
