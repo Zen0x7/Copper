@@ -92,13 +92,13 @@ namespace copper::components {
 
                 route.value().controller_->set_start(now);
 
-                if (route.value().controller_->requires_limitation()) {
-                    if (auto [limited, TTL] = co_await state_->get_redis()->is_alive(request, ip, route.value().controller_->requests_per_minute()); limited) {
+                if (route.value().controller_->config_.use_throttler) {
+                    if (auto [limited, TTL] = co_await state_->get_redis()->is_alive(request, ip, route.value().controller_->config_.rpm); limited) {
                         co_return http_response_too_many_requests(request, now, TTL);
                     }
                 }
 
-                if (route.value().controller_->requires_authentication()) {
+                if (route.value().controller_->config_.use_auth) {
                     std::string bearer {request["Authorization"]};
 
                     std::string token = boost::starts_with(bearer, "Bearer ") ? bearer.substr(7) : bearer;
@@ -114,13 +114,13 @@ namespace copper::components {
                 route.value().controller_->set_bindings(bindings);
                 route.value().controller_->set_state(state_);
 
-                if (route.value().controller_->requires_data()) {
+                if (route.value().controller_->config_.use_validator) {
                     boost::system::error_code json_parse_error_code;
                     boost::json::value value = boost::json::parse(request.body(), json_parse_error_code);
 
                     if (!json_parse_error_code) {
                         route.value().controller_->set_data(value);
-                        auto rules = route.value().controller_->validate_data();
+                        auto rules = route.value().controller_->rules();
 
                         if (auto validator = validator_make(rules, value); !validator->success) {
                             auto error_response = boost::json::object(

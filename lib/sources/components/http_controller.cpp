@@ -14,5 +14,9 @@ namespace copper::components {
     void http_controller::set_user(const uuid id) { auth_id_ = id; }
 
     void http_controller::set_start(long at) { start_ = at; }
+
+    void http_controller::set_config(http_controller_config config) {
+      config_ = config;
+    }
     // LCOV_EXCL_STOP
 }

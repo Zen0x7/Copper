@@ -7,13 +7,7 @@
 namespace app::controllers {
     class auth_controller final : public copper::components::http_controller {
     public:
-      bool requires_limitation() const override { return true; }
-
-      bool requires_data() const override { return true; }
-
-      int requests_per_minute() const override { return 5; }
-
-      copper::components::containers::map_of_strings validate_data() const override {
+      copper::components::containers::map_of_strings rules() const override {
         return {
           {"*",        "is_object"},
           {"email",    "is_string"},
@@ -54,4 +48,4 @@ namespace app::controllers {
       }
     };
 
-} // namespace copper::components
+} // namespace app::controller

@@ -80,9 +80,20 @@ namespace copper {
 
         state
           ->get_router()
-          ->push(components::http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>())
-          ->push(components::http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>())
-          ->push(components::http_method::post, "/api/auth", boost::make_shared<app::controllers::up_controller>());
+          ->push(components::http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>(), {
+            .use_auth = true,
+            .use_throttler = true,
+            .rpm = 5,
+          })
+          ->push(components::http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>(), {
+            .use_throttler = true,
+            .rpm = 5,
+          })
+          ->push(components::http_method::post, "/api/auth", boost::make_shared<app::controllers::auth_controller>(), {
+            .use_throttler = true,
+            .use_validator = true,
+            .rpm = 5,
+          });
 
         boost::asio::co_spawn(
           boost::asio::make_strand(ioc),

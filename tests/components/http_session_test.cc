@@ -35,10 +35,6 @@ boost::asio::awaitable<
 
 class exception_controller final : public http_controller {
 public:
-  bool requires_limitation() const override { return false; }
-
-  int requests_per_minute() const override { return 5; }
-
   http_response invoke(const http_request &request) override {
     throw std::runtime_error("Something went wrong");
     auto now = chronos::now();
@@ -54,10 +50,6 @@ public:
 
 class params_controller final : public http_controller {
 public:
-  bool requires_limitation() const override { return true; }
-
-  int requests_per_minute() const override { return 5; }
-
   http_response invoke(const http_request &request) override {
     auto now = chronos::now();
     const json::object data = {
@@ -91,11 +83,28 @@ TEST(Components_HTTP_Session, Implementation) {
   state_->get_database()->start();
 
   state_->get_router()
-    ->push(http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>())
-    ->push(http_method::get, "/api/params/{name}", boost::make_shared<params_controller>())
-    ->push(http_method::get, "/api/exception", boost::make_shared<exception_controller>())
-    ->push(http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>())
-    ->push(http_method::post, "/api/auth", boost::make_shared<app::controllers::auth_controller>());
+    ->push(http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>(), {
+      .use_throttler = true,
+      .rpm = 5
+    })
+    ->push(http_method::get, "/api/params/{name}", boost::make_shared<params_controller>(), {
+      .use_throttler = true,
+        .rpm = 5
+    })
+    ->push(http_method::get, "/api/exception", boost::make_shared<exception_controller>(), {
+      .use_throttler = true,
+      .rpm = 5
+    })
+    ->push(http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>(), {
+      .use_auth = true,
+      .use_throttler = true,
+      .rpm = 5,
+    })
+    ->push(http_method::post, "/api/auth", boost::make_shared<app::controllers::auth_controller>(), {
+      .use_throttler = true,
+      .use_validator = true,
+      .rpm = 5,
+    });
 
   boost::asio::co_spawn(
     boost::asio::make_strand(ioc),
@@ -165,19 +174,6 @@ TEST(Components_HTTP_Session, Implementation) {
       response.clear();
     }
 
-
-    {
-      boost::beast::flat_buffer buffer;
-      boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{http_method::options, "/api/up", 11};
-      request.set(http_fields::host, host);
-      request.set(http_fields::user_agent, "Copper");
-      boost::beast::http::write(stream, request);
-      boost::beast::http::read(stream, buffer, response);
-      buffer.clear();
-      response.clear();
-    }
-
     {
       for (int i = 0; i <= 5; i++) {
         boost::beast::flat_buffer buffer;
@@ -191,6 +187,18 @@ TEST(Components_HTTP_Session, Implementation) {
         std::cout << "Too Many Request: " << response << std::endl << std::endl;
         response.clear();
       }
+    }
+
+    {
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::response<boost::beast::http::string_body> response;
+      http_request request{http_method::options, "/api/up", 11};
+      request.set(http_fields::host, host);
+      request.set(http_fields::user_agent, "Copper");
+      boost::beast::http::write(stream, request);
+      boost::beast::http::read(stream, buffer, response);
+      buffer.clear();
+      response.clear();
     }
 
     {
