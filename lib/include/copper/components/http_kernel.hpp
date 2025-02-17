@@ -33,6 +33,8 @@
 #include <copper/components/validator.hpp>
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/json/parse.hpp>
+#include <boost/json/serialize.hpp>
 
 #ifndef HTTP_SERVER_HEADER_CONTENT
 #define HTTP_SERVER_HEADER_CONTENT "Copper"

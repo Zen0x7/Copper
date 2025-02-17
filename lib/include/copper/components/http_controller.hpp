@@ -17,7 +17,6 @@
 #include <copper/components/http_controller_config.hpp>
 
 #include <boost/smart_ptr.hpp>
-#include <boost/json.hpp>
 #include <iostream>
 #include <unordered_map>
 #include <map>
@@ -41,14 +40,6 @@ namespace copper::components {
         http_response response;
         return response;
       };
-
-      virtual void prepare(
-        http_request &request,
-        json::object &errors
-      ) const {
-        std::cout << request.body() << std::endl;
-        std::cout << serialize(errors) << std::endl;
-      }
 
       virtual containers::map_of_strings rules() const { return {}; }
 

@@ -2,7 +2,6 @@
 
 #include <copper/components/mime_type.hpp>
 
-
 TEST(Components_Filesystem_MimeType, Binary) {
     using namespace copper::components;
 

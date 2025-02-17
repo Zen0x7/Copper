@@ -1,8 +1,5 @@
 #include <copper/app.hpp>
 
-#include <boost/beast.hpp>
-#include <boost/asio.hpp>
-
 #include <copper/components/certificates.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/task_group.hpp>
@@ -11,19 +8,15 @@
 #include <copper/components/shared.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/base64.hpp>
-#include <boost/redis/connection.hpp>
-#include <boost/asio/thread_pool.hpp>
 
+#include <boost/redis/connection.hpp>
 #include <boost/program_options.hpp>
-#include <boost/mysql/pool_params.hpp>
-#include <boost/mysql/connection_pool.hpp>
 
 #include <fmt/core.h>
 
 #include <app/controllers/auth_controller.hpp>
 #include <app/controllers/up_controller.hpp>
 #include <app/controllers/user_controller.hpp>
-
 
 namespace copper {
 

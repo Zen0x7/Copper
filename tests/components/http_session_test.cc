@@ -5,11 +5,9 @@
 #include <copper/components/listener.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/signal_handler.hpp>
-#include <copper/components/http_method.hpp>
 #include <copper/components/http_response.hpp>
 #include <copper/components/http_fields.hpp>
 #include <copper/components/http_controller.hpp>
-#include <copper/components/http_status_code.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/chronos.hpp>
@@ -18,8 +16,6 @@
 #include <app/controllers/auth_controller.hpp>
 #include <app/controllers/up_controller.hpp>
 #include <app/controllers/user_controller.hpp>
-
-#include <boost/beast.hpp>
 
 using namespace copper::components;
 

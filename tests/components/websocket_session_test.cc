@@ -6,7 +6,6 @@
 #include <copper/components/state.hpp>
 #include <copper/components/signal_handler.hpp>
 
-
 TEST(Components_WebSocket_Session, Client) {
     using namespace copper::components;
 
