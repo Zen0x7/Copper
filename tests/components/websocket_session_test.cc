@@ -13,7 +13,7 @@ boost::asio::awaitable<
   boost::asio::strand<
     boost::asio::io_context::executor_type
   >
-> cancel_ws() {
+> cancel_websocket_session() {
   auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
 }
@@ -95,7 +95,7 @@ TEST(Components_WebSocket_Session, Client) {
 
     std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_ws(), boost::asio::detached);
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_websocket_session(), boost::asio::detached);
 
     thread.join();
   } catch (std::exception const &e) {
