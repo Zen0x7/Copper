@@ -29,11 +29,12 @@ namespace copper::components {
         json::value data_;
         shared<state> state_;
         uuid auth_id_;
+        long start_;
 
         // LCOV_EXCL_START
         virtual ~http_controller() = default;
 
-        virtual http_response invoke(const http_request &request) {
+        virtual http_response invoke(const http_request & /*request*/) {
           http_response response;
           return response;
         };
@@ -59,19 +60,20 @@ namespace copper::components {
 
         void set_state(const shared<state> &state);
 
+        void set_start(long at);
+
         void set_bindings(containers::unordered_map_of_strings &bindings);
 
         void set_data(const json::value &data);
 
         void set_user(uuid id);
 
-        http_response static response(
+        http_response response(
                 http_request const &request,
                 const http_status_code status,
                 const std::string &data,
-                const char *type = "text/html",
-                const long started_at = 0
-        ) {
+                const char *type = "text/html"
+        ) const {
             const auto resolved_at = chronos::now();
 
             http_response response{};
@@ -85,7 +87,7 @@ namespace copper::components {
             response.set(http_fields::access_control_allow_origin, allowed_origins);
 
             response.set("X-Server", "Copper");
-            response.set("X-Time", std::to_string(resolved_at - started_at));
+            response.set("X-Time", std::to_string(resolved_at - start_));
             response.version(request.version());
             response.keep_alive(request.keep_alive());
             response.result(status);

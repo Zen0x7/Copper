@@ -38,9 +38,10 @@ namespace app::controllers {
         }
 
         if (copper::components::cipher_password_validator(password, user.value().password_)) {
-          std::string token = copper::components::authentication_to_bearer(user.value().id_, dotenv::getenv("APP_KEY"), "user");
+          std::string token = copper::components::authentication_to_bearer(user.value().id_, dotenv::getenv("APP_KEY"),
+                                                                           "user");
 
-          const copper::components::json::object data = {{"token",token}};
+          const copper::components::json::object data = {{"token", token}};
 
           auto shared_token = std::make_shared<std::string>(token.data());
           return response(request, copper::components::http_status_code::ok, serialize(data), "application/json");
@@ -52,4 +53,5 @@ namespace app::controllers {
                         "application/json");
       }
     };
-}
+
+} // namespace copper::components

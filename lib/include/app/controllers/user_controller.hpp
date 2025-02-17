@@ -16,7 +16,7 @@ namespace app::controllers {
       copper::components::http_response invoke(const copper::components::http_request &request) override {
         auto now = copper::components::chronos::now();
         const copper::components::json::object data = {{"data",to_string(this->auth_id_)},{"timestamp", now}};
-        return response(request, copper::components::http_status_code::ok, serialize(data), "application/json", now);
+        return response(request, copper::components::http_status_code::ok, serialize(data), "application/json");
       }
     };
 }

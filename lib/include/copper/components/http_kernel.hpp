@@ -84,12 +84,13 @@ namespace copper::components {
         > invoke(
             boost::beast::string_view /* root */,
             const http_request & request,
-            const std::string & ip
+            const std::string & ip,
+            long now
         ) const {
-            const auto now = chronos::now();
-
             if (const auto route = find_on_routes(request); route.has_value()) {
                 containers::unordered_map_of_strings bindings = route.value().bindings_;
+
+                route.value().controller_->set_start(now);
 
                 if (route.value().controller_->requires_limitation()) {
                     if (auto [limited, TTL] = co_await state_->get_redis()->is_alive(request, ip, route.value().controller_->requests_per_minute()); limited) {
@@ -127,7 +128,7 @@ namespace copper::components {
 
                             co_return route.value().controller_->response(
                                     request, boost::beast::http::status::unprocessable_entity,
-                                    serialize(error_response), "application/json", now);
+                                    serialize(error_response), "application/json");
                         }
                     } else {
                         auto error_response
@@ -136,7 +137,7 @@ namespace copper::components {
 
                         co_return route.value().controller_->response(
                                 request, boost::beast::http::status::unprocessable_entity, serialize(error_response),
-                                "application/json", now);
+                                "application/json");
                     }
                 }
 

@@ -48,7 +48,7 @@ public:
       {"timestamp", now},
       {"status",    200}
     };
-    return response(request, http_status_code::ok, serialize(data), "application/json", now);
+    return response(request, http_status_code::ok, serialize(data), "application/json");
   }
 };
 
@@ -66,7 +66,7 @@ public:
       {"timestamp", now},
       {"status",    200}
     };
-    return response(request, http_status_code::ok, serialize(data), "application/json", now);
+    return response(request, http_status_code::ok, serialize(data), "application/json");
   }
 };
 

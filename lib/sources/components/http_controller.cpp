@@ -12,5 +12,7 @@ namespace copper::components {
     void http_controller::set_data(const json::value &data) { data_ = data; }
 
     void http_controller::set_user(const uuid id) { auth_id_ = id; }
+
+    void http_controller::set_start(long at) { start_ = at; }
     // LCOV_EXCL_STOP
 }
