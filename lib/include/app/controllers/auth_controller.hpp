@@ -4,6 +4,7 @@
 #include <copper/components/json.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/authentication.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace app::controllers {
     class auth_controller final : public copper::components::http_controller {
@@ -33,8 +34,9 @@ namespace app::controllers {
         }
 
         if (copper::components::cipher_password_validator(password, user.value().password_)) {
-          std::string token = copper::components::authentication_to_bearer(user.value().id_, dotenv::getenv("APP_KEY"),
-                                                                           "user");
+          std::string token = copper::components::authentication_to_bearer(
+            boost::lexical_cast<copper::components::uuid>(user.value().id_), dotenv::getenv("APP_KEY"),
+            "user");
 
           const copper::components::json::object data = {{"token", token}};
 

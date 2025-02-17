@@ -12,13 +12,13 @@ namespace app::models {
     using namespace copper::components;
 
     struct user {
-        uuid id_;
-        std::string name_;
-        std::string email_;
-        boost::mysql::datetime email_verified_at_;
-        std::string password_;
-        boost::mysql::datetime created_at_;
-        boost::mysql::datetime updated_at_;
+      std::string id_;
+      std::string name_;
+      std::string email_;
+      long email_verified_at_;
+      std::string password_;
+      long created_at_;
+      long updated_at_;
     };
     BOOST_DESCRIBE_STRUCT(user, (), (id_, name_, email_, email_verified_at_, password_, created_at_, updated_at_));
 }

@@ -10,26 +10,26 @@
 #include <boost/redis/connection.hpp>
 
 namespace copper::components {
-    class redis_service : public shared_enabled<redis_service> {
-      shared<boost::redis::config> redis_config_;
+    class cache : public shared_enabled<cache> {
+      shared<boost::redis::config> config_;
 
       boost::asio::awaitable<
         shared<boost::redis::connection>,
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
-      > get_redis_connection();
+      > get_connection();
 
     public:
 
-      redis_service();
+      cache();
 
       boost::asio::awaitable<
         std::tuple<bool, int>,
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
-      > is_alive(const http_request &request, const std::string &ip, const int &max_requests);
+      > can_invoke(const http_request &request, const std::string &ip, const int &max_requests);
 
     private:
 
@@ -38,7 +38,7 @@ namespace copper::components {
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
-      > exists(const std::string &key, const shared<boost::redis::connection> &connection);
+      > has(const std::string &key, const shared<boost::redis::connection> &connection);
 
       static boost::asio::awaitable<
         int64_t,
@@ -52,7 +52,7 @@ namespace copper::components {
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
-      > ttl_of(const std::string &key, const shared<boost::redis::connection> &connection);
+      > get_expiration_of(const std::string &key, const shared<boost::redis::connection> &connection);
 
       static boost::asio::awaitable<
         void,
@@ -69,6 +69,6 @@ namespace copper::components {
         >
       > set(const std::string &key, const shared<boost::redis::connection> &connection);
 
-      static std::string get_key_of(const http_request &request, const std::string &ip);
+      static std::string get_key_for(const http_request &request, const std::string &ip);
     };
 }
