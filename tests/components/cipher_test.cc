@@ -50,7 +50,7 @@ TEST(Components_Cipher, Encrypt_And_Decrypt_Using_Random_Key) {
 }
 
 TEST(Components_Cipher, Generate_BCrypt_Hash) {
-    auto hash = cipher_password_hash("password");
+    auto hash = cipher_password_hash("password", 6);
 
     ASSERT_TRUE(cipher_password_validator("password", hash));
     ASSERT_FALSE(cipher_password_validator("other_password", hash));

@@ -157,6 +157,8 @@ TEST(Components_HTTP_Session, Implementation) {
     first_thread.detach();
     second_thread.detach();
 
+    sleep(5); // Wait for service
+
     boost::asio::ip::tcp::resolver resolver(client_ioc);
     boost::beast::tcp_stream stream(client_ioc);
 

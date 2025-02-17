@@ -28,8 +28,8 @@ namespace copper::components {
      * @return std::string Output
      */
     std::string cipher_hmac(
-            const std::string &input,
-            const std::string &app_key
+      const std::string &input,
+      const std::string &app_key
     );
 
     /**
@@ -38,8 +38,8 @@ namespace copper::components {
      * @return std::pair<std::string, std::string> Pair of secret and initialization vector
      */
     std::pair<
-            std::string,
-            std::string
+      std::string,
+      std::string
     > cipher_generate_aes_key_iv();
 
     /**
@@ -52,9 +52,9 @@ namespace copper::components {
      * @return std::string Output
      */
     std::string cipher_encrypt(
-            const std::string &input,
-            const std::string &key,
-            const std::string &iv
+      const std::string &input,
+      const std::string &key,
+      const std::string &iv
     );
 
     /**
@@ -66,18 +66,19 @@ namespace copper::components {
      * @return std::string Output
      */
     std::string cipher_decrypt(
-            const std::string &input,
-            const std::string &key,
-            const std::string &iv
+      const std::string &input,
+      const std::string &key,
+      const std::string &iv
     );
 
     bool cipher_password_validator(
-            const std::string &input,
-            const std::string &hash
+      const std::string &input,
+      const std::string &hash
     );
 
     std::string cipher_password_hash(
-            const std::string &input
+      const std::string &input,
+      int workload = 12
     );
 
 } // namespace copper::components
