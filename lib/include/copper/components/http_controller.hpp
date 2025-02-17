@@ -33,7 +33,10 @@ namespace copper::components {
         // LCOV_EXCL_START
         virtual ~http_controller() = default;
 
-        virtual http_response invoke(const http_request &request) = 0;
+        virtual http_response invoke(const http_request &request) {
+          http_response response;
+          return response;
+        };
 
         virtual void prepare(
                 http_request &request,

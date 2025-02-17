@@ -78,20 +78,11 @@ namespace copper {
 
         state->get_database()->start();
 
-        state->get_router()->get_routes()->push_back(
-          std::pair(components::http_router::factory(components::http_method::post, "/api/auth"),
-                    boost::make_shared<app::controllers::auth_controller>())
-        );
-
-        state->get_router()->get_routes()->push_back(
-          std::pair(components::http_router::factory(components::http_method::get, "/api/up"),
-                    boost::make_shared<app::controllers::up_controller>())
-        );
-
-        state->get_router()->get_routes()->push_back(
-          std::pair(components::http_router::factory(components::http_method::get, "/api/user"),
-                    boost::make_shared<app::controllers::user_controller>())
-        );
+        state
+          ->get_router()
+          ->push(components::http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>())
+          ->push(components::http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>())
+          ->push(components::http_method::post, "/api/auth", boost::make_shared<app::controllers::up_controller>());
 
         boost::asio::co_spawn(
           boost::asio::make_strand(ioc),

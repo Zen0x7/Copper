@@ -50,28 +50,28 @@ namespace copper::components {
                 boost::asio::strand<
                         boost::asio::io_context::executor_type
                 >
-        > exists(const std::string & key);
+        > exists(const std::string & key, const shared<boost::redis::connection> & connection);
 
         boost::asio::awaitable<
                 int64_t,
                 boost::asio::strand<
                         boost::asio::io_context::executor_type
                 >
-        > counter_of(const std::string & key);
+        > counter_of(const std::string & key, const shared<boost::redis::connection> & connection);
 
         boost::asio::awaitable<
                 int64_t,
                 boost::asio::strand<
                         boost::asio::io_context::executor_type
                 >
-        > ttl_of(const std::string & key);
+        > ttl_of(const std::string & key, const shared<boost::redis::connection> & connection);
 
         boost::asio::awaitable<
                 void,
                 boost::asio::strand<
                         boost::asio::io_context::executor_type
                 >
-        > increase(const std::string & key);
+        > increase(const std::string & key, const shared<boost::redis::connection> & connection);
 
 
         boost::asio::awaitable<
@@ -79,7 +79,7 @@ namespace copper::components {
                 boost::asio::strand<
                         boost::asio::io_context::executor_type
                 >
-        > set(const std::string & key);
+        > set(const std::string & key, const shared<boost::redis::connection> & connection);
 
         boost::asio::awaitable<
                 std::tuple<bool, int>,

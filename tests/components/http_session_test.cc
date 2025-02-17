@@ -90,26 +90,12 @@ TEST(Components_HTTP_Session, Implementation) {
 
   state_->get_database()->start();
 
-  state_->get_router()->get_routes()->push_back(
-    std::pair(http_router::factory(http_method::get, "/api/up"), boost::make_shared<app::controllers::up_controller>())
-  );
-
-  state_->get_router()->get_routes()->push_back(
-    std::pair(http_router::factory(http_method::get, "/api/params/{name}"), boost::make_shared<params_controller>())
-  );
-
-  state_->get_router()->get_routes()->push_back(
-    std::pair(http_router::factory(http_method::get, "/api/exception"), boost::make_shared<exception_controller>())
-  );
-
-  state_->get_router()->get_routes()->push_back(
-    std::pair(http_router::factory(http_method::get, "/api/user"), boost::make_shared<app::controllers::user_controller>())
-  );
-
-  state_->get_router()->get_routes()->push_back(
-    std::pair(http_router::factory(http_method::post, "/api/auth"),
-              boost::make_shared<app::controllers::auth_controller>())
-  );
+  state_->get_router()
+    ->push(http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>())
+    ->push(http_method::get, "/api/params/{name}", boost::make_shared<params_controller>())
+    ->push(http_method::get, "/api/exception", boost::make_shared<exception_controller>())
+    ->push(http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>())
+    ->push(http_method::post, "/api/auth", boost::make_shared<app::controllers::auth_controller>());
 
   boost::asio::co_spawn(
     boost::asio::make_strand(ioc),
@@ -243,6 +229,9 @@ TEST(Components_HTTP_Session, Implementation) {
       response.clear();
 
       {
+        std::cout << "Key used: " << dotenv::getenv("APP_KEY") << std::endl << std::endl;
+        std::cout << "Token that will be used: " << json_response.as_object().at("token").as_string() << std::endl << std::endl;
+
         boost::beast::flat_buffer user_buffer;
         boost::beast::http::response<boost::beast::http::string_body> user_response;
         http_request user_request{http_method::get, "/api/user", 11};

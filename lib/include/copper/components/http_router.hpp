@@ -17,6 +17,13 @@ namespace copper::components {
             return routes_;
         }
 
+        shared<http_router> push(http_method method, const char path[], const shared<http_controller> & controller) {
+          get_routes()->push_back(
+            std::pair(components::http_router::factory(method, path), controller)
+          );
+          return shared_from_this();
+        }
+
         static http_route factory(http_method method, const char* path);
     };
 }  // namespace copper::components
