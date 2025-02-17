@@ -1,9 +1,9 @@
 #pragma once
 
-#include <boost/optional.hpp>
-#include <boost/uuid.hpp>
-
 #include <copper/components/uuid.hpp>
+
+#include <boost/optional.hpp>
+
 #include <string>
 
 namespace copper::components {
@@ -35,7 +35,7 @@ namespace copper::components {
      * @return
      */
     std::string authentication_to_bearer(
-            boost::uuids::uuid id,
+            uuid id,
             const std::string &app_key,
             const std::string &type = "App\\Models\\User"
     );

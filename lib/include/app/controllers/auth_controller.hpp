@@ -3,17 +3,12 @@
 #include <copper/components/http_controller.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/cipher.hpp>
+#include <copper/components/authentication.hpp>
 
 namespace app::controllers {
     class auth_controller final : public copper::components::http_controller {
     public:
-      bool requires_limitation() const override { return true; }
-
-      bool requires_data() const override { return true; }
-
-      int requests_per_minute() const override { return 5; }
-
-      copper::components::containers::map_of_strings validate_data() const override {
+      copper::components::containers::map_of_strings rules() const override {
         return {
           {"*",        "is_object"},
           {"email",    "is_string"},
@@ -38,9 +33,10 @@ namespace app::controllers {
         }
 
         if (copper::components::cipher_password_validator(password, user.value().password_)) {
-          std::string token = copper::components::authentication_to_bearer(user.value().id_, dotenv::getenv("APP_KEY"), "user");
+          std::string token = copper::components::authentication_to_bearer(user.value().id_, dotenv::getenv("APP_KEY"),
+                                                                           "user");
 
-          const copper::components::json::object data = {{"token",token}};
+          const copper::components::json::object data = {{"token", token}};
 
           auto shared_token = std::make_shared<std::string>(token.data());
           return response(request, copper::components::http_status_code::ok, serialize(data), "application/json");
@@ -52,4 +48,5 @@ namespace app::controllers {
                         "application/json");
       }
     };
-}
+
+} // namespace app::controller

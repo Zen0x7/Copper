@@ -1,17 +1,21 @@
 #pragma once
 
-#include <boost/beast.hpp>
-
 #include <copper/components/report.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/ssl.hpp>
-#include <boost/beast.hpp>
-#include <boost/beast/ssl.hpp>
-#include <boost/scope/scope_exit.hpp>
 #include <copper/components/state.hpp>
 
-namespace copper::components {
+#include <boost/scope/scope_exit.hpp>
+#include <boost/beast/core/flat_buffer.hpp>
+#include <boost/beast/core/tcp_stream.hpp>
+#include <boost/beast/websocket/stream.hpp>
+#include <boost/beast/core/detect_ssl.hpp>
+#include <boost/beast/ssl/ssl_stream.hpp>
+#include <boost/asio/as_tuple.hpp>
+#include <boost/asio/ssl.hpp>
 
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/strand.hpp>
+
+namespace copper::components {
     /**
      * Run websocket session
      *
@@ -33,9 +37,7 @@ namespace copper::components {
             shared<state> &  /* state */,
             Stream &stream,
             boost::beast::flat_buffer &buffer,
-            boost::beast::http::request<
-                    boost::beast::http::string_body
-            > req,
+            http_request req,
             boost::beast::string_view
     ) {
         auto cs = co_await boost::asio::this_coro::cancellation_state;

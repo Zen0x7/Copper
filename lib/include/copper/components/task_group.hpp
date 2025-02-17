@@ -4,8 +4,14 @@
 
 #include <mutex>
 #include <list>
-#include <boost/asio.hpp>
 #include <boost/scope/scope_exit.hpp>
+#include <boost/asio/bind_cancellation_slot.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/asio/consign.hpp>
+#include <boost/asio/compose.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/asio/signal_set.hpp>
+#include <boost/asio/append.hpp>
 #include <iostream>
 
 namespace copper::components {
@@ -97,13 +103,7 @@ namespace copper::components {
          *
          * @param type
          */
-        void emit(
-                boost::asio::cancellation_type type
-        ) {
-            auto guard = std::lock_guard{mutex_};
-            for (auto &signal: signals_)
-                signal.emit(type);
-        }
+        void emit(boost::asio::cancellation_type type);
 
         // LCOV_EXCL_START
         /**

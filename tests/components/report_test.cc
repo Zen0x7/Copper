@@ -2,7 +2,6 @@
 
 #include <copper/components/report.hpp>
 
-
 TEST(Components_Report, Call) {
     using namespace copper::components;
 

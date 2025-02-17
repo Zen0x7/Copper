@@ -2,7 +2,6 @@
 
 #include <copper/components/normalized_path.hpp>
 
-
 TEST(Components_Filesystem_NormalizedPath, Usage) {
     using namespace copper::components;
 

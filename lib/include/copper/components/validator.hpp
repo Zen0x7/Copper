@@ -1,7 +1,9 @@
 #pragma once
 
-#include <boost/json.hpp>
-#include <boost/smart_ptr.hpp>
+#include <copper/components/json.hpp>
+
+#include <copper/components/shared.hpp>
+#include <copper/components/containers.hpp>
 #include <map>
 #include <string>
 
@@ -12,7 +14,7 @@ namespace copper::components {
         /**
          * Errors container
          */
-        boost::json::object errors;
+        json::object errors;
 
         /**
          * Status
@@ -43,14 +45,11 @@ namespace copper::components {
      * @param value
      * @return boost::shared_ptr<validator> validator
      */
-    boost::shared_ptr<
+    shared<
             validator
     > validator_make(
-            const std::map<
-                    std::string,
-                    std::string
-            > &rules,
-            const boost::json::value &value
+            const containers::map_of_strings &rules,
+            const json::value &value
     );
 
 } // namespace copper::components::validator

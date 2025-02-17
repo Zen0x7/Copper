@@ -9,12 +9,10 @@
 // Official repository: https://github.com/boostorg/beast
 
 
-#include <boost/beast.hpp>
-#include <queue>
-
 #include <copper/components/report.hpp>
 #include <copper/components/websocket_session.hpp>
 #include <copper/components/http_kernel.hpp>
+#include <copper/components/chronos.hpp>
 
 namespace copper::components {
 
@@ -50,6 +48,8 @@ namespace copper::components {
             auto [ec, _] =
                     co_await boost::beast::http::async_read(stream, buffer, parser, boost::asio::as_tuple);
 
+            auto now = chronos::now();
+
             if (ec == boost::beast::http::error::end_of_stream)
                 co_return;
 
@@ -66,7 +66,7 @@ namespace copper::components {
 
             std::string ip = boost::beast::get_lowest_layer(stream).socket().remote_endpoint().address().to_string();
 
-            auto res = co_await kernel->invoke(doc_root, parser.release(), ip);
+            auto res = co_await kernel->invoke(doc_root, parser.release(), ip, now);
 
             if (!res.keep_alive()) {
                 co_await boost::beast::async_write(stream, std::move(res));

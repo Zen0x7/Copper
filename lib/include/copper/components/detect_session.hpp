@@ -1,12 +1,5 @@
 #pragma once
 
-
-#include <boost/asio.hpp>
-#include <boost/asio/ssl.hpp>
-#include <boost/beast.hpp>
-#include <boost/beast/ssl.hpp>
-#include <boost/scope/scope_exit.hpp>
-
 #include <copper/components/http_session.hpp>
 
 namespace copper::components {

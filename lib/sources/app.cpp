@@ -1,8 +1,5 @@
 #include <copper/app.hpp>
 
-#include <boost/beast.hpp>
-#include <boost/asio.hpp>
-
 #include <copper/components/certificates.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/task_group.hpp>
@@ -11,12 +8,6 @@
 #include <copper/components/shared.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/base64.hpp>
-#include <boost/redis/connection.hpp>
-#include <boost/asio/thread_pool.hpp>
-
-#include <boost/program_options.hpp>
-#include <boost/mysql/pool_params.hpp>
-#include <boost/mysql/connection_pool.hpp>
 
 #include <fmt/core.h>
 
@@ -24,6 +15,10 @@
 #include <app/controllers/up_controller.hpp>
 #include <app/controllers/user_controller.hpp>
 
+#include <boost/program_options.hpp>
+#include <boost/asio/co_spawn.hpp>
+
+#include <thread>
 
 namespace copper {
 
@@ -78,20 +73,22 @@ namespace copper {
 
         state->get_database()->start();
 
-        state->get_router()->get_routes()->push_back(
-          std::pair(components::http_router::factory(components::http_method::post, "/api/auth"),
-                    boost::make_shared<app::controllers::auth_controller>())
-        );
-
-        state->get_router()->get_routes()->push_back(
-          std::pair(components::http_router::factory(components::http_method::get, "/api/up"),
-                    boost::make_shared<app::controllers::up_controller>())
-        );
-
-        state->get_router()->get_routes()->push_back(
-          std::pair(components::http_router::factory(components::http_method::get, "/api/user"),
-                    boost::make_shared<app::controllers::user_controller>())
-        );
+        state
+          ->get_router()
+          ->push(components::http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>(), {
+            .use_auth = true,
+            .use_throttler = true,
+            .rpm = 5,
+          })
+          ->push(components::http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>(), {
+            .use_throttler = true,
+            .rpm = 5,
+          })
+          ->push(components::http_method::post, "/api/auth", boost::make_shared<app::controllers::auth_controller>(), {
+            .use_throttler = true,
+            .use_validator = true,
+            .rpm = 5,
+          });
 
         boost::asio::co_spawn(
           boost::asio::make_strand(ioc),
