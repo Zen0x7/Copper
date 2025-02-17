@@ -224,27 +224,41 @@ TEST(Components_HTTP_Session, Implementation) {
     success_auth_request.body() = serialize(existing_user);
     boost::beast::http::write(stream, success_auth_request);
     boost::beast::http::read(stream, buffer, response);
-    std::cout << "Success Auth Request: " << response << std::endl << std::endl;
+    std::cout << "Success auth Request: " << response << std::endl << std::endl;
     buffer.clear();
     response.clear();
 
-    http_request failed_auth_request{http_method::post, "/api/auth", 11};
-    failed_auth_request.set(http_fields::host, host);
-    failed_auth_request.set(http_fields::user_agent, "Copper");
-    failed_auth_request.set(http_fields::content_type, "application/json");
-    failed_auth_request.set(http_fields::content_length, "53");
-    boost::json::object non_existing_user = {
+    http_request wrong_password_auth_request{http_method::post, "/api/auth", 11};
+    wrong_password_auth_request.set(http_fields::host, host);
+    wrong_password_auth_request.set(http_fields::user_agent, "Copper");
+    wrong_password_auth_request.set(http_fields::content_type, "application/json");
+    wrong_password_auth_request.set(http_fields::content_length, "53");
+    boost::json::object wrong_user = {
       {"email",    "iantorres@outlook.com"},
       {"password", "defabc"}
     };
-    
-    failed_auth_request.body() = serialize(non_existing_user);
-    boost::beast::http::write(stream, failed_auth_request);
+    wrong_password_auth_request.body() = serialize(wrong_user);
+    boost::beast::http::write(stream, wrong_password_auth_request);
     boost::beast::http::read(stream, buffer, response);
-    std::cout << "Failed Auth Request: " << response << std::endl << std::endl;
+    std::cout << "Wrong password auth Request: " << response << std::endl << std::endl;
     buffer.clear();
     response.clear();
 
+    http_request wrong_email_auth_request{http_method::post, "/api/auth", 11};
+    wrong_email_auth_request.set(http_fields::host, host);
+    wrong_email_auth_request.set(http_fields::user_agent, "Copper");
+    wrong_email_auth_request.set(http_fields::content_type, "application/json");
+    wrong_email_auth_request.set(http_fields::content_length, "53");
+    boost::json::object non_registered_user = {
+      {"email",    "ian@zentrack.cl"},
+      {"password", "abcdef"}
+    };
+    wrong_email_auth_request.body() = serialize(non_registered_user);
+    boost::beast::http::write(stream, wrong_email_auth_request);
+    boost::beast::http::read(stream, buffer, response);
+    std::cout << "Wrong email auth Request: " << response << std::endl << std::endl;
+    buffer.clear();
+    response.clear();
 
     http_request params_request{http_method::get, "/api/params/{name}", 11};
     params_request.set(http_fields::host, host);
