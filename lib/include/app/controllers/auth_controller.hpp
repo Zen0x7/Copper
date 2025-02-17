@@ -38,33 +38,7 @@ namespace app::controllers {
         }
 
         if (copper::components::cipher_password_validator(password, user.value().password_)) {
-          // LCOV_EXC_START
-          const copper::components::json::object header = {
-            {"srv", "Copper"},
-            {"aut", "Ian Torres"},
-            {"alg", "HS256"},
-            {"typ", "JWT"},
-          };
-          // LCOV_EXCL_STOP
-
-          const std::string id_ = boost::uuids::to_string(user.value().id_);
-          auto now = std::chrono::system_clock::now();
-          auto expires_at = now + std::chrono::days(7);
-          std::string type = "user";
-          // LCOV_EXC_START
-          const copper::components::json::object payload = {
-            {"sub", id_},
-            {"typ", type},
-            {"iat", copper::components::chronos::to_timestamp(now)},
-            {"exp", copper::components::chronos::to_timestamp(expires_at)},
-          };
-          // LCOV_EXCL_STOP
-
-          const std::string header_ = copper::components::base64url_encode(serialize(header));
-          const std::string payload_ = copper::components::base64url_encode(serialize(payload));
-          const std::string signature_ = copper::components::base64url_encode(
-            copper::components::cipher_hmac(header_ + "." + payload_, dotenv::getenv("APP_KEY")));
-          std::string token = "Bearer " + header_ + "." + payload_ + "." + signature_;
+          std::string token = copper::components::authentication_to_bearer(user.value().id_, dotenv::getenv("APP_KEY"), "user");
 
           const copper::components::json::object data = {{"token",token}};
 

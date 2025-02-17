@@ -35,7 +35,7 @@ namespace copper::components {
 
             if (parts.size() == 3) {
                 std::string merged = parts[0] + "." + parts[1];
-                if (const std::string signature_ = base64url_encode(cipher_hmac(merged, app_key)); signature_ == parts[2]) {
+                if (const std::string signature_ = base64url_encode(cipher_hmac(merged, app_key), false); signature_ == parts[2]) {
                     boost::system::error_code ec;
                     auto payload = boost::json::parse(base64url_decode(parts[1]), ec);
 
@@ -79,17 +79,17 @@ namespace copper::components {
             const std::string &type
     ) {
         const boost::json::object header = {
-                {"alg", "HS256"},
-                {"typ", "JWT"},
+          {"srv", "Copper"},
+          {"aut", "Ian Torres"},
+          {"alg", "HS256"},
+          {"typ", "JWT"},
         };
 
         const std::string id_ = to_string(id);
         const auto now = std::chrono::system_clock::now();
         const auto expires_at = now + std::chrono::days(7);
-        const auto iat
-                = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-        const auto exp
-                = std::chrono::duration_cast<std::chrono::nanoseconds>(expires_at.time_since_epoch()).count();
+        const auto iat= chronos::to_timestamp(now);
+        const auto exp= chronos::to_timestamp(expires_at);
         const boost::json::object payload = {
                 {"sub", id_},
                 {"typ", type},
@@ -100,7 +100,7 @@ namespace copper::components {
         const std::string payload_ = base64url_encode(serialize(payload), false);
         const std::string signature_
                 = base64url_encode(cipher_hmac(header_ + "." + payload_, app_key), false);
-        return header_ + "." + payload_ + "." + signature_;
+        return "Bearer " + header_ + "." + payload_ + "." + signature_;
     }
 
 } // namespace copper::components::authenticator
