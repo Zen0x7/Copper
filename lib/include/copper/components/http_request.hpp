@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/beast.hpp>
+#include <boost/beast/http/string_body.hpp>
 
 namespace copper::components {
     typedef boost::beast::http::request<boost::beast::http::string_body> http_request;

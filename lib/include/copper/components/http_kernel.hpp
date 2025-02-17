@@ -9,8 +9,6 @@
 // Official repository: https://github.com/boostorg/beast
 
 
-#include <boost/beast.hpp>
-
 #include <copper/components/mime_type.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/containers.hpp>
@@ -31,10 +29,10 @@
 
 #include <copper/components/state.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 #include <copper/components/authentication.hpp>
 #include <copper/components/validator.hpp>
+
+#include <boost/algorithm/string/predicate.hpp>
 
 #ifndef HTTP_SERVER_HEADER_CONTENT
 #define HTTP_SERVER_HEADER_CONTENT "Copper"
@@ -127,7 +125,7 @@ namespace copper::components {
                                     {{"message", "The given data was invalid."}, {"errors", validator->errors}});
 
                             co_return route.value().controller_->response(
-                                    request, boost::beast::http::status::unprocessable_entity,
+                                    request, http_status_code::unprocessable_entity,
                                     serialize(error_response), "application/json");
                         }
                     } else {
@@ -136,7 +134,7 @@ namespace copper::components {
                                                        {"errors", {{"*", "The body must be a valid JSON."}}}});
 
                         co_return route.value().controller_->response(
-                                request, boost::beast::http::status::unprocessable_entity, serialize(error_response),
+                                request, http_status_code::unprocessable_entity, serialize(error_response),
                                 "application/json");
                     }
                 }
