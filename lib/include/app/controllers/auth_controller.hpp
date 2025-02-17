@@ -30,9 +30,7 @@ namespace app::controllers {
         const auto user = state_->get_database()->get_user_by_email(email);
 
         if (!user.has_value()) {
-          const copper::components::json::object errors = {
-            {"message", "Email provided isn't registered."},
-          };
+          const copper::components::json::object errors = {{"message", "Email provided isn't registered."}};
 
 
           return response(request, copper::components::http_status_code::not_found, serialize(errors),

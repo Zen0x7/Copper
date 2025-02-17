@@ -13,10 +13,7 @@ namespace app::controllers {
 
       copper::components::http_response invoke(const copper::components::http_request &request) override {
         auto now = copper::components::chronos::now();
-        const copper::components::json::object data = {
-          {"timestamp", now},
-          {"status",    200}
-        };
+        const copper::components::json::object data = {{"timestamp",now},{"status",200}};
         return response(request, copper::components::http_status_code::ok, serialize(data), "application/json", now);
       }
     };
