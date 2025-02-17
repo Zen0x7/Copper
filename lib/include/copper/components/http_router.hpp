@@ -12,21 +12,11 @@ namespace copper::components {
     class http_router : public shared_enabled<http_router> {
         shared<http_routes> routes_;
     public:
-        explicit http_router() : routes_(boost::make_shared<http_routes>()) {}
+        explicit http_router();
 
-        shared<http_routes> get_routes() {
-            return routes_;
-        }
+        shared<http_routes> get_routes();
 
-        shared<http_router> push(http_method method, const char path[], const shared<http_controller> & controller, http_controller_config config) {
-          controller->set_config(config);
-
-          get_routes()->push_back(
-            std::pair(components::http_router::factory(method, path), controller)
-          );
-
-          return shared_from_this();
-        }
+        shared<http_router> push(http_method method, const char path[], const shared<http_controller> & controller, http_controller_config config);
 
         static http_route factory(http_method method, const char* path);
     };

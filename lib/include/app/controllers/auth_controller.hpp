@@ -3,6 +3,7 @@
 #include <copper/components/http_controller.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/cipher.hpp>
+#include <copper/components/authentication.hpp>
 
 namespace app::controllers {
     class auth_controller final : public copper::components::http_controller {

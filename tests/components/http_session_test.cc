@@ -18,6 +18,8 @@
 #include <app/controllers/user_controller.hpp>
 
 #include <boost/asio/co_spawn.hpp>
+#include <boost/json/parse.hpp>
+#include <boost/json/serialize.hpp>
 
 using namespace copper::components;
 

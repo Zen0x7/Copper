@@ -103,13 +103,7 @@ namespace copper::components {
          *
          * @param type
          */
-        void emit(
-                boost::asio::cancellation_type type
-        ) {
-            auto guard = std::lock_guard{mutex_};
-            for (auto &signal: signals_)
-                signal.emit(type);
-        }
+        void emit(boost::asio::cancellation_type type);
 
         // LCOV_EXCL_START
         /**

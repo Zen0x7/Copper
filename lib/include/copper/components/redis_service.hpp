@@ -18,35 +18,11 @@ namespace copper::components {
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
-      > get_redis_connection() {
-        auto conn = boost::make_shared<boost::redis::connection>(co_await boost::asio::this_coro::executor);
-        conn->async_run(*this->redis_config_, {}, boost::asio::consign(boost::asio::detached, conn));
-        co_return conn;
-      }
+      > get_redis_connection();
 
     public:
 
-      redis_service() : redis_config_(boost::make_shared<boost::redis::config>()) {
-
-        redis_config_->addr = boost::redis::address{
-          dotenv::getenv("REDIS_HOST", "127.0.0.1"),
-          dotenv::getenv("REDIS_PORT", "6379")
-        };
-
-        redis_config_->health_check_interval = std::chrono::seconds{
-          std::stoi(dotenv::getenv("REDIS_HEALTH_CHECK_INTERVAL", "60")),
-        };
-
-        redis_config_->connect_timeout = std::chrono::seconds{
-          std::stoi(dotenv::getenv("REDIS_CONNECTION_TIMEOUT", "60")),
-        };
-
-        redis_config_->reconnect_wait_interval = std::chrono::seconds{
-          std::stoi(dotenv::getenv("REDIS_RECONNECTION_WAIT_INTERVAL", "5")),
-        };
-
-        redis_config_->clientname = dotenv::getenv("REDIS_CLIENT_NAME", "Copper");
-      }
+      redis_service();
 
       boost::asio::awaitable<
         std::tuple<bool, int>,

@@ -16,7 +16,9 @@
 
 #include <copper/components/http_controller_config.hpp>
 
+#include <boost/json/serialize.hpp>
 #include <boost/smart_ptr.hpp>
+
 #include <iostream>
 #include <unordered_map>
 #include <map>
@@ -59,30 +61,9 @@ namespace copper::components {
 
       http_response response(
         http_request const &request,
-        const http_status_code status,
+        http_status_code status,
         const std::string &data,
         const char *type = "text/html"
-      ) const {
-        const auto resolved_at = chronos::now();
-
-        http_response response{};
-
-        response.set(http_fields::content_type, type);
-        response.set(http_fields::allow, request.method_string());
-        response.set(http_fields::access_control_allow_headers, "Accept,Authorization,Content-Type,X-Requested-With");
-
-        const auto allowed_origins = dotenv::getenv("HTTP_ALLOWED_ORIGINS", "*");
-
-        response.set(http_fields::access_control_allow_origin, allowed_origins);
-
-        response.set("X-Server", "Copper");
-        response.set("X-Time", std::to_string(resolved_at - start_));
-        response.version(request.version());
-        response.keep_alive(request.keep_alive());
-        response.result(status);
-        response.body() = data;
-        response.prepare_payload();
-        return response;
-      }
+      ) const;
     };
 }
