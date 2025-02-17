@@ -22,7 +22,7 @@ jobs:
           MYSQL_USER: user
           MYSQL_PASSWORD: user_password
         ports:
-          - 3306
+          - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
       redis:
@@ -44,7 +44,7 @@ jobs:
           ping -c 4 redis
           ping -c 4 mysql 
           nc -zv redis 6379
-          mysql -u user -p'user_password' -h 127.0.0.1 -P ${{ job.services.mysql.ports[3306] }} -D copper -e "exit"
+          mysql -u user -p'user_password' -h mysql -P 3306 -D copper -e "exit"
           curl -Os https://cli.codecov.io/latest/linux/codecov
           chmod +x codecov
           mkdir build
@@ -57,11 +57,11 @@ jobs:
           lcov --capture --directory . --output-file coverage.info
           lcov --list coverage.info
         env:
-          DATABASE_HOST: 127.0.0.1
+          DATABASE_HOST: mysql
           DATABASE_USER: user
           DATABASE_PASSWORD: user_password
           DATABASE_NAME: copper
-          DATABASE_PORT: ${{ job.services.mysql.ports[3306] }}
+          DATABASE_PORT: 3306
           REDIS_HOST: redis
           REDIS_PORT: 6379
 
