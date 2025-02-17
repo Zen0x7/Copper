@@ -1,5 +1,4 @@
 #include <copper/components/detect_session.hpp>
-
 #include <copper/components/state.hpp>
 
 namespace copper::components {

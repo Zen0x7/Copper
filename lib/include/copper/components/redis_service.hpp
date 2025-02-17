@@ -4,8 +4,9 @@
 #include <copper/components/http_request.hpp>
 #include <copper/components/dotenv.hpp>
 
-#include <boost/asio.hpp>
-#include <boost/redis.hpp>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/asio/detached.hpp>
 #include <boost/redis/connection.hpp>
 
 namespace copper::components {

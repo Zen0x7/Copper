@@ -1,5 +1,4 @@
 #include <copper/components/state.hpp>
-
 #include <copper/components/shared.hpp>
 
 namespace copper::components {

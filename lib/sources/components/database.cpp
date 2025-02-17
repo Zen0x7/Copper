@@ -1,6 +1,5 @@
 #include <copper/components/database.hpp>
 
-
 #include <boost/asio/detached.hpp>
 #include <boost/asio/cancel_after.hpp>
 #include <boost/asio/use_future.hpp>

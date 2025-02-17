@@ -3,6 +3,8 @@
 #include <copper/components/authentication.hpp>
 #include <copper/components/base64.hpp>
 
+#include <boost/uuid/random_generator.hpp>
+
 
 TEST(Components_Authenticator, IssueAndCheck) {
     using namespace copper::components;

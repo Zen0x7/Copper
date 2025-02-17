@@ -1,6 +1,3 @@
-//
-// Created by ian on 09-02-25.
-//
 #include <copper/components/normalized_path.hpp>
 
 namespace copper::components {

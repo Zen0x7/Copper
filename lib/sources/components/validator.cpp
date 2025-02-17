@@ -1,7 +1,8 @@
 #include <copper/components/validator.hpp>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/uuid.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace copper::components {
 

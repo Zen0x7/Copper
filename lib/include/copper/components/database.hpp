@@ -5,6 +5,7 @@
 #include <copper/components/dotenv.hpp>
 #include <copper/components/report.hpp>
 #include <copper/components/uuid.hpp>
+
 #include <app/models/user.hpp>
 
 #include <boost/mysql/connection_pool.hpp>

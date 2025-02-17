@@ -17,6 +17,8 @@
 #include <app/controllers/up_controller.hpp>
 #include <app/controllers/user_controller.hpp>
 
+#include <boost/asio/co_spawn.hpp>
+
 using namespace copper::components;
 
 boost::asio::awaitable<

@@ -9,14 +9,16 @@
 #include <copper/components/cipher.hpp>
 #include <copper/components/base64.hpp>
 
-#include <boost/redis/connection.hpp>
-#include <boost/program_options.hpp>
-
 #include <fmt/core.h>
 
 #include <app/controllers/auth_controller.hpp>
 #include <app/controllers/up_controller.hpp>
 #include <app/controllers/user_controller.hpp>
+
+#include <boost/program_options.hpp>
+#include <boost/asio/co_spawn.hpp>
+
+#include <thread>
 
 namespace copper {
 

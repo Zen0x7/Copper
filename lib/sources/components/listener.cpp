@@ -1,6 +1,7 @@
 #include <copper/components/listener.hpp>
 #include <copper/components/state.hpp>
-#include <boost/redis.hpp>
+
+#include <boost/asio/co_spawn.hpp>
 
 namespace copper::components {
 

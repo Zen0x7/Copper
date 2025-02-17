@@ -4,8 +4,14 @@
 
 #include <mutex>
 #include <list>
-#include <boost/asio.hpp>
 #include <boost/scope/scope_exit.hpp>
+#include <boost/asio/bind_cancellation_slot.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/asio/consign.hpp>
+#include <boost/asio/compose.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/asio/signal_set.hpp>
+#include <boost/asio/append.hpp>
 #include <iostream>
 
 namespace copper::components {
