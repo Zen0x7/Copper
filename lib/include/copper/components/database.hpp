@@ -67,10 +67,10 @@ namespace copper::components {
                     .id_ = boost::lexical_cast<uuid>(row.at(0).as_string()),
                     .name_ = row.at(1).as_string(),
                     .email_ = email,
-                    .email_verified_at_ = row.at(2).as_datetime(),
+                    .email_verified_at_ = row.at(2).is_null() ? boost::mysql::datetime() : row.at(2).as_datetime(),
                     .password_ = row.at(3).as_string(),
-                    .created_at_ = row.at(4).as_datetime(),
-                    .updated_at_ = row.at(5).as_datetime()
+                    .created_at_ = row.at(4).is_null() ? boost::mysql::datetime() : row.at(4).as_datetime(),
+                    .updated_at_ = row.at(5).is_null() ? boost::mysql::datetime() : row.at(5).as_datetime()
             };
         }
     };
