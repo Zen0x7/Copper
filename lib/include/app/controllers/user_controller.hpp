@@ -11,6 +11,8 @@ namespace app::controllers {
       copper::components::http_response invoke(const copper::components::http_request &request) override {
         auto _user = state_->get_database()->get_user_by_id(auth_id_);
 
+        _user.password_ = "***";
+
         const copper::components::json::value data = boost::json::value_from(_user);
 
         return response(request, copper::components::http_status_code::ok, serialize(data), "application/json");
