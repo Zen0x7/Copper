@@ -44,7 +44,7 @@ jobs:
           ping -c 4 redis
           ping -c 4 mysql 
           nc -zv redis 6379
-          mysql -u user -p'user_password' -h mysql -P ${{ job.services.mysql.ports[3306] }} -D copper -e "exit"
+          mysql -u user -p'user_password' -h 127.0.0.1 -P ${{ job.services.mysql.ports[3306] }} -D copper -e "exit"
           curl -Os https://cli.codecov.io/latest/linux/codecov
           chmod +x codecov
           mkdir build
