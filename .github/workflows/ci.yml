@@ -45,6 +45,7 @@ jobs:
           ping -c 4 mysql 
           nc -zv redis 6379
           mysql -u user -p'user_password' -h mysql -P 3306 -D copper -e "exit"
+          mysql -u user -p'user_password' -h mysql -P 3306 -D copper < dump.sql
           curl -Os https://cli.codecov.io/latest/linux/codecov
           chmod +x codecov
           mkdir build
@@ -57,6 +58,10 @@ jobs:
           lcov --capture --directory . --output-file coverage.info
           lcov --list coverage.info
         env:
+          APP_KEY: pPSYHIu2gUrjVZTv2ti/t7DFxBxSrwszHcxTooirYBY=
+          APP_HOST: 0.0.0.0
+          APP_THREADS: 4
+          HTTP_BODY_LIMIT: 10000
           DATABASE_HOST: mysql
           DATABASE_USER: user
           DATABASE_PASSWORD: user_password
@@ -64,6 +69,10 @@ jobs:
           DATABASE_PORT: 3306
           REDIS_HOST: redis
           REDIS_PORT: 6379
+          REDIS_HEALTH_CHECK_INTERVAL: 60
+          REDIS_CONNECTION_TIMEOUT: 60
+          REDIS_RECONNECTION_WAIT_INTERVAL: 5
+          REDIS_CLIENT_NAME: Copper
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
