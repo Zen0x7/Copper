@@ -35,7 +35,7 @@ namespace copper::components {
 
             if (parts.size() == 3) {
                 std::string merged = parts[0] + "." + parts[1];
-                if (const std::string signature_ = base64url_encode(cipher_hmac(merged, app_key), false); signature_ == parts[2]) {
+                if (const std::string signature_ = base64url_encode(cipher_hmac(merged, app_key)); signature_ == parts[2]) {
                     boost::system::error_code ec;
                     auto payload = boost::json::parse(base64url_decode(parts[1]), ec);
 

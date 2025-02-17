@@ -21,6 +21,8 @@
 #include <fmt/core.h>
 
 #include <app/controllers/auth_controller.hpp>
+#include <app/controllers/up_controller.hpp>
+#include <app/controllers/user_controller.hpp>
 
 
 namespace copper {
@@ -79,6 +81,16 @@ namespace copper {
         state->get_router()->get_routes()->push_back(
           std::pair(components::http_router::factory(components::http_method::post, "/api/auth"),
                     boost::make_shared<app::controllers::auth_controller>())
+        );
+
+        state->get_router()->get_routes()->push_back(
+          std::pair(components::http_router::factory(components::http_method::get, "/api/up"),
+                    boost::make_shared<app::controllers::up_controller>())
+        );
+
+        state->get_router()->get_routes()->push_back(
+          std::pair(components::http_router::factory(components::http_method::get, "/api/user"),
+                    boost::make_shared<app::controllers::user_controller>())
         );
 
         boost::asio::co_spawn(

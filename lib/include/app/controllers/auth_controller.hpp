@@ -38,23 +38,27 @@ namespace app::controllers {
         }
 
         if (copper::components::cipher_password_validator(password, user.value().password_)) {
+          // LCOV_EXC_START
           const copper::components::json::object header = {
-            {"service", "Copper"},
-            {"author",  "Zen0x7"},
-            {"alg",     "HS256"},
-            {"typ",     "JWT"},
+            {"srv", "Copper"},
+            {"aut", "Ian Torres"},
+            {"alg", "HS256"},
+            {"typ", "JWT"},
           };
+          // LCOV_EXCL_STOP
 
           const std::string id_ = boost::uuids::to_string(user.value().id_);
           auto now = std::chrono::system_clock::now();
           auto expires_at = now + std::chrono::days(7);
-          std::string type = "App\\Models\\User";
+          std::string type = "user";
+          // LCOV_EXC_START
           const copper::components::json::object payload = {
-            {"id",         id_},
-            {"type",       type},
-            {"issued_at",  copper::components::chronos::to_timestamp(now)},
-            {"expires_at", copper::components::chronos::to_timestamp(expires_at)},
+            {"sub", id_},
+            {"typ", type},
+            {"iat", copper::components::chronos::to_timestamp(now)},
+            {"exp", copper::components::chronos::to_timestamp(expires_at)},
           };
+          // LCOV_EXCL_STOP
 
           const std::string header_ = copper::components::base64url_encode(serialize(header));
           const std::string payload_ = copper::components::base64url_encode(serialize(payload));
@@ -62,18 +66,13 @@ namespace app::controllers {
             copper::components::cipher_hmac(header_ + "." + payload_, dotenv::getenv("APP_KEY")));
           std::string token = "Bearer " + header_ + "." + payload_ + "." + signature_;
 
-          const copper::components::json::object data = {
-            {"message", "OK"},
-            {"token",   token},
-          };
+          const copper::components::json::object data = {{"token",token}};
 
           auto shared_token = std::make_shared<std::string>(token.data());
           return response(request, copper::components::http_status_code::ok, serialize(data), "application/json");
         }
 
-        const copper::components::json::object errors = {
-          {"message", "Password provided doesn't match."},
-        };
+        const copper::components::json::object errors = {{"message", "Password provided doesn't match."}};
 
         return response(request, copper::components::http_status_code::unauthorized, serialize(errors),
                         "application/json");
