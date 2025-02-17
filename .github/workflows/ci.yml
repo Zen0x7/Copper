@@ -39,12 +39,12 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           apt update
-          apt install -y lcov iputils-ping netcat-traditional
+          apt install -y lcov iputils-ping netcat-traditional default-mysql-client
           ping -c 4 127.0.0.1
           ping -c 4 redis
           ping -c 4 mysql 
           nc -zv redis 6379
-          nc -zv mysql ${{ job.services.mysql.ports[3306] }}
+          mysql -u user -p'user_password' -h mysql -P ${{ job.services.mysql.ports[3306] }} -D copper -e "exit"
           curl -Os https://cli.codecov.io/latest/linux/codecov
           chmod +x codecov
           mkdir build
