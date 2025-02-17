@@ -9,8 +9,6 @@
 #include <copper/components/chronos.hpp>
 #include <copper/components/dotenv.hpp>
 
-#include <boost/algorithm/string/join.hpp>
-
 namespace copper::components {
     http_response http_response_exception(const http_request & request, long start_at);
 }

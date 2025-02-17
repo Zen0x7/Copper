@@ -8,7 +8,7 @@
 //
 // Official repository: https://github.com/boostorg/beast
 
-#include <boost/beast.hpp>
+#include <boost/beast/core/string.hpp>
 
 namespace copper::components {
 

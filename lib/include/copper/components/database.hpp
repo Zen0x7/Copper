@@ -4,6 +4,7 @@
 #include <copper/components/containers.hpp>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/report.hpp>
+#include <copper/components/uuid.hpp>
 
 #include <boost/mysql.hpp>
 #include <boost/asio.hpp>

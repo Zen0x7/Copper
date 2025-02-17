@@ -9,9 +9,6 @@
 // Official repository: https://github.com/boostorg/beast
 
 
-#include <boost/beast.hpp>
-#include <queue>
-
 #include <copper/components/report.hpp>
 #include <copper/components/websocket_session.hpp>
 #include <copper/components/http_kernel.hpp>

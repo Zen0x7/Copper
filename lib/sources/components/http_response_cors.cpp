@@ -1,5 +1,7 @@
 #include <copper/components/http_response_cors.hpp>
 
+#include <boost/algorithm/string/join.hpp>
+
 namespace copper::components {
 
     http_response http_response_cors(const http_request &request, long start_at, const containers::vector_of<http_method> methods) {

@@ -1,17 +1,11 @@
 #pragma once
 
-#include <boost/beast.hpp>
-
 #include <copper/components/expression.hpp>
 
 #include <copper/components/containers.hpp>
 #include <copper/components/shared.hpp>
 
 #include <copper/components/http_method.hpp>
-
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 namespace copper::components {
     struct http_route_result {

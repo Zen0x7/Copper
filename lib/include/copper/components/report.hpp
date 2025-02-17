@@ -9,7 +9,7 @@
 // Official repository: https://github.com/boostorg/beast
 
 
-#include <boost/beast.hpp>
+#include <boost/beast/core/error.hpp>
 #include <iostream>
 #include <boost/stacktrace.hpp>
 
