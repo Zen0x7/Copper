@@ -277,7 +277,7 @@ TEST(Components_HTTP_Session, Implementation) {
     failed_auth_request.body() = serialize(non_existing_user);
     boost::beast::http::write(stream, failed_auth_request);
     boost::beast::http::read(stream, buffer, response);
-    std::cout << "Auth Request: " << response << std::endl << std::endl;
+    std::cout << "Failed Auth Request: " << response << std::endl << std::endl;
     buffer.clear();
     response.clear();
 
