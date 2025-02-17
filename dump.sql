@@ -173,7 +173,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES (4,'0001_01_01_000000_create_users_table',1),(5,'0001_01_01_000001_create_cache_table',1),(6,'0001_01_01_000002_create_jobs_table',1);
+INSERT INTO `migrations` VALUES (1,'0001_01_01_000000_create_users_table',1),(2,'0001_01_01_000001_create_cache_table',1),(3,'0001_01_01_000002_create_jobs_table',1),(4,'2025_02_17_214412_create_sessions_table',1),(5,'2025_02_17_214417_create_requests_table',1),(6,'2025_02_17_214434_create_responses_table',1);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -202,6 +202,69 @@ LOCK TABLES `password_reset_tokens` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `requests`
+--
+
+DROP TABLE IF EXISTS `requests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `requests` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `session_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `version` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `method` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `headers` json DEFAULT NULL,
+  `body` json DEFAULT NULL,
+  `started_at` bigint NOT NULL,
+  `finished_at` bigint DEFAULT NULL,
+  `duration` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `requests_session_id_index` (`session_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `requests`
+--
+
+LOCK TABLES `requests` WRITE;
+/*!40000 ALTER TABLE `requests` DISABLE KEYS */;
+/*!40000 ALTER TABLE `requests` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `responses`
+--
+
+DROP TABLE IF EXISTS `responses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `responses` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `session_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `request_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status_code` smallint unsigned NOT NULL,
+  `headers` json DEFAULT NULL,
+  `body` json DEFAULT NULL,
+  `started_at` bigint NOT NULL,
+  `finished_at` bigint NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `responses_session_id_index` (`session_id`),
+  KEY `responses_request_id_index` (`request_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `responses`
+--
+
+LOCK TABLES `responses` WRITE;
+/*!40000 ALTER TABLE `responses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `responses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `sessions`
 --
 
@@ -210,14 +273,14 @@ DROP TABLE IF EXISTS `sessions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sessions` (
   `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_id` bigint unsigned DEFAULT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `last_activity` int NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `sessions_user_id_index` (`user_id`),
-  KEY `sessions_last_activity_index` (`last_activity`)
+  `ip` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `port` smallint unsigned NOT NULL,
+  `started_at` bigint NOT NULL,
+  `finished_at` bigint DEFAULT NULL,
+  `is_encrypted` tinyint(1) NOT NULL DEFAULT '0',
+  `is_upgrade` tinyint(1) NOT NULL DEFAULT '0',
+  `exception` text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -257,7 +320,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('34f576d2-dd21-451c-9c44-388cd4d66534','Ian Torres','iantorres@outlook.com',NULL,'$2y$12$FYrOhgBVWaWFrLWAboGsOuIUyAjyI4AxA2XzHQcQpdBBnRpMty31a',NULL,'2025-02-17 04:09:22','2025-02-17 04:09:22');
+INSERT INTO `users` VALUES ('5416f0e0-5142-4d40-9edd-8b0a6a67f2e0','Ian Torres','iantorres@outlook.com','2025-02-18 01:55:01','$2y$12$zDj2n16I7hMK.2bIQX.dnuXRt93NHXNFXvsnXVaEoW0vwhon2W6BG','hcqhC094ks','2025-02-18 01:55:01','2025-02-18 01:55:01');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -270,4 +333,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-16 22:10:39
+-- Dump completed on 2025-02-17 19:55:13

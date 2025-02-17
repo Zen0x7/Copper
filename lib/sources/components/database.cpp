@@ -10,6 +10,8 @@
 #include <boost/mysql/with_diagnostics.hpp>
 #include <boost/mysql/pool_params.hpp>
 
+#include <boost/uuid/random_generator.hpp>
+
 #include <boost/lexical_cast.hpp>
 
 namespace copper::components {
@@ -105,5 +107,79 @@ namespace copper::components {
         .created_at_ = row.at(5).is_null() ? 0 : chronos::to_timestamp(row.at(5).as_datetime().as_time_point()),
         .updated_at_ = row.at(6).is_null() ? 0 : chronos::to_timestamp(row.at(6).as_datetime().as_time_point())
       };
+    }
+
+    app::models::session database::create_session(const std::string &ip, uint_least16_t port) {
+      std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
+      auto now = chronos::now();
+      auto id = boost::uuids::random_generator()();
+
+      auto connection = pool_->async_get_connection(
+        boost::mysql::with_diagnostics(boost::asio::cancel_after(timeout, boost::asio::use_future))).get();
+
+
+      boost::mysql::results result;
+
+      connection->execute(
+        boost::mysql::with_params(
+          "INSERT INTO sessions (id, ip, port, started_at) VALUES ({}, {}, {}, {})",
+          to_string(id),
+          ip,
+          port,
+          now
+        ), result);
+
+      return {
+        .id_ = to_string(id),
+        .ip_ = ip,
+        .port_ = port,
+        .started_at_ = now,
+        .finished_at_ = 0,
+      };
+    }
+
+    void database::session_closed(app::models::session session, const char exception[]) {
+      std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
+      auto now = chronos::now();
+
+      auto connection = pool_->async_get_connection(
+        boost::mysql::with_diagnostics(boost::asio::cancel_after(timeout, boost::asio::use_future))).get();
+
+      boost::mysql::results result;
+      connection->execute(
+        boost::mysql::with_params(
+          "UPDATE sessions SET finished_at = {}, exception = {} WHERE id = {}",
+          now,
+          exception,
+          session.id_
+        ), result);
+    }
+
+    void database::session_is_encrypted(app::models::session session) {
+      std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
+
+      auto connection = pool_->async_get_connection(
+        boost::mysql::with_diagnostics(boost::asio::cancel_after(timeout, boost::asio::use_future))).get();
+
+      boost::mysql::results result;
+      connection->execute(
+        boost::mysql::with_params(
+          "UPDATE sessions SET is_encrypted = true WHERE id = {}",
+          session.id_
+        ), result);
+    }
+
+    void database::session_is_upgrade(app::models::session session) {
+      std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
+
+      auto connection = pool_->async_get_connection(
+        boost::mysql::with_diagnostics(boost::asio::cancel_after(timeout, boost::asio::use_future))).get();
+
+      boost::mysql::results result;
+      connection->execute(
+        boost::mysql::with_params(
+          "UPDATE sessions SET is_upgrade = true WHERE id = {}",
+          session.id_
+        ), result);
     }
 }
