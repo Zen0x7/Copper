@@ -40,6 +40,11 @@ jobs:
       - run: |
           apt update
           apt install -y lcov iputils-ping
+          ping -c 4 127.0.0.1
+          ping -c 4 redis
+          ping -c 4 mysql 
+          nc -zv redis 6379
+          nc -zv mysql ${{ job.services.mysql.ports[3306] }}
           curl -Os https://cli.codecov.io/latest/linux/codecov
           chmod +x codecov
           mkdir build
@@ -52,7 +57,7 @@ jobs:
           lcov --capture --directory . --output-file coverage.info
           lcov --list coverage.info
         env:
-          DATABASE_HOST: mysql
+          DATABASE_HOST: 127.0.0.1
           DATABASE_USER: user
           DATABASE_PASSWORD: user_password
           DATABASE_NAME: copper
