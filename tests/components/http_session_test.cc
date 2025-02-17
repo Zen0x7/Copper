@@ -193,12 +193,12 @@ TEST(Components_HTTP_Session, Implementation) {
     }
 
     {
-      boost::beast::flat_buffer buffer;
-      boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{http_method::get, "/api/up", 11};
-      request.set(http_fields::host, host);
-      request.set(http_fields::user_agent, "Copper");
       for (int i = 0; i <= 5; i++) {
+        boost::beast::flat_buffer buffer;
+        boost::beast::http::response<boost::beast::http::string_body> response;
+        http_request request{http_method::get, "/api/up", 11};
+        request.set(http_fields::host, host);
+        request.set(http_fields::user_agent, "Copper");
         boost::beast::http::write(stream, request);
         boost::beast::http::read(stream, buffer, response);
         buffer.clear();
