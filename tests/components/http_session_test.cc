@@ -165,7 +165,6 @@ TEST(Components_HTTP_Session, Implementation) {
   boost::asio::co_spawn(boost::asio::make_strand(ioc), signal_handler(task_group_), boost::asio::detached);
 
   boost::asio::io_context client_ioc;
-  boost::asio::io_context second_client_ioc;
 
   try {
     std::thread first_thread([&]() {
@@ -198,127 +197,122 @@ TEST(Components_HTTP_Session, Implementation) {
 
     boost::asio::ip::tcp::resolver resolver(client_ioc);
     boost::beast::tcp_stream stream(client_ioc);
-    boost::asio::ip::tcp::resolver second_resolver(second_client_ioc);
-    boost::beast::tcp_stream second_stream(second_client_ioc);
 
     auto const host = "127.0.0.1";
     auto const results = resolver.resolve(host, "9001");
-    auto const second_results = second_resolver.resolve(host, "9001");
 
     stream.connect(results);
-    second_stream.connect(second_results);
-
-    http_request req{http_method::get, "/", 11};
-    req.set(http_fields::host, host);
-    req.set(http_fields::user_agent, "Copper");
-
-    http_request options_up_request{http_method::options, "/api/up", 11};
-    options_up_request.set(http_fields::host, host);
-    options_up_request.set(http_fields::user_agent, "Copper");
-
-    http_request up_request{http_method::get, "/api/up", 11};
-    up_request.set(http_fields::host, host);
-    up_request.set(http_fields::user_agent, "Copper");
-
-    http_request exception_request{http_method::get, "/api/exception", 11};
-    exception_request.set(http_fields::host, host);
-    exception_request.set(http_fields::user_agent, "Copper");
-
-    http_request bad_request{http_method::get, "/api/../exception", 11};
-    bad_request.set(http_fields::host, host);
-    bad_request.set(http_fields::user_agent, "Copper");
-
-    http_request authenticated_request{http_method::get, "/api/user", 11};
-    authenticated_request.set(http_fields::host, host);
-    authenticated_request.set(http_fields::user_agent, "Copper");
-
-    http_request auth_request{http_method::post, "/api/auth", 11};
-    auth_request.set(http_fields::host, host);
-    auth_request.set(http_fields::user_agent, "Copper");
-    auth_request.set(http_fields::content_type, "application/json");
-    auth_request.set(http_fields::content_length, "53");
-    boost::json::object user = {
-      {"email",    "iantorres@outlook.com"},
-      {"password", "abcdef"}
-    };
-    auth_request.body() = serialize(user);
-
-    http_request params_request{http_method::get, "/api/params/{name}", 11};
-    params_request.set(http_fields::host, host);
-    params_request.set(http_fields::user_agent, "Copper");
 
     http_request close_req{http_method::get, "/", 11};
     close_req.set(http_fields::host, host);
     close_req.set(http_fields::user_agent, "Copper");
 
     boost::beast::flat_buffer buffer;
-    boost::beast::flat_buffer second_buffer;
-    boost::beast::http::response<boost::beast::http::string_body> res;
-    boost::beast::http::response<boost::beast::http::string_body> options_up_res;
-    boost::beast::http::response<boost::beast::http::string_body> up_res;
-    boost::beast::http::response<boost::beast::http::string_body> exception_res;
-    boost::beast::http::response<boost::beast::http::string_body> auth_res;
-    boost::beast::http::response<boost::beast::http::string_body> params_res;
-    boost::beast::http::response<boost::beast::http::string_body> bad_res;
-    boost::beast::http::response<boost::beast::http::string_body> authenticated_res;
-    boost::beast::http::response<boost::beast::http::string_body> close_res;
+    boost::beast::http::response<boost::beast::http::string_body> response;
 
+    http_request req{http_method::get, "/", 11};
+    req.set(http_fields::host, host);
+    req.set(http_fields::user_agent, "Copper");
+    boost::beast::http::response<boost::beast::http::string_body> res;
     boost::beast::http::write(stream, req);
     boost::beast::http::read(stream, buffer, res);
     buffer.clear();
     res.clear();
 
-    boost::beast::http::write(stream, options_up_request);
-    boost::beast::http::read(stream, buffer, options_up_res);
-    buffer.clear();
-    options_up_res.clear();
 
+    http_request options_up_request{http_method::options, "/api/up", 11};
+    options_up_request.set(http_fields::host, host);
+    options_up_request.set(http_fields::user_agent, "Copper");
+    boost::beast::http::write(stream, options_up_request);
+    boost::beast::http::read(stream, buffer, response);
+    buffer.clear();
+    response.clear();
+
+    http_request up_request{http_method::get, "/api/up", 11};
+    up_request.set(http_fields::host, host);
+    up_request.set(http_fields::user_agent, "Copper");
     for (int i = 0; i <= 5; i++) {
-      boost::beast::http::response<boost::beast::http::string_body> up_local_res;
       boost::beast::http::write(stream, up_request);
-      boost::beast::http::read(stream, buffer, up_local_res);
-      std::cout << "Too Many Request: " << up_local_res << std::endl << std::endl;
+      boost::beast::http::read(stream, buffer, response);
+      std::cout << "Too Many Request: " << response << std::endl << std::endl;
       buffer.clear();
-      up_local_res.clear();
+      response.clear();
     }
 
+    http_request exception_request{http_method::get, "/api/exception", 11};
+    exception_request.set(http_fields::host, host);
+    exception_request.set(http_fields::user_agent, "Copper");
     boost::beast::http::write(stream, exception_request);
-    boost::beast::http::read(stream, buffer, exception_res);
-    std::cout << "Exception Request: " << exception_res << std::endl << std::endl;
+    boost::beast::http::read(stream, buffer, response);
+    std::cout << "Exception Request: " << response << std::endl << std::endl;
     buffer.clear();
-    exception_res.clear();
+    response.clear();
 
-    std::cerr << "A" << std::endl;
+    http_request success_auth_request{http_method::post, "/api/auth", 11};
+    success_auth_request.set(http_fields::host, host);
+    success_auth_request.set(http_fields::user_agent, "Copper");
+    success_auth_request.set(http_fields::content_type, "application/json");
+    success_auth_request.set(http_fields::content_length, "53");
+    boost::json::object existing_user = {
+      {"email",    "iantorres@outlook.com"},
+      {"password", "abcdef"}
+    };
+    success_auth_request.body() = serialize(existing_user);
+    boost::beast::http::write(stream, success_auth_request);
+    boost::beast::http::read(stream, buffer, response);
+    std::cout << "Success Auth Request: " << response << std::endl << std::endl;
+    buffer.clear();
+    response.clear();
 
-    boost::beast::http::write(second_stream, auth_request);
-    boost::beast::http::read(second_stream, second_buffer, auth_res);
-    std::cout << "Auth Request: " << auth_res << std::endl << std::endl;
-    second_buffer.clear();
-    auth_res.clear();
+    http_request failed_auth_request{http_method::post, "/api/auth", 11};
+    failed_auth_request.set(http_fields::host, host);
+    failed_auth_request.set(http_fields::user_agent, "Copper");
+    failed_auth_request.set(http_fields::content_type, "application/json");
+    failed_auth_request.set(http_fields::content_length, "53");
+    boost::json::object non_existing_user = {
+      {"email",    "iantorres@outlook.com"},
+      {"password", "defabc"}
+    };
+    
+    failed_auth_request.body() = serialize(non_existing_user);
+    boost::beast::http::write(stream, failed_auth_request);
+    boost::beast::http::read(stream, buffer, response);
+    std::cout << "Auth Request: " << response << std::endl << std::endl;
+    buffer.clear();
+    response.clear();
 
-    std::cerr << "B" << std::endl;
 
-    boost::beast::http::write(second_stream, params_request);
-    boost::beast::http::read(second_stream, second_buffer, params_res);
-    std::cout << "Params Request: " << params_res << std::endl << std::endl;
-    second_buffer.clear();
-    params_res.clear();
+    http_request params_request{http_method::get, "/api/params/{name}", 11};
+    params_request.set(http_fields::host, host);
+    params_request.set(http_fields::user_agent, "Copper");
+    boost::beast::http::write(stream, params_request);
+    boost::beast::http::read(stream, buffer, response);
+    std::cout << "Params Request: " << response << std::endl << std::endl;
+    buffer.clear();
+    response.clear();
 
-    boost::beast::http::write(second_stream, bad_request);
-    boost::beast::http::read(second_stream, second_buffer, bad_res);
-    std::cout << "Bad Request: " << bad_res << std::endl << std::endl;
-    second_buffer.clear();
-    bad_res.clear();
+    http_request bad_request{http_method::get, "/api/../bad_request", 11};
+    bad_request.set(http_fields::host, host);
+    bad_request.set(http_fields::user_agent, "Copper");
+    boost::beast::http::write(stream, bad_request);
+    boost::beast::http::read(stream, buffer, response);
+    std::cout << "Bad Request: " << response << std::endl << std::endl;
+    buffer.clear();
+    response.clear();
 
-    boost::beast::http::write(second_stream, authenticated_request);
-    boost::beast::http::read(second_stream, second_buffer, authenticated_res);
-    second_buffer.clear();
-    std::cout << "Authenticated Request: " << authenticated_res << std::endl << std::endl;
-    authenticated_res.clear();
+    http_request authenticated_request{http_method::get, "/api/user", 11};
+    authenticated_request.set(http_fields::host, host);
+    authenticated_request.set(http_fields::user_agent, "Copper");
+    boost::beast::http::write(stream, authenticated_request);
+    boost::beast::http::read(stream, buffer, response);
+    buffer.clear();
+    std::cout << "Authenticated Request: " << response << std::endl << std::endl;
+    response.clear();
 
-    boost::beast::http::write(second_stream, close_req);
-    boost::beast::http::read(second_stream, second_buffer, close_res);
-    second_buffer.clear();
+    boost::beast::http::response<boost::beast::http::string_body> close_res;
+    boost::beast::http::write(stream, close_req);
+    boost::beast::http::read(stream, buffer, close_res);
+    buffer.clear();
     std::cout << "Close Request: " << close_res << std::endl << std::endl;
     close_res.clear();
 
@@ -329,13 +323,7 @@ TEST(Components_HTTP_Session, Implementation) {
       std::cerr << "Error en shutdown: " << ec.message() << std::endl;
     }
 
-    second_stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    if (ec && ec != boost::system::errc::not_connected) {
-      std::cerr << "Error en shutdown: " << ec.message() << std::endl;
-    }
-
     stream.close();
-    second_stream.close();
 
     boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel(), boost::asio::detached);
 
