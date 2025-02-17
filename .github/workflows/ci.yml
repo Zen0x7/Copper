@@ -38,9 +38,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          ping 127.0.0.1
           apt update
-          apt install -y lcov
+          apt install -y lcov iputils-ping
+          ping 127.0.0.1
           curl -Os https://cli.codecov.io/latest/linux/codecov
           chmod +x codecov
           mkdir build
