@@ -18,6 +18,12 @@ namespace copper::components {
       pool_->async_run(boost::asio::detached);
     }
 
+    /**
+     * Find user by email
+     *
+     * @param email
+     * @return
+     */
     containers::optional_of<app::models::user> database::get_user_by_email(const std::string &email) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
@@ -68,6 +74,12 @@ namespace copper::components {
       pool_ = boost::make_shared<boost::mysql::connection_pool>(*thread_pool_, std::move(params));
     }
 
+    /**
+     * Find existing user by id
+     *
+     * @param id
+     * @return
+     */
     app::models::user database::get_user_by_id(uuid id) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
@@ -81,11 +93,6 @@ namespace copper::components {
         boost::mysql::with_params(
           "SELECT id, name, email, email_verified_at, password, created_at, updated_at FROM users WHERE id = {}",
           to_string(id)), result);
-
-
-      if (result.rows().empty()) {
-        return {};
-      }
 
       const auto &row = result.rows().at(0);
 
