@@ -69,7 +69,22 @@ namespace copper {
 
         auto task_group = boost::make_shared<components::task_group>(ioc.get_executor());
 
-        auto state = boost::make_shared<components::state>();
+        boost::mysql::pool_params database_params;
+        database_params.server_address.emplace_host_and_port(
+          dotenv::getenv("DATABASE_HOST", "127.0.0.1"),
+          std::stoi(dotenv::getenv("DATABASE_PORT", "3306"))
+        );
+
+        database_params.username = dotenv::getenv("DATABASE_USER", "user");
+        database_params.password = dotenv::getenv("DATABASE_PASSWORD", "user_password");
+        database_params.database = dotenv::getenv("DATABASE_NAME", "copper");
+        database_params.thread_safe = true;
+        database_params.initial_size = 10;
+        database_params.max_size = 100;
+
+        auto database_pool = boost::make_shared<boost::mysql::connection_pool>(ioc, std::move(database_params));
+
+        auto state = boost::make_shared<components::state>(database_pool);
 
         state->get_database()->start();
 

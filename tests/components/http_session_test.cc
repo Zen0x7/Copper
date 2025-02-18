@@ -69,8 +69,9 @@ TEST(Components_HTTP_Session, Implementation) {
     auto const port = 9001;
     auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
     auto const doc_root = std::string_view{"."};
+    auto const threads = 4;
 
-    boost::asio::io_context ioc;
+    boost::asio::io_context ioc {threads};
 
     boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
 
@@ -78,7 +79,22 @@ TEST(Components_HTTP_Session, Implementation) {
 
     auto task_group_ = boost::make_shared<task_group>(ioc.get_executor());
 
-    auto state_ = boost::make_shared<state>();
+    boost::mysql::pool_params database_params;
+    database_params.server_address.emplace_host_and_port(
+      dotenv::getenv("DATABASE_HOST", "127.0.0.1"),
+      std::stoi(dotenv::getenv("DATABASE_PORT", "3306"))
+    );
+
+    database_params.username = dotenv::getenv("DATABASE_USER", "user");
+    database_params.password = dotenv::getenv("DATABASE_PASSWORD", "user_password");
+    database_params.database = dotenv::getenv("DATABASE_NAME", "copper");
+    database_params.thread_safe = true;
+    database_params.initial_size = 10;
+    database_params.max_size = 100;
+
+    auto database_pool = boost::make_shared<boost::mysql::connection_pool>(ioc, std::move(database_params));
+
+    auto state_ = boost::make_shared<state>(database_pool);
 
     state_->get_database()->start();
 
@@ -125,11 +141,14 @@ TEST(Components_HTTP_Session, Implementation) {
 
     boost::asio::io_context client_ioc;
 
-    std::thread thread([&]() {
-      std::cout << "Running thread #1" << std::endl;
-      ioc.run();
-      std::cout << "Stopped thread #1" << std::endl;
-    });
+    std::vector<std::thread> v;
+    v.reserve(threads);
+    for (auto i = threads; i > 0; --i)
+      v.emplace_back([&ioc, i] {
+        std::cout << "Thread " << i << " starting " << std::endl;
+        ioc.run();
+        std::cout << "Thread " << i << " stopped " << std::endl;
+      });
 
     sleep(1);
 
@@ -344,7 +363,8 @@ TEST(Components_HTTP_Session, Implementation) {
 
     sleep(5);
 
-    thread.join();
+    for (auto &t: v)
+      t.join();
 
     ASSERT_TRUE(true);
 

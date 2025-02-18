@@ -59,23 +59,7 @@ namespace copper::components {
       );
     }
 
-    database::database() {
-      thread_pool_ = boost::make_shared<boost::asio::thread_pool>(std::stoi(dotenv::getenv("DATABASE_THREADS", "1")));
-
-      boost::mysql::pool_params params;
-      params.server_address.emplace_host_and_port(
-        dotenv::getenv("DATABASE_HOST", "127.0.0.1"),
-        std::stoi(dotenv::getenv("DATABASE_PORT", "3306"))
-      );
-      params.username = dotenv::getenv("DATABASE_USER", "user");
-      params.password = dotenv::getenv("DATABASE_PASSWORD", "user_password");
-      params.database = dotenv::getenv("DATABASE_NAME", "copper");
-      params.thread_safe = true;
-      params.initial_size = 10;
-      params.max_size = 100;
-
-      pool_ = boost::make_shared<boost::mysql::connection_pool>(*thread_pool_, std::move(params));
-    }
+    database::database(const shared<boost::mysql::connection_pool> & pool) : pool_(pool) { }
 
     /**
      * Find existing user by id

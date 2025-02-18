@@ -2,10 +2,10 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
-    state::state() :
+    state::state(const shared<boost::mysql::connection_pool> & pool) :
       http_router_(boost::make_shared<http_router>()),
       redis_(boost::make_shared<cache>()),
-      database_(boost::make_shared<database>())
+      database_(boost::make_shared<database>(pool))
     { }
 
     shared<http_router> state::get_http_router() { return http_router_; }

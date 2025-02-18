@@ -15,12 +15,8 @@
 namespace copper::components {
     class database : public shared_enabled<database> {
         shared<boost::mysql::connection_pool> pool_;
-        shared<boost::asio::thread_pool> thread_pool_;
     public:
-        database();
-
-        ~database() {
-        }
+        database(const shared<boost::mysql::connection_pool> & pool);
 
         void start();
 
