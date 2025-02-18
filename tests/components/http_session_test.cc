@@ -28,7 +28,7 @@ boost::asio::awaitable<
   boost::asio::strand<
     boost::asio::io_context::executor_type
   >
-> cancel_http_sessions(boost::asio::io_context &ioc) {
+> cancel_http_sessions() {
   auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
 }
@@ -358,7 +358,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     sleep(5);
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_http_sessions(ioc), boost::asio::detached);
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_http_sessions(), boost::asio::detached);
     ioc.stop();
 
     sleep(5);
