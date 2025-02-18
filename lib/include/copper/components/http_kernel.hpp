@@ -17,6 +17,9 @@
 #include <copper/components/http_request.hpp>
 
 #include <copper/components/http_response_generic.hpp>
+#include <copper/components/uuid.hpp>
+#include <app/models/session.hpp>
+#include <app/models/request.hpp>
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/strand.hpp>
@@ -27,36 +30,39 @@
 
 namespace copper::components {
     class state;
+
     class http_controller;
 
     struct http_kernel_result {
-        http_route route_;
-        shared<http_controller> controller_;
-        containers::unordered_map_of_strings bindings_;
+      http_route route_;
+      shared<http_controller> controller_;
+      containers::unordered_map_of_strings bindings_;
     };
 
     class http_kernel : public shared_enabled<http_kernel> {
-        shared<state> state_;
+      shared<state> state_;
     public:
-        explicit http_kernel(const shared<state> &state) : state_(state) {}
+      explicit http_kernel(const shared<state> &state) : state_(state) {}
 
-        containers::optional_of<http_kernel_result> find_on_routes(
-                const http_request & request
-                ) const;
+      containers::optional_of<http_kernel_result> find_on_routes(
+        const http_request &request
+      ) const;
 
-        containers::vector_of<http_method> get_available_methods(const http_request & request) const;
+      containers::vector_of<http_method> get_available_methods(const http_request &request) const;
 
-        boost::asio::awaitable<
-                http_response_generic,
-                boost::asio::strand<
-                        boost::asio::io_context::executor_type
-                >
-        > invoke(
-            boost::beast::string_view /* root */,
-            const http_request & request,
-            const std::string & ip,
-            long now
-        ) const;
+      boost::asio::awaitable<
+        std::tuple<shared<app::models::request>, http_response_generic>,
+        boost::asio::strand<
+          boost::asio::io_context::executor_type
+        >
+      > invoke(
+        const shared<app::models::session> &session,
+        boost::beast::string_view /* root */,
+        const http_request &request,
+        const std::string &ip,
+        const uuid &request_id,
+        long now
+      ) const;
     };
 
 } // namespace copper::component

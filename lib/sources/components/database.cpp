@@ -40,7 +40,7 @@ namespace copper::components {
           "SELECT id, name, password, email_verified_at, created_at, updated_at FROM users WHERE email = {}",
           email), result);
 
-      connection->close();
+      connection.return_without_reset();
 
       if (result.rows().empty()) {
         return boost::none;
@@ -83,7 +83,7 @@ namespace copper::components {
 
       const auto &row = result.rows().at(0);
 
-      connection->close();
+      connection.return_without_reset();
 
       return boost::make_shared<app::models::user>(
         to_string(id),
@@ -116,7 +116,7 @@ namespace copper::components {
           now
         ), result);
 
-      connection->close();
+      connection.return_without_reset();
 
       return boost::make_shared<app::models::session>(
         to_string(id),
@@ -143,7 +143,7 @@ namespace copper::components {
           session->id_
         ), result);
 
-      connection->close();
+      connection.return_without_reset();
     }
 
     void database::session_is_encrypted(const shared<app::models::session> & session) {
@@ -160,7 +160,7 @@ namespace copper::components {
         ), result);
 
 
-      connection->close();
+      connection.return_without_reset();
     }
 
     void database::session_is_upgrade(const shared<app::models::session> & session) {
@@ -176,6 +176,6 @@ namespace copper::components {
           session->id_
         ), result);
 
-      connection->close();
+      connection.return_without_reset();
     }
 }

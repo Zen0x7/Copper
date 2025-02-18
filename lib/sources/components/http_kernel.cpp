@@ -19,6 +19,8 @@
 
 #include <copper/components/mime_type.hpp>
 
+#include <app/models/request.hpp>
+
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/json/parse.hpp>
 #include <boost/json/serialize.hpp>
@@ -48,12 +50,37 @@ namespace copper::components {
       return methods; }
 
     boost::asio::awaitable<
-      http_response_generic,
+      std::tuple<shared<app::models::request>, http_response_generic>,
       boost::asio::strand<
         boost::asio::io_context::executor_type
       >
     >
-    http_kernel::invoke(boost::beast::string_view, const http_request &request, const std::string &ip, long now) const {
+    http_kernel::invoke(
+      const shared<app::models::session> & session,
+      boost::beast::string_view,
+      const http_request &request,
+      const std::string &ip,
+      const uuid & request_id,
+      long now
+      ) const {
+
+      json::object headers;
+      for (const auto& header : request.base()) {
+        headers[header.name_string()] = header.value();
+      }
+      auto _request = boost::make_shared<app::models::request>(
+        to_string(request_id),
+        session->id_,
+        std::to_string(request.version()),
+        std::string(request.method_string()),
+        std::string(request.target()),
+        serialize(headers),
+        std::string(request.body()),
+        now,
+        0,
+        0
+      );
+
       if (const auto route = find_on_routes(request); route.has_value()) {
         containers::unordered_map_of_strings bindings = route.value().bindings_;
 
@@ -62,7 +89,7 @@ namespace copper::components {
         if (route.value().controller_->config_.use_throttler) {
           if (auto [can, TTL] = co_await state_->get_cache()->can_invoke(request, ip,
                                                                          route.value().controller_->config_.rpm); !can) {
-            co_return http_response_too_many_requests(request, now, TTL);
+            co_return std::make_tuple(_request, http_response_too_many_requests(request, now, TTL));
           }
         }
 
@@ -74,7 +101,7 @@ namespace copper::components {
           boost::optional<authentication_result> user_id;
           user_id = authentication_from_bearer(bearer, dotenv::getenv("APP_KEY"));
 
-          if (!user_id.has_value()) co_return http_response_unauthorized(request, now);
+          if (!user_id.has_value()) co_return std::make_tuple(_request, http_response_unauthorized(request, now));
 
           route.value().controller_->set_user(user_id.get().id);
         }
@@ -94,39 +121,39 @@ namespace copper::components {
               auto error_response = boost::json::object(
                 {{"message", "The given data was invalid."}, {"errors", validator->errors}});
 
-              co_return route.value().controller_->response(
+              co_return std::make_tuple(_request, route.value().controller_->response(
                 request, http_status_code::unprocessable_entity,
-                serialize(error_response), "application/json");
+                serialize(error_response), "application/json"));
             }
           } else {
             auto error_response
               = boost::json::object({{"message", "The given data was invalid."},
                                      {"errors", {{"*", "The body must be a valid JSON."}}}});
 
-            co_return route.value().controller_->response(
+            co_return std::make_tuple(_request, route.value().controller_->response(
               request, http_status_code::unprocessable_entity, serialize(error_response),
-              "application/json");
+              "application/json"));
           }
         }
 
         try {
-          co_return route.value().controller_->invoke(request);
+          co_return std::make_tuple(_request, route.value().controller_->invoke(request));
         } catch (std::exception& exception) {
           std::cout << exception.what() << std::endl;
 
-          co_return http_response_exception(request, now);
+          co_return std::make_tuple(_request, http_response_exception(request, now));
         }
       }
 
       if (request.method() == http_method::options) {
         auto available_verbs = get_available_methods(request);
-        co_return http_response_cors(request, now, available_verbs);
+        co_return std::make_tuple(_request, http_response_cors(request, now, available_verbs));
       }
 
       if (http_request_is_illegal(request)) {
-        co_return http_response_bad_request(request, now);
+        co_return std::make_tuple(_request, http_response_bad_request(request, now));
       }
 
-      co_return http_response_not_found(request, now);
+      co_return std::make_tuple(_request, http_response_not_found(request, now));
     }
 }
