@@ -24,10 +24,10 @@ namespace app::models {
       long updated_at_;
 
       user(std::string id, std::string name, std::string email, std::string password, long email_verified_at, long created_at, long updated_at) :
-        id_(std::move(id)),
-        name_(std::move(name)),
-        email_(std::move(email)),
-        password_(std::move(password)),
+        id_(id),
+        name_(name),
+        email_(email),
+        password_(password),
         email_verified_at_(email_verified_at),
         created_at_(created_at),
         updated_at_(updated_at)

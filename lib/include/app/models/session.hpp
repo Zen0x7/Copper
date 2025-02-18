@@ -21,8 +21,8 @@ namespace app::models {
       long finished_at_;
 
       session(std::string id, std::string ip, uint_least16_t port, long started_at, long finished_at) :
-        id_(std::move(id)),
-        ip_(std::move(ip)),
+        id_(id),
+        ip_(ip),
         port_(port),
         started_at_(started_at),
         finished_at_(finished_at)
