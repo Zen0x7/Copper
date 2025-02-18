@@ -355,6 +355,8 @@ TEST(Components_HTTP_Session, Implementation) {
 
     stream.close();
 
+    sleep(5); // Wait for transactions
+
     boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_http_sessions(), boost::asio::detached);
 
     sleep(5); // Wait for shutdown

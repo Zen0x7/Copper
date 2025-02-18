@@ -119,6 +119,8 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
 
+    sleep(5); // Wait for transactions
+
     boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_websocket_session(), boost::asio::detached);
 
     sleep(5); // Wait for shutdown
