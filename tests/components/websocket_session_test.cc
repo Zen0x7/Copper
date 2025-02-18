@@ -13,9 +13,9 @@ boost::asio::awaitable<
   boost::asio::strand<
     boost::asio::io_context::executor_type
   >
-> cancel_websocket_session() {
-  auto executor = co_await boost::asio::this_coro::executor;
-  executor.get_inner_executor().context().stop();
+> cancel_websocket_session(boost::asio::io_context &ioc) {
+  co_await boost::asio::this_coro::executor;
+  boost::asio::post(ioc, [&]() { ioc.stop(); });
 }
 
 TEST(Components_WebSocket_Session, Implementation) {
@@ -58,7 +58,7 @@ TEST(Components_WebSocket_Session, Implementation) {
   boost::asio::io_context client_ioc;
 
   try {
-    std::thread first_thread([&]() {
+    std::thread thread([&]() {
       try {
         std::cout << "Running thread #1" << std::endl;
         ioc.run();
@@ -68,8 +68,6 @@ TEST(Components_WebSocket_Session, Implementation) {
         std::cout << "Exception on thread #1" << std::endl;
       }
     });
-
-    first_thread.detach();
 
     sleep(5); // Wait for service
 
@@ -108,15 +106,16 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     sleep(5); // Wait for transactions
 
-    task_group_->emit(boost::asio::cancellation_type::all);
 
-    sleep(5);
-
-    ioc.stop();
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_websocket_session(ioc), boost::asio::detached);
 
     sleep(5); // Wait for shutdown
 
-    first_thread.join();
+    if (thread.joinable()) {
+      thread.join();
+    }
+
+    client_ioc.run();
 
   } catch (std::exception const &e) {
   }
