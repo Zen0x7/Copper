@@ -15,7 +15,10 @@ boost::asio::awaitable<
   >
 > cancel_websocket_session(boost::asio::io_context &ioc) {
   co_await boost::asio::this_coro::executor;
-  boost::asio::post(ioc, [&]() { ioc.stop(); });
+  boost::asio::post(ioc, [&]() {
+    sleep(10);
+    ioc.stop();
+  });
 }
 
 TEST(Components_WebSocket_Session, Implementation) {
@@ -58,61 +61,60 @@ TEST(Components_WebSocket_Session, Implementation) {
 
   boost::asio::io_context client_ioc;
 
-  try {
-    std::thread thread([&]() {
-      try {
-        std::cout << "Running thread #1" << std::endl;
-        ioc.run();
-        std::cout << "Stopped thread #1" << std::endl;
-      } catch (std::exception &e) {
+  std::thread thread([&]() {
+    try {
+      std::cout << "Running thread #1" << std::endl;
+      ioc.run();
+      std::cout << "Stopped thread #1" << std::endl;
+    } catch (std::exception &e) {
 
-        std::cout << "Exception on thread #1" << std::endl;
-      }
-    });
-
-    boost::asio::ip::tcp::resolver resolver(client_ioc);
-
-    std::string host = "127.0.0.1";
-    auto const results = resolver.resolve(host, "9002");
-
-    boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws(client_ioc);
-
-    auto ep = boost::asio::connect(ws.next_layer(), results);
-
-    host += ':' + std::to_string(ep.port());
-
-    ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::client));
-
-    ws.set_option(boost::beast::websocket::stream_base::decorator(
-      [](boost::beast::websocket::request_type &req) {
-        req.set(boost::beast::http::field::user_agent, "Copper");
-      }));
-
-    ws.handshake(host, "/");
-    ws.write(boost::asio::buffer(std::string("hello")));
-    boost::beast::flat_buffer buffer;
-    ws.read(buffer);
-
-    boost::beast::error_code ec;
-    ws.close(boost::beast::websocket::close_code::normal, ec);
-    if (ec) {
-      std::cerr << "Error cerrando WebSocket: " << ec.message() << std::endl;
-    } else {
-      std::cout << "Conexión WebSocket cerrada correctamente." << std::endl;
+      std::cout << "Exception on thread #1" << std::endl;
     }
+  });
 
-    std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
+  boost::asio::ip::tcp::resolver resolver(client_ioc);
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_websocket_session(ioc), boost::asio::detached);
+  std::string host = "127.0.0.1";
+  auto const results = resolver.resolve(host, "9002");
 
-    if (thread.joinable()) {
-      thread.join();
-    }
+  boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws(client_ioc);
 
-    client_ioc.run();
+  auto ep = boost::asio::connect(ws.next_layer(), results);
 
-  } catch (std::exception const &e) {
+  host += ':' + std::to_string(ep.port());
+
+  ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::client));
+
+  ws.set_option(boost::beast::websocket::stream_base::decorator(
+    [](boost::beast::websocket::request_type &req) {
+      req.set(boost::beast::http::field::user_agent, "Copper");
+    }));
+
+  ws.handshake(host, "/");
+  ws.write(boost::asio::buffer(std::string("hello")));
+  boost::beast::flat_buffer buffer;
+  ws.read(buffer);
+
+  boost::beast::error_code ec;
+  ws.close(boost::beast::websocket::close_code::normal, ec);
+  if (ec) {
+    std::cerr << "Error cerrando WebSocket: " << ec.message() << std::endl;
+  } else {
+    std::cout << "Conexión WebSocket cerrada correctamente." << std::endl;
   }
 
+  std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
+
+  boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_websocket_session(ioc), boost::asio::detached);
+
+  client_ioc.run();
+
+  while (!thread.joinable()) {
+    usleep(100);
+  }
+  thread.join();
+
   ASSERT_TRUE(true);
+
+  sleep(10);
 }

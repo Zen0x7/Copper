@@ -19,6 +19,11 @@ namespace copper::components {
     public:
         database();
 
+        ~database() {
+          pool_->cancel();
+          thread_pool_->stop();
+        }
+
         void start();
 
         containers::optional_of<shared<app::models::user>> get_user_by_email(const std::string &email);

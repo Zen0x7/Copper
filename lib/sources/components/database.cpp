@@ -103,7 +103,7 @@ namespace copper::components {
 
       return boost::make_shared<app::models::user>(
         to_string(id),
-        std::string(row.at(1).as_string()),
+        row.at(1).as_string(),
         row.at(2).as_string(),
         row.at(3).as_string(),
         row.at(4).is_null() ? 0 : chronos::to_timestamp(row.at(4).as_datetime().as_time_point()),
