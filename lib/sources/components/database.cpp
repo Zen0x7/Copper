@@ -42,6 +42,8 @@ namespace copper::components {
 
 
       if (result.rows().empty()) {
+        connection->close();
+
         return boost::none;
       }
 
