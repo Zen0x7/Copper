@@ -28,9 +28,9 @@ boost::asio::awaitable<
   boost::asio::strand<
     boost::asio::io_context::executor_type
   >
-> cancel_http_sessions() {
-  auto executor = co_await boost::asio::this_coro::executor;
-  executor.get_inner_executor().context().stop();
+> cancel_http_sessions(boost::asio::io_context &ioc) {
+  co_await boost::asio::this_coro::executor;
+  boost::asio::post(ioc, [&]() { ioc.stop(); });
 }
 
 class exception_controller final : public http_controller {
@@ -70,7 +70,7 @@ TEST(Components_HTTP_Session, Implementation) {
   auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
   auto const doc_root = std::string_view{"."};
 
-  boost::asio::io_context ioc{2};
+  boost::asio::io_context ioc;
 
   boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
 
@@ -126,7 +126,7 @@ TEST(Components_HTTP_Session, Implementation) {
   boost::asio::io_context client_ioc;
 
   try {
-    std::thread first_thread([&]() {
+    std::thread thread([&]() {
       try {
         std::cout << "Running thread #1" << std::endl;
         ioc.run();
@@ -136,23 +136,6 @@ TEST(Components_HTTP_Session, Implementation) {
         std::cout << "Exception on thread #1" << std::endl;
       }
     });
-
-    std::thread second_thread([&]() {
-      try {
-        std::cout << "Running thread #2" << std::endl;
-        ioc.run();
-        std::cout << "Stopped thread #2" << std::endl;
-      } catch (std::exception &e) {
-
-        std::cout << "Exception on thread #2" << std::endl;
-
-      }
-    });
-
-    first_thread.detach();
-    second_thread.detach();
-
-    sleep(5); // Wait for service
 
     boost::asio::ip::tcp::resolver resolver(client_ioc);
     boost::beast::tcp_stream stream(client_ioc);
@@ -355,15 +338,13 @@ TEST(Components_HTTP_Session, Implementation) {
 
     stream.close();
 
-    sleep(5); // Wait for transactions
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_http_sessions(ioc), boost::asio::detached);
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_http_sessions(), boost::asio::detached);
+    if (thread.joinable()) {
+      thread.join();
+    }
 
-    sleep(5); // Wait for shutdown
-
-    first_thread.join();
-    second_thread.join();
-
+    client_ioc.run();
   } catch (std::exception const &e) {
 
   }

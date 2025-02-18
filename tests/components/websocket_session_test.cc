@@ -19,6 +19,7 @@ boost::asio::awaitable<
 }
 
 TEST(Components_WebSocket_Session, Implementation) {
+  dotenv::init();
   using namespace copper::components;
 
   auto const address = boost::asio::ip::make_address("0.0.0.0");
@@ -26,7 +27,7 @@ TEST(Components_WebSocket_Session, Implementation) {
   auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
   auto const doc_root = std::string_view{"."};
 
-  boost::asio::io_context ioc{2};
+  boost::asio::io_context ioc;
 
   boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
 
@@ -69,8 +70,6 @@ TEST(Components_WebSocket_Session, Implementation) {
       }
     });
 
-    sleep(5); // Wait for service
-
     boost::asio::ip::tcp::resolver resolver(client_ioc);
 
     std::string host = "127.0.0.1";
@@ -104,12 +103,7 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
 
-    sleep(5); // Wait for transactions
-
-
     boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_websocket_session(ioc), boost::asio::detached);
-
-    sleep(5); // Wait for shutdown
 
     if (thread.joinable()) {
       thread.join();
