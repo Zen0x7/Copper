@@ -69,20 +69,7 @@ TEST(Components_WebSocket_Session, Implementation) {
       }
     });
 
-    std::thread second_thread([&]() {
-      try {
-        std::cout << "Running thread #2" << std::endl;
-        ioc.run();
-        std::cout << "Stopped thread #2" << std::endl;
-      } catch (std::exception &e) {
-
-        std::cout << "Exception on thread #2" << std::endl;
-
-      }
-    });
-
     first_thread.detach();
-    second_thread.detach();
 
     sleep(5); // Wait for service
 
@@ -123,12 +110,13 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     task_group_->emit(boost::asio::cancellation_type::all);
 
+    sleep(5);
+
     ioc.stop();
 
     sleep(5); // Wait for shutdown
 
     first_thread.join();
-    second_thread.join();
 
   } catch (std::exception const &e) {
   }
