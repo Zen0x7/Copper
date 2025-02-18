@@ -1,11 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <copper/components/certificates.hpp>
+#include <copper/components/server_certificates.hpp>
+#include <copper/components/client_certificates.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/signal_handler.hpp>
 
+#include <boost/asio/ssl.hpp>
 #include <boost/asio/co_spawn.hpp>
 
 boost::asio::awaitable<
@@ -29,11 +31,13 @@ TEST(Components_WebSocket_Session, Implementation) {
     auto const doc_root = std::string_view{"."};
     auto const threads = 4;
 
-    boost::asio::io_context ioc { threads };
+    boost::asio::io_context ioc{threads};
 
     boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
+    boost::asio::ssl::context client_ctx{boost::asio::ssl::context::tlsv12};
 
     load_server_certificate(ctx);
+    load_root_certificates(client_ctx);
 
     auto task_group_ = boost::make_shared<task_group>(ioc.get_executor());
 
@@ -91,14 +95,22 @@ TEST(Components_WebSocket_Session, Implementation) {
     std::string host = "127.0.0.1";
     auto const results = resolver.resolve(host, "9002");
 
-    boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws(client_ioc);
+    boost::beast::websocket::stream<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>> ws(client_ioc, client_ctx);
 
-    auto ep = boost::asio::connect(ws.next_layer(), results);
+    auto ep = boost::asio::connect(boost::beast::get_lowest_layer(ws), results);
+
+    if (!SSL_set_tlsext_host_name(ws.next_layer().native_handle(), host.c_str()))
+      throw boost::beast::system_error(
+        boost::beast::error_code(
+          static_cast<int>(::ERR_get_error()),
+          boost::asio::error::get_ssl_category()),
+        "Failed to set SNI Hostname");
 
     host += ':' + std::to_string(ep.port());
 
-    ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::client));
+    ws.next_layer().handshake(ssl::stream_base::client);
 
+    ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::client));
     ws.set_option(boost::beast::websocket::stream_base::decorator(
       [](boost::beast::websocket::request_type &req) {
         req.set(boost::beast::http::field::user_agent, "Copper");
