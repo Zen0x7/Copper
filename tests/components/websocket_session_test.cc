@@ -121,7 +121,9 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     sleep(5); // Wait for transactions
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_websocket_session(), boost::asio::detached);
+    task_group_->emit(boost::asio::cancellation_type::all);
+
+    ioc.stop();
 
     sleep(5); // Wait for shutdown
 
