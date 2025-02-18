@@ -40,10 +40,9 @@ namespace copper::components {
           "SELECT id, name, password, email_verified_at, created_at, updated_at FROM users WHERE email = {}",
           email), result);
 
+      connection->close();
 
       if (result.rows().empty()) {
-        connection->close();
-
         return boost::none;
       }
 
