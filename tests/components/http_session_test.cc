@@ -357,6 +357,8 @@ TEST(Components_HTTP_Session, Implementation) {
 
     boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_http_sessions(), boost::asio::detached);
 
+    sleep(5); // Wait for shutdown
+
     first_thread.join();
     second_thread.join();
 

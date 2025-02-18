@@ -18,11 +18,11 @@ boost::asio::awaitable<
   executor.get_inner_executor().context().stop();
 }
 
-TEST(Components_WebSocket_Session, Client) {
+TEST(Components_WebSocket_Session, Implementation) {
   using namespace copper::components;
 
   auto const address = boost::asio::ip::make_address("0.0.0.0");
-  auto const port = 9000;
+  auto const port = 9002;
   auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
   auto const doc_root = std::string_view{"."};
 
@@ -58,22 +58,38 @@ TEST(Components_WebSocket_Session, Client) {
   boost::asio::io_context client_ioc;
 
   try {
-    std::thread thread([&]() {
+    std::thread first_thread([&]() {
       try {
+        std::cout << "Running thread #1" << std::endl;
         ioc.run();
+        std::cout << "Stopped thread #1" << std::endl;
       } catch (std::exception &e) {
+
+        std::cout << "Exception on thread #1" << std::endl;
+      }
+    });
+
+    std::thread second_thread([&]() {
+      try {
+        std::cout << "Running thread #2" << std::endl;
+        ioc.run();
+        std::cout << "Stopped thread #2" << std::endl;
+      } catch (std::exception &e) {
+
+        std::cout << "Exception on thread #2" << std::endl;
 
       }
     });
 
-    thread.detach();
+    first_thread.detach();
+    second_thread.detach();
 
-    sleep(5);
+    sleep(5); // Wait for service
 
     boost::asio::ip::tcp::resolver resolver(client_ioc);
 
     std::string host = "127.0.0.1";
-    auto const results = resolver.resolve(host, "9000");
+    auto const results = resolver.resolve(host, "9002");
 
     boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws{client_ioc};
 
@@ -93,11 +109,17 @@ TEST(Components_WebSocket_Session, Client) {
 
     ws.close(boost::beast::websocket::close_code::normal);
 
+    ws.next_layer().close();
+
     std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
 
     boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_websocket_session(), boost::asio::detached);
 
-    thread.join();
+    sleep(5); // Wait for shutdown
+
+    first_thread.join();
+    second_thread.join();
+
   } catch (std::exception const &e) {
   }
 

@@ -98,6 +98,8 @@ namespace copper::components {
 
       const auto &row = result.rows().at(0);
 
+      connection->close();
+
       return app::models::user{
         .id_ = to_string(id),
         .name_ = row.at(1).as_string(),
@@ -129,6 +131,8 @@ namespace copper::components {
           now
         ), result);
 
+      connection->close();
+
       return {
         .id_ = to_string(id),
         .ip_ = ip,
@@ -153,6 +157,8 @@ namespace copper::components {
           exception,
           session.id_
         ), result);
+
+      connection->close();
     }
 
     void database::session_is_encrypted(app::models::session session) {
@@ -167,6 +173,9 @@ namespace copper::components {
           "UPDATE sessions SET is_encrypted = true WHERE id = {}",
           session.id_
         ), result);
+
+
+      connection->close();
     }
 
     void database::session_is_upgrade(app::models::session session) {
@@ -181,5 +190,7 @@ namespace copper::components {
           "UPDATE sessions SET is_upgrade = true WHERE id = {}",
           session.id_
         ), result);
+
+      connection->close();
     }
 }
