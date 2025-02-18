@@ -20,8 +20,6 @@ namespace copper::components {
         database();
 
         ~database() {
-          pool_->cancel();
-          thread_pool_->stop();
         }
 
         void start();
