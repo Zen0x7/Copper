@@ -21,15 +21,15 @@ namespace copper::components {
 
         void start();
 
-        containers::optional_of<app::models::user> get_user_by_email(const std::string &email);
+        containers::optional_of<shared<app::models::user>> get_user_by_email(const std::string &email);
 
-        app::models::user get_user_by_id(uuid id);
+        shared<app::models::user> get_user_by_id(uuid id);
 
-        app::models::session create_session(const std::string & ip, uint_least16_t port);
+        shared<app::models::session> create_session(const std::string & ip, uint_least16_t port);
 
-        void session_closed(app::models::session session, const char exception[]);
+        void session_closed(const shared<app::models::session> & session, const char exception[]);
 
-        void session_is_encrypted(app::models::session session);
-        void session_is_upgrade(app::models::session session);
+        void session_is_encrypted(const shared<app::models::session> & session);
+        void session_is_upgrade(const shared<app::models::session> & session);
     };
 }

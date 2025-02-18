@@ -33,9 +33,9 @@ namespace app::controllers {
                           "application/json");
         }
 
-        if (copper::components::cipher_password_validator(password, user.value().password_)) {
+        if (copper::components::cipher_password_validator(password, user.value()->password_)) {
           std::string token = copper::components::authentication_to_bearer(
-            boost::lexical_cast<copper::components::uuid>(user.value().id_), dotenv::getenv("APP_KEY"),
+            boost::lexical_cast<copper::components::uuid>(user.value()->id_), dotenv::getenv("APP_KEY"),
             "user");
 
           const copper::components::json::object data = {{"token", token}};

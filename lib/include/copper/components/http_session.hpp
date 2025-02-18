@@ -36,8 +36,8 @@ namespace copper::components {
         boost::asio::io_context::executor_type
       >
     > http_session_run(
-      shared<state> &state,
-      app::models::session session,
+      shared<state> state,
+      shared<app::models::session> session,
       Stream &stream,
       boost::beast::flat_buffer &buffer,
       boost::beast::string_view doc_root

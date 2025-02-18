@@ -26,7 +26,7 @@ namespace copper::components {
      * @param email
      * @return
      */
-    containers::optional_of<app::models::user> database::get_user_by_email(const std::string &email) {
+    containers::optional_of<shared<app::models::user>> database::get_user_by_email(const std::string &email) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
       auto connection = pool_->async_get_connection(
@@ -37,7 +37,7 @@ namespace copper::components {
 
       connection->execute(
         boost::mysql::with_params(
-          "SELECT id, name, email_verified_at, password, created_at, updated_at FROM users WHERE email = {}",
+          "SELECT id, name, password, email_verified_at, created_at, updated_at FROM users WHERE email = {}",
           email), result);
 
 
@@ -47,15 +47,15 @@ namespace copper::components {
 
       const auto &row = result.rows().at(0);
 
-      return app::models::user{
-        .id_ = row.at(0).as_string(),
-        .name_ = row.at(1).as_string(),
-        .email_ = email,
-        .email_verified_at_ = row.at(2).is_null() ? 0 : chronos::to_timestamp(row.at(2).as_datetime().as_time_point()),
-        .password_ = row.at(3).as_string(),
-        .created_at_ = row.at(4).is_null() ? 0 : chronos::to_timestamp(row.at(4).as_datetime().as_time_point()),
-        .updated_at_ = row.at(5).is_null() ? 0 : chronos::to_timestamp(row.at(5).as_datetime().as_time_point())
-      };
+      return boost::make_shared<app::models::user>(
+        row.at(0).as_string(),
+        std::string(row.at(1).as_string()),
+        email,
+        row.at(2).as_string(),
+        row.at(3).is_null() ? 0 : chronos::to_timestamp(row.at(3).as_datetime().as_time_point()),
+        row.at(4).is_null() ? 0 : chronos::to_timestamp(row.at(4).as_datetime().as_time_point()),
+        row.at(5).is_null() ? 0 : chronos::to_timestamp(row.at(5).as_datetime().as_time_point())
+      );
     }
 
     database::database() {
@@ -82,7 +82,7 @@ namespace copper::components {
      * @param id
      * @return
      */
-    app::models::user database::get_user_by_id(uuid id) {
+    shared<app::models::user> database::get_user_by_id(uuid id) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
       auto connection = pool_->async_get_connection(
@@ -93,25 +93,25 @@ namespace copper::components {
 
       connection->execute(
         boost::mysql::with_params(
-          "SELECT id, name, email, email_verified_at, password, created_at, updated_at FROM users WHERE id = {}",
+          "SELECT id, name, email, password, email_verified_at, created_at, updated_at FROM users WHERE id = {}",
           to_string(id)), result);
 
       const auto &row = result.rows().at(0);
 
       connection->close();
 
-      return app::models::user{
-        .id_ = to_string(id),
-        .name_ = row.at(1).as_string(),
-        .email_ = row.at(2).as_string(),
-        .email_verified_at_ = row.at(3).is_null() ? 0 : chronos::to_timestamp(row.at(3).as_datetime().as_time_point()),
-        .password_ = row.at(4).as_string(),
-        .created_at_ = row.at(5).is_null() ? 0 : chronos::to_timestamp(row.at(5).as_datetime().as_time_point()),
-        .updated_at_ = row.at(6).is_null() ? 0 : chronos::to_timestamp(row.at(6).as_datetime().as_time_point())
-      };
+      return boost::make_shared<app::models::user>(
+        to_string(id),
+        std::string(row.at(1).as_string()),
+        row.at(2).as_string(),
+        row.at(3).as_string(),
+        row.at(4).is_null() ? 0 : chronos::to_timestamp(row.at(4).as_datetime().as_time_point()),
+        row.at(5).is_null() ? 0 : chronos::to_timestamp(row.at(5).as_datetime().as_time_point()),
+        row.at(6).is_null() ? 0 : chronos::to_timestamp(row.at(6).as_datetime().as_time_point())
+      );
     }
 
-    app::models::session database::create_session(const std::string &ip, uint_least16_t port) {
+    shared<app::models::session> database::create_session(const std::string &ip, uint_least16_t port) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
       auto now = chronos::now();
       auto id = boost::uuids::random_generator()();
@@ -133,16 +133,16 @@ namespace copper::components {
 
       connection->close();
 
-      return {
-        .id_ = to_string(id),
-        .ip_ = ip,
-        .port_ = port,
-        .started_at_ = now,
-        .finished_at_ = 0,
-      };
+      return boost::make_shared<app::models::session>(
+        to_string(id),
+        ip,
+        port,
+        now,
+        0
+      );
     }
 
-    void database::session_closed(app::models::session session, const char exception[]) {
+    void database::session_closed(const shared<app::models::session> & session, const char exception[]) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
       auto now = chronos::now();
 
@@ -155,13 +155,13 @@ namespace copper::components {
           "UPDATE sessions SET finished_at = {}, exception = {} WHERE id = {}",
           now,
           exception,
-          session.id_
+          session->id_
         ), result);
 
       connection->close();
     }
 
-    void database::session_is_encrypted(app::models::session session) {
+    void database::session_is_encrypted(const shared<app::models::session> & session) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
       auto connection = pool_->async_get_connection(
@@ -171,14 +171,14 @@ namespace copper::components {
       connection->execute(
         boost::mysql::with_params(
           "UPDATE sessions SET is_encrypted = true WHERE id = {}",
-          session.id_
+          session->id_
         ), result);
 
 
       connection->close();
     }
 
-    void database::session_is_upgrade(app::models::session session) {
+    void database::session_is_upgrade(const shared<app::models::session> & session) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
       auto connection = pool_->async_get_connection(
@@ -188,7 +188,7 @@ namespace copper::components {
       connection->execute(
         boost::mysql::with_params(
           "UPDATE sessions SET is_upgrade = true WHERE id = {}",
-          session.id_
+          session->id_
         ), result);
 
       connection->close();

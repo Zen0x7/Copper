@@ -7,16 +7,25 @@
 #include <boost/mysql/datetime.hpp>
 
 #include <copper/components/uuid.hpp>
+#include <copper/components/shared.hpp>
 
 namespace app::models {
     using namespace copper::components;
 
-    struct session {
+    class session : public shared_enabled<session> {
+    public:
       std::string id_;
       std::string ip_;
       uint_least16_t port_;
       long started_at_;
       long finished_at_;
+
+      session(std::string id, std::string ip, uint_least16_t port, long started_at, long finished_at) :
+        id_(std::move(id)),
+        ip_(std::move(ip)),
+        port_(port),
+        started_at_(started_at),
+        finished_at_(finished_at)
+      {}
     };
-    BOOST_DESCRIBE_STRUCT(session, (), (id_, ip_, port_, started_at_, finished_at_));
 }
