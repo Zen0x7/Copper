@@ -70,7 +70,7 @@ TEST(Components_HTTP_Session, Implementation) {
   auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
   auto const doc_root = std::string_view{"."};
 
-  boost::asio::io_context ioc{8};
+  boost::asio::io_context ioc{2};
 
   boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
 

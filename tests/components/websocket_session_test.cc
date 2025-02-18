@@ -26,7 +26,7 @@ TEST(Components_WebSocket_Session, Implementation) {
   auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
   auto const doc_root = std::string_view{"."};
 
-  boost::asio::io_context ioc{8};
+  boost::asio::io_context ioc{2};
 
   boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
 
@@ -91,11 +91,13 @@ TEST(Components_WebSocket_Session, Implementation) {
     std::string host = "127.0.0.1";
     auto const results = resolver.resolve(host, "9002");
 
-    boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws{client_ioc};
+    boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws(client_ioc);
 
     auto ep = boost::asio::connect(ws.next_layer(), results);
 
     host += ':' + std::to_string(ep.port());
+
+    ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::client));
 
     ws.set_option(boost::beast::websocket::stream_base::decorator(
       [](boost::beast::websocket::request_type &req) {
@@ -107,9 +109,13 @@ TEST(Components_WebSocket_Session, Implementation) {
     boost::beast::flat_buffer buffer;
     ws.read(buffer);
 
-    ws.close(boost::beast::websocket::close_code::normal);
-
-    ws.next_layer().close();
+    boost::beast::error_code ec;
+    ws.close(boost::beast::websocket::close_code::normal, ec);
+    if (ec) {
+      std::cerr << "Error cerrando WebSocket: " << ec.message() << std::endl;
+    } else {
+      std::cout << "Conexión WebSocket cerrada correctamente." << std::endl;
+    }
 
     std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
 
