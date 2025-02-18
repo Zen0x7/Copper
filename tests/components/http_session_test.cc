@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <copper/components/certificates.hpp>
+#include <copper/components/server_certificates.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/state.hpp>
@@ -28,7 +28,7 @@ boost::asio::awaitable<
   boost::asio::strand<
     boost::asio::io_context::executor_type
   >
-> cancel() {
+> cancel_http_sessions() {
   auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
 }
@@ -64,95 +64,93 @@ public:
 
 TEST(Components_HTTP_Session, Implementation) {
   dotenv::init();
-
-  auto const address = boost::asio::ip::make_address("0.0.0.0");
-  auto const port = 9001;
-  auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
-  auto const doc_root = std::string_view{"."};
-
-  boost::asio::io_context ioc{8};
-
-  boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
-
-  load_server_certificate(ctx);
-
-  auto task_group_ = boost::make_shared<task_group>(ioc.get_executor());
-
-  auto state_ = boost::make_shared<state>();
-
-  state_->get_database()->start();
-
-  state_->get_http_router()
-    ->push(http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>(), {
-      .use_throttler = true,
-      .rpm = 5
-    })
-    ->push(http_method::get, "/api/params/{name}", boost::make_shared<params_controller>(), {
-      .use_throttler = true,
-        .rpm = 5
-    })
-    ->push(http_method::get, "/api/exception", boost::make_shared<exception_controller>(), {
-      .use_throttler = true,
-      .rpm = 5
-    })
-    ->push(http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>(), {
-      .use_auth = true,
-      .use_throttler = true,
-      .rpm = 5,
-    })
-    ->push(http_method::post, "/api/auth", boost::make_shared<app::controllers::auth_controller>(), {
-      .use_throttler = true,
-      .use_validator = true,
-      .rpm = 5,
-    });
-
-  boost::asio::co_spawn(
-    boost::asio::make_strand(ioc),
-    listener(state_, task_group_, ctx, endpoint, doc_root),
-    task_group_->adapt(
-      [](std::exception_ptr e) {
-        if (e) {
-          try {
-            std::rethrow_exception(e);
-          }
-          catch (std::exception &e) {
-            std::cerr << "Error in listener: " << e.what() << "\n";
-          }
-        }
-      }));
-
-  boost::asio::co_spawn(boost::asio::make_strand(ioc), signal_handler(task_group_), boost::asio::detached);
-
-  boost::asio::io_context client_ioc;
-
   try {
-    std::thread first_thread([&]() {
-      try {
-        std::cout << "Running thread #1" << std::endl;
+    auto const address = boost::asio::ip::make_address("0.0.0.0");
+    auto const port = 9001;
+    auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
+    auto const doc_root = std::string_view{"."};
+    auto const threads = 4;
+
+    boost::asio::io_context ioc {threads};
+
+    boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
+
+    load_server_certificate(ctx);
+
+    auto task_group_ = boost::make_shared<task_group>(ioc.get_executor());
+
+    boost::mysql::pool_params database_params;
+    database_params.server_address.emplace_host_and_port(
+      dotenv::getenv("DATABASE_HOST", "127.0.0.1"),
+      std::stoi(dotenv::getenv("DATABASE_PORT", "3306"))
+    );
+
+    database_params.username = dotenv::getenv("DATABASE_USER", "user");
+    database_params.password = dotenv::getenv("DATABASE_PASSWORD", "user_password");
+    database_params.database = dotenv::getenv("DATABASE_NAME", "copper");
+    database_params.thread_safe = true;
+    database_params.initial_size = 10;
+    database_params.max_size = 100;
+
+    auto database_pool = boost::make_shared<boost::mysql::connection_pool>(ioc, std::move(database_params));
+
+    auto state_ = boost::make_shared<state>(database_pool);
+
+    state_->get_database()->start();
+
+    state_->get_http_router()
+      ->push(http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>(), {
+        .use_throttler = true,
+        .rpm = 5
+      })
+      ->push(http_method::get, "/api/params/{name}", boost::make_shared<params_controller>(), {
+        .use_throttler = true,
+        .rpm = 5
+      })
+      ->push(http_method::get, "/api/exception", boost::make_shared<exception_controller>(), {
+        .use_throttler = true,
+        .rpm = 5
+      })
+      ->push(http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>(), {
+        .use_auth = true,
+        .use_throttler = true,
+        .rpm = 5,
+      })
+      ->push(http_method::post, "/api/auth", boost::make_shared<app::controllers::auth_controller>(), {
+        .use_throttler = true,
+        .use_validator = true,
+        .rpm = 5,
+      });
+
+    boost::asio::co_spawn(
+      boost::asio::make_strand(ioc),
+      listener(state_, task_group_, ctx, endpoint, doc_root),
+      task_group_->adapt(
+        [](std::exception_ptr e) {
+          if (e) {
+            try {
+              std::rethrow_exception(e);
+            }
+            catch (std::exception &e) {
+              std::cerr << "Error in listener: " << e.what() << "\n";
+            }
+          }
+        }));
+
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), signal_handler(task_group_), boost::asio::detached);
+
+    boost::asio::io_context client_ioc;
+
+    std::vector<std::thread> v;
+    v.reserve(threads);
+    for (auto i = threads; i > 0; --i)
+      v.emplace_back([&ioc, i] {
+        std::cout << "Thread " << i << " starting " << std::endl;
         ioc.run();
-        std::cout << "Stopped thread #1" << std::endl;
-      } catch (std::exception &e) {
+        std::cout << "Thread " << i << " stopped " << std::endl;
+      });
 
-        std::cout << "Exception on thread #1" << std::endl;
-      }
-    });
-
-    std::thread second_thread([&]() {
-      try {
-        std::cout << "Running thread #2" << std::endl;
-        ioc.run();
-        std::cout << "Stopped thread #2" << std::endl;
-      } catch (std::exception &e) {
-
-        std::cout << "Exception on thread #2" << std::endl;
-
-      }
-    });
-
-    first_thread.detach();
-    second_thread.detach();
-
-    sleep(5); // Wait for service
+    sleep(1);
 
     boost::asio::ip::tcp::resolver resolver(client_ioc);
     boost::beast::tcp_stream stream(client_ioc);
@@ -238,7 +236,8 @@ TEST(Components_HTTP_Session, Implementation) {
 
       {
         std::cout << "Key used: " << dotenv::getenv("APP_KEY") << std::endl << std::endl;
-        std::cout << "Token that will be used: " << json_response.as_object().at("token").as_string() << std::endl << std::endl;
+        std::cout << "Token that will be used: " << json_response.as_object().at("token").as_string() << std::endl
+                  << std::endl;
 
         boost::beast::flat_buffer user_buffer;
         boost::beast::http::response<boost::beast::http::string_body> user_response;
@@ -355,14 +354,25 @@ TEST(Components_HTTP_Session, Implementation) {
 
     stream.close();
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel(), boost::asio::detached);
+    client_ioc.run();
 
-    first_thread.join();
-    second_thread.join();
+    sleep(5);
 
-  } catch (std::exception const &e) {
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), cancel_http_sessions(), boost::asio::detached);
+    ioc.stop();
+
+    sleep(5);
+
+    for (auto &t: v)
+      t.join();
+
+    ASSERT_TRUE(true);
+
+  } catch (std::runtime_error &e) {
+
+  } catch (std::exception &e) {
+
+  } catch (...) {
 
   }
-
-  ASSERT_TRUE(true);
 }

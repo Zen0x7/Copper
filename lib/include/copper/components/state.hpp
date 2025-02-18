@@ -13,7 +13,7 @@ namespace copper::components {
         shared<cache> redis_;
         shared<database> database_;
     public:
-        state();
+        state(const shared<boost::mysql::connection_pool> & pool);
 
         shared<http_router> get_http_router();
         shared<cache> get_cache();
