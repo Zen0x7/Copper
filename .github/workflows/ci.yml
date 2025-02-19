@@ -56,7 +56,8 @@ jobs:
           cd ../bin
           ./tests
           cd ..
-          lcov --capture --directory . --output-file coverage.info
+          lcov --capture --directory . --output-file coverage.info --no-external
+          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/vendor/*' --output-file coverage.filtered.info
           lcov --list coverage.info
         env:
           APP_KEY: pPSYHIu2gUrjVZTv2ti/t7DFxBxSrwszHcxTooirYBY=

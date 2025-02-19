@@ -178,4 +178,33 @@ namespace copper::components {
 
       connection->close();
     }
+
+    boost::asio::awaitable<
+      void,
+      boost::asio::strand<
+        boost::asio::io_context::executor_type
+      >
+    > database::create_request(shared<app::models::request> request) {
+      auto connection = co_await pool_->async_get_connection(boost::asio::cancel_after(std::chrono::seconds(10)));
+
+      boost::mysql::results result;
+
+      co_await connection->async_execute(
+        boost::mysql::with_params(
+          "INSERT INTO requests (id, session_id, version, method, path, query, headers, body, started_at, finished_at, duration) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})",
+          request->id_,
+          request->session_id_,
+          request->version_,
+          request->method_,
+          request->path_,
+          request->query_,
+          request->headers_,
+          request->body_,
+          request->started_at_,
+          request->finished_at_,
+          request->duration_
+        ), result);
+
+      connection->close();
+    }
 }

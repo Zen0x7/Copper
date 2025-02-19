@@ -214,8 +214,9 @@ CREATE TABLE `requests` (
   `version` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `method` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `headers` json DEFAULT NULL,
-  `body` json DEFAULT NULL,
+  `query` text COLLATE utf8mb4_unicode_ci,
+  `headers` text COLLATE utf8mb4_unicode_ci,
+  `body` text COLLATE utf8mb4_unicode_ci,
   `started_at` bigint NOT NULL,
   `finished_at` bigint DEFAULT NULL,
   `duration` int DEFAULT NULL,
@@ -320,7 +321,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('047a3e83-f117-4bdd-ba47-448cd4375134','Ian Torres','iantorres@outlook.com','2025-02-18 04:34:52','$2y$12$sQLw3TbhYsGvtFRNqlogCeLw6VwhP.Q7VrbOi6Psr93NSjAiXSq6C','dZ8wfifYQD','2025-02-18 04:34:52','2025-02-18 04:34:52');
+INSERT INTO `users` VALUES ('826a242e-9af8-4baf-8efa-84e4bee4b698','Ian Torres','iantorres@outlook.com','2025-02-19 05:33:29','$2y$12$wL6GSDPWsGey.tQHYjxOK.zZZ5NCX5E127wIjhuv58oIpaF4lRQ0q','Sq8f2Kga3o','2025-02-19 05:33:29','2025-02-19 05:33:29');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -333,4 +334,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-17 22:34:58
+-- Dump completed on 2025-02-18 23:33:35

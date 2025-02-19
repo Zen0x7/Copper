@@ -14,7 +14,10 @@
 #include <copper/components/http_kernel.hpp>
 #include <copper/components/chronos.hpp>
 #include <app/models/session.hpp>
+#include <app/models/request.hpp>
 #include <boost/beast/core/error.hpp>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/asio/co_spawn.hpp>
 
 namespace copper::components {
 
@@ -44,6 +47,8 @@ namespace copper::components {
     ) {
       auto cs = co_await boost::asio::this_coro::cancellation_state;
 
+      auto generator = boost::uuids::random_generator();
+
       while (!cs.cancelled()) {
         boost::beast::http::request_parser<boost::beast::http::string_body> parser;
         parser.body_limit(std::stoi(dotenv::getenv("HTTP_BODY_LIMIT", "10000")));
@@ -51,7 +56,7 @@ namespace copper::components {
         auto [ec, _] =
           co_await boost::beast::http::async_read(stream, buffer, parser, boost::asio::as_tuple);
 
-        auto now = chronos::now();
+        auto start_at = chronos::now();
 
         if (ec == boost::beast::http::error::end_of_stream)
           co_return;
@@ -76,16 +81,23 @@ namespace copper::components {
           throw boost::system::system_error{ec};
         }
 
+        auto request_id = generator();
+
         std::string ip = boost::beast::get_lowest_layer(stream).socket().remote_endpoint().address().to_string();
 
-        auto res = co_await kernel->invoke(doc_root, parser.release(), ip, now);
+        auto [_request, res] = co_await kernel->invoke(session, doc_root, parser.release(), ip, request_id, start_at);
+
+        _request->finished_at_ = chronos::now();
+        _request->duration_ = _request->finished_at_ - start_at;
 
         if (!res.keep_alive()) {
           co_await boost::beast::async_write(stream, std::move(res));
+          co_await state->get_database()->create_request(_request);
           co_return;
         }
 
         co_await boost::beast::async_write(stream, std::move(res));
+        co_await state->get_database()->create_request(_request);
       }
     }
 

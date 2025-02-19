@@ -8,9 +8,12 @@
 
 #include <app/models/user.hpp>
 #include <app/models/session.hpp>
+#include <app/models/request.hpp>
 
 #include <boost/mysql/connection_pool.hpp>
 #include <boost/asio/thread_pool.hpp>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/strand.hpp>
 
 namespace copper::components {
     class database : public shared_enabled<database> {
@@ -30,5 +33,12 @@ namespace copper::components {
 
         void session_is_encrypted(const shared<app::models::session> & session);
         void session_is_upgrade(const shared<app::models::session> & session);
+
+      boost::asio::awaitable<
+        void,
+        boost::asio::strand<
+          boost::asio::io_context::executor_type
+        >
+      > create_request(shared<app::models::request> request);
     };
 }
