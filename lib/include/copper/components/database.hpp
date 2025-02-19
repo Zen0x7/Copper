@@ -39,6 +39,6 @@ namespace copper::components {
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
-      > create_request(const shared<app::models::request> & request);
+      > create_request(shared<app::models::request> request);
     };
 }

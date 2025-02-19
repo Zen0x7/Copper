@@ -19,6 +19,7 @@ namespace app::models {
       std::string version_;
       std::string method_;
       std::string path_;
+      std::string query_;
       std::string headers_;
       std::string body_;
       long started_at_;
@@ -31,6 +32,7 @@ namespace app::models {
         std::string version,
         std::string method,
         std::string path,
+        std::string query,
         std::string headers,
         std::string body,
         long started_at,
@@ -42,6 +44,7 @@ namespace app::models {
         version_(version),
         method_(method),
         path_(path),
+        query_(query),
         headers_(headers),
         body_(body),
         started_at_(started_at),

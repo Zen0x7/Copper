@@ -65,16 +65,29 @@ namespace copper::components {
       ) const {
 
       json::object headers;
+      int headers_count = 0;
       for (const auto& header : request.base()) {
         headers[header.name_string()] = header.value();
+        headers_count++;
       }
+
+      const size_t query_ask_symbol_position = request.target().find('?');
+      const bool path_has_parameters = query_ask_symbol_position != std::string::npos;
+      const std::string path {
+        path_has_parameters ? request.target().substr(0, query_ask_symbol_position) : request.target()
+      };
+      const std::string query {
+        path_has_parameters ? request.target().substr(query_ask_symbol_position) : ""
+      };
+
       auto _request = boost::make_shared<app::models::request>(
         to_string(request_id),
         session->id_,
         std::to_string(request.version()),
         std::string(request.method_string()),
-        std::string(request.target()),
-        serialize(headers),
+        path,
+        query,
+        headers_count > 0 ? serialize(headers) : "",
         std::string(request.body()),
         now,
         0,

@@ -40,7 +40,7 @@ namespace copper::components {
           "SELECT id, name, password, email_verified_at, created_at, updated_at FROM users WHERE email = {}",
           email), result);
 
-      connection.return_without_reset();
+      connection->close();
 
       if (result.rows().empty()) {
         return boost::none;
@@ -83,7 +83,7 @@ namespace copper::components {
 
       const auto &row = result.rows().at(0);
 
-      connection.return_without_reset();
+      connection->close();
 
       return boost::make_shared<app::models::user>(
         to_string(id),
@@ -116,7 +116,7 @@ namespace copper::components {
           now
         ), result);
 
-      connection.return_without_reset();
+      connection->close();
 
       return boost::make_shared<app::models::session>(
         to_string(id),
@@ -143,7 +143,7 @@ namespace copper::components {
           session->id_
         ), result);
 
-      connection.return_without_reset();
+      connection->close();
     }
 
     void database::session_is_encrypted(const shared<app::models::session> & session) {
@@ -160,7 +160,7 @@ namespace copper::components {
         ), result);
 
 
-      connection.return_without_reset();
+      connection->close();
     }
 
     void database::session_is_upgrade(const shared<app::models::session> & session) {
@@ -176,7 +176,7 @@ namespace copper::components {
           session->id_
         ), result);
 
-      connection.return_without_reset();
+      connection->close();
     }
 
     boost::asio::awaitable<
@@ -184,24 +184,27 @@ namespace copper::components {
       boost::asio::strand<
         boost::asio::io_context::executor_type
       >
-    > database::create_request(const shared<app::models::request> &request) {
+    > database::create_request(shared<app::models::request> request) {
       auto connection = co_await pool_->async_get_connection(boost::asio::cancel_after(std::chrono::seconds(10)));
 
       boost::mysql::results result;
 
       co_await connection->async_execute(
         boost::mysql::with_params(
-          "INSERT INTO requests (id, session_id, version, method, path, headers, body, started_at, finished_at, duration) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {})",
+          "INSERT INTO requests (id, session_id, version, method, path, query, headers, body, started_at, finished_at, duration) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})",
           request->id_,
           request->session_id_,
           request->version_,
           request->method_,
           request->path_,
+          request->query_,
           request->headers_,
           request->body_,
           request->started_at_,
           request->finished_at_,
           request->duration_
         ), result);
+
+      connection->close();
     }
 }
