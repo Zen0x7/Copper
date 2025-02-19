@@ -18,6 +18,7 @@
 #include <copper/components/state.hpp>
 
 #include <copper/components/mime_type.hpp>
+#include <copper/components/http_query.hpp>
 
 #include <app/models/request.hpp>
 
@@ -67,8 +68,13 @@ namespace copper::components {
       json::object headers;
       int headers_count = 0;
       for (const auto& header : request.base()) {
-        headers[header.name_string()] = header.value();
-        headers_count++;
+        if (header.name_string() != "Authorization") {
+          headers[header.name_string()] = header.value();
+          headers_count++;
+        } else {
+          headers[header.name_string()] = "***";
+          headers_count++;
+        }
       }
 
       const size_t query_ask_symbol_position = request.target().find('?');
@@ -77,8 +83,9 @@ namespace copper::components {
         path_has_parameters ? request.target().substr(0, query_ask_symbol_position) : request.target()
       };
       const std::string query {
-        path_has_parameters ? request.target().substr(query_ask_symbol_position) : ""
+        path_has_parameters ? request.target().substr(query_ask_symbol_position + 1) : ""
       };
+
 
       auto _request = boost::make_shared<app::models::request>(
         to_string(request_id),
@@ -86,7 +93,7 @@ namespace copper::components {
         std::to_string(request.version()),
         std::string(request.method_string()),
         path,
-        query,
+        serialize(http_query_to_json(query)),
         headers_count > 0 ? serialize(headers) : "",
         std::string(request.body()),
         now,
