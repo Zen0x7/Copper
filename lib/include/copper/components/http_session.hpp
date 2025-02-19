@@ -17,6 +17,7 @@
 #include <app/models/request.hpp>
 #include <boost/beast/core/error.hpp>
 #include <boost/uuid/random_generator.hpp>
+#include <boost/asio/co_spawn.hpp>
 
 namespace copper::components {
 
@@ -86,17 +87,16 @@ namespace copper::components {
 
         auto [_request, res] = co_await kernel->invoke(session, doc_root, parser.release(), ip, request_id, start_at);
 
-        _request->finished_at = chronos::now();
-        _request->duration = _request->finished_at - start_at;
+        _request->finished_at_ = chronos::now();
+        _request->duration_ = _request->finished_at_ - start_at;
 
-
-
-        if (!res.keep_alive()) {
-          co_await boost::beast::async_write(stream, std::move(res));
-          co_return;
-        }
 
         co_await boost::beast::async_write(stream, std::move(res));
+        co_await state->get_database()->create_request(_request);
+
+        if (!res.keep_alive()) {
+          co_return;
+        }
       }
     }
 

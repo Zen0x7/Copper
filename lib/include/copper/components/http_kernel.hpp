@@ -51,7 +51,7 @@ namespace copper::components {
       containers::vector_of<http_method> get_available_methods(const http_request &request) const;
 
       boost::asio::awaitable<
-        std::tuple<shared<app::models::request>, http_response_generic>,
+        std::pair<shared<app::models::request>, http_response_generic>,
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
