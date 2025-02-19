@@ -90,12 +90,14 @@ namespace copper::components {
         _request->finished_at_ = chronos::now();
         _request->duration_ = _request->finished_at_ - start_at;
 
-        co_await boost::beast::async_write(stream, std::move(res));
-        co_await state->get_database()->create_request(_request);
-
         if (!res.keep_alive()) {
+          co_await boost::beast::async_write(stream, std::move(res));
+          co_await state->get_database()->create_request(_request);
           co_return;
         }
+
+        co_await boost::beast::async_write(stream, std::move(res));
+        co_await state->get_database()->create_request(_request);
       }
     }
 
