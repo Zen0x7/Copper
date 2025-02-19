@@ -1,6 +1,8 @@
 #pragma once
 
 #include <copper/components/json.hpp>
+#include <copper/components/http_request.hpp>
+#include <copper/components/containers.hpp>
 #include <string>
 #include <map>
 #include <vector>
@@ -9,36 +11,43 @@
 
 namespace copper::components {
 
-    json::object http_query_to_json(const std::string & query) {
-        json::object obj;
-        std::map<std::string, std::vector<std::string>> arrayMap;
+    std::string http_query_from_request(const http_request &request) {
+      json::object object;
 
-        std::istringstream ss(query.data());
-        std::string pair;
+      containers::map_of<std::string, std::vector<std::string>> map;
 
-        while (std::getline(ss, pair, '&')) {
-          size_t pos = pair.find('=');
-          if (pos == std::string::npos) continue;
+      const size_t query_ask_symbol_position = request.target().find('?');
+      const bool path_has_parameters = query_ask_symbol_position != std::string::npos;
+      const std::string query{
+        path_has_parameters ? request.target().substr(query_ask_symbol_position + 1) : ""
+      };
 
-          std::string key = pair.substr(0, pos);
-          std::string value = pair.substr(pos + 1);
+      std::istringstream ss(query);
+      std::string pair;
 
-          if (key.size() > 2 && key.substr(key.size() - 2) == "[]") {
-            key = key.substr(0, key.size() - 2);
-            arrayMap[key].push_back(value);
-          } else {
-            obj[key] = value;
-          }
+      while (std::getline(ss, pair, '&')) {
+        size_t pos = pair.find('=');
+        if (pos == std::string::npos) continue;
+
+        std::string key = pair.substr(0, pos);
+        std::string value = pair.substr(pos + 1);
+
+        if (key.size() > 2 && key.substr(key.size() - 2) == "[]") {
+          key = key.substr(0, key.size() - 2);
+          map[key].push_back(value);
+        } else {
+          object[key] = value;
         }
+      }
 
-        for (const auto& [key, values] : arrayMap) {
-          json::array jsonArray;
-          for (const auto& val : values) {
-            jsonArray.push_back(json::string(val));
-          }
-          obj[key] = jsonArray;
+      for (const auto &[key, values]: map) {
+        json::array array;
+        for (const auto &value: values) {
+          array.push_back(json::string(value));
         }
+        object[key] = array;
+      }
 
-        return obj;
+      return std::string(serialize(object));
     }
 }

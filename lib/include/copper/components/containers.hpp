@@ -20,6 +20,9 @@ namespace copper::components::containers {
     template <typename T>
     using vector_of = std::vector<T>;
 
+    template <typename T, typename S>
+    using map_of = std::map<T, S>;
+
     template <typename T>
     using queue_of = std::queue<T>;
 

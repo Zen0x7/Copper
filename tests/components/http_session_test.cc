@@ -296,12 +296,25 @@ TEST(Components_HTTP_Session, Implementation) {
     {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{http_method::get, "/api/params/{name}", 11};
+      http_request request{http_method::get, "/api/params/hello", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::user_agent, "Copper");
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       std::cout << "Params Request: " << response << std::endl << std::endl;
+      buffer.clear();
+      response.clear();
+    }
+
+    {
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::response<boost::beast::http::string_body> response;
+      http_request request{http_method::get, "/api/params/hello?a=b&c=d&e[]=f&e[]=g", 11};
+      request.set(http_fields::host, host);
+      request.set(http_fields::user_agent, "Copper");
+      boost::beast::http::write(stream, request);
+      boost::beast::http::read(stream, buffer, response);
+      std::cout << "Query Request: " << response << std::endl << std::endl;
       buffer.clear();
       response.clear();
     }
