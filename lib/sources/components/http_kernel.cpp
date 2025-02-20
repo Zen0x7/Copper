@@ -52,8 +52,7 @@ namespace copper::components {
         if (auto [matches, bindings] = http_route_find(request.target(), route); matches)
           methods.push_back(route.method_);
       }
-      return methods;
-    }
+      return methods; }
 
     boost::asio::awaitable<
       std::tuple<shared<app::models::request>, shared<app::models::response>, http_response_generic>,
