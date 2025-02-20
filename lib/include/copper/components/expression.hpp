@@ -1,139 +1,107 @@
 #pragma once
 
+#include <boost/smart_ptr.hpp>
 #include <regex>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#include <boost/smart_ptr.hpp>
-
 namespace copper::components {
 
-    class expression_result : public std::enable_shared_from_this<expression_result> {
-        /**
-         * Matches flag
-         */
-        bool matches_;
+class expression_result
+    : public std::enable_shared_from_this<expression_result> {
+  /**
+   * Matches flag
+   */
+  bool matches_;
 
-        /**
-         * Bindings
-         */
-        std::unordered_map<
-                std::string,
-                std::string
-        > bindings_;
+  /**
+   * Bindings
+   */
+  std::unordered_map<std::string, std::string> bindings_;
 
-    public:
+ public:
+  /**
+   * Constructor
+   *
+   * @param matches
+   * @param bindings
+   */
+  expression_result(
+      bool matches,
+      const std::unordered_map<std::string, std::string> &bindings);
 
-        /**
-         * Constructor
-         *
-         * @param matches
-         * @param bindings
-         */
-        expression_result(
-                bool matches,
-                const std::unordered_map<
-                        std::string,
-                        std::string
-                > &bindings
-        );
+  /**
+   * Retrieves if matches
+   *
+   * @return
+   */
+  bool matches() const;
 
-        /**
-         * Retrieves if matches
-         *
-         * @return
-         */
-        bool matches() const;
+  /**
+   * Retrieves the bindings
+   *
+   * @return
+   */
+  std::unordered_map<std::string, std::string> get_bindings() const;
 
-        /**
-         * Retrieves the bindings
-         *
-         * @return
-         */
-        std::unordered_map<
-                std::string,
-                std::string
-        > get_bindings() const;
+  /**
+   * Retrieves the value of attribute
+   *
+   * @param name
+   * @return
+   */
+  std::string get(const std::string &name) const;
+};
 
-        /**
-         * Retrieves the value of attribute
-         *
-         * @param name
-         * @return
-         */
-        std::string get(
-                const std::string &name
-        ) const;
-    };
+class expression : public std::enable_shared_from_this<expression> {
+  /**
+   * Regex expression
+   */
+  std::string regex_;
 
-    class expression : public std::enable_shared_from_this<expression> {
+  /**
+   * Arguments
+   */
+  std::vector<std::string> arguments_;
 
-        /**
-         * Regex expression
-         */
-        std::string regex_;
+ public:
+  /**
+   * Constructor
+   *
+   * @param regex
+   * @param arguments
+   */
+  expression(std::string regex, const std::vector<std::string> &arguments);
 
-        /**
-         * Arguments
-         */
-        std::vector<
-                std::string
-        > arguments_;
+  /**
+   * Retrieves arguments
+   *
+   * @return
+   */
+  std::vector<std::string> get_arguments() const;
 
-    public:
+  /**
+   * Retrieves regex expression
+   * @return
+   */
+  std::string get_regex() const;
 
-        /**
-         * Constructor
-         *
-         * @param regex
-         * @param arguments
-         */
-        expression(
-                std::string regex,
-                const std::vector<
-                        std::string
-                > &arguments
-        );
+  /**
+   * Retrieves a expression_result
+   *
+   * @param input
+   * @return
+   */
+  boost::shared_ptr<expression_result> query(const std::string &input) const;
+};
 
-        /**
-         * Retrieves arguments
-         *
-         * @return
-         */
-        std::vector<
-                std::string
-        > get_arguments() const;
+/**
+ * Factory
+ *
+ * @param input
+ * @return
+ */
+boost::shared_ptr<expression> expression_make(const std::string &input);
 
-        /**
-         * Retrieves regex expression
-         * @return
-         */
-        std::string get_regex() const;
-
-        /**
-         * Retrieves a expression_result
-         *
-         * @param input
-         * @return
-         */
-        boost::shared_ptr<
-                expression_result
-        > query(
-                const std::string &input
-        ) const;
-    };
-
-    /**
-     * Factory
-     *
-     * @param input
-     * @return
-     */
-    boost::shared_ptr<
-            expression
-    > expression_make(
-            const std::string &input
-    );
-
-} // namespace copper::components
+}  // namespace copper::components

@@ -12,16 +12,14 @@
 
 namespace copper::components {
 
-    /**
-     * Get normalized path
-     *
-     * @param base
-     * @param path
-     * @return std::string Output
-     */
-    std::string normalized_path(
-            boost::beast::string_view base,
-            boost::beast::string_view path
-    );
+/**
+ * Get normalized path
+ *
+ * @param base
+ * @param path
+ * @return std::string Output
+ */
+std::string normalized_path(boost::beast::string_view base,
+                            boost::beast::string_view path);
 
-} // namespace copper::component
+}  // namespace copper::components

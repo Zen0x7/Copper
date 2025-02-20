@@ -2,36 +2,32 @@
 
 namespace copper::components {
 
-    boost::asio::awaitable<
-            void,
-            boost::asio::strand<
-                    boost::asio::io_context::executor_type
-            >
-    > signal_handler(shared<task_group> task_group) {
-        auto executor = co_await boost::asio::this_coro::executor;
-        auto signal_set = boost::asio::signal_set{executor, SIGINT, SIGTERM};
+boost::asio::awaitable<
+    void, boost::asio::strand<boost::asio::io_context::executor_type> >
+signal_handler(shared<task_group> task_group) {
+  auto executor = co_await boost::asio::this_coro::executor;
+  auto signal_set = boost::asio::signal_set{executor, SIGINT, SIGTERM};
 
-        auto sig = co_await signal_set.async_wait();
+  auto sig = co_await signal_set.async_wait();
 
-        if (sig == SIGINT) {
-            std::cout << "Gracefully cancelling child tasks...\n";
-            task_group->emit(boost::asio::cancellation_type::total);
+  if (sig == SIGINT) {
+    std::cout << "Gracefully cancelling child tasks...\n";
+    task_group->emit(boost::asio::cancellation_type::total);
 
-            auto [ec] = co_await task_group->async_wait(
-                    boost::asio::as_tuple(boost::asio::cancel_after(std::chrono::seconds{10})));
+    auto [ec] = co_await task_group->async_wait(boost::asio::as_tuple(
+        boost::asio::cancel_after(std::chrono::seconds{10})));
 
-            if (ec == boost::asio::error::operation_aborted)
-            {
-                std::cout << "Sending a terminal cancellation signal...\n";
-                task_group->emit(boost::asio::cancellation_type::terminal);
-                co_await task_group->async_wait();
-            }
-
-            std::cout << "Child tasks completed.\n";
-        } else // SIGTERM
-        {
-            executor.get_inner_executor().context().stop();
-        }
+    if (ec == boost::asio::error::operation_aborted) {
+      std::cout << "Sending a terminal cancellation signal...\n";
+      task_group->emit(boost::asio::cancellation_type::terminal);
+      co_await task_group->async_wait();
     }
 
-} // namespace copper::component
+    std::cout << "Child tasks completed.\n";
+  } else  // SIGTERM
+  {
+    executor.get_inner_executor().context().stop();
+  }
+}
+
+}  // namespace copper::components

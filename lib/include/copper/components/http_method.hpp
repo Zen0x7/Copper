@@ -3,5 +3,5 @@
 #include <boost/beast/http/verb.hpp>
 
 namespace copper::components {
-    typedef boost::beast::http::verb http_method;
+typedef boost::beast::http::verb http_method;
 }

@@ -1,152 +1,132 @@
 #pragma once
 
-#include <copper/components/shared.hpp>
-
-#include <mutex>
-#include <list>
-#include <boost/scope/scope_exit.hpp>
+#include <boost/asio/append.hpp>
 #include <boost/asio/bind_cancellation_slot.hpp>
-#include <boost/asio/steady_timer.hpp>
-#include <boost/asio/consign.hpp>
 #include <boost/asio/compose.hpp>
+#include <boost/asio/consign.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/signal_set.hpp>
-#include <boost/asio/append.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <boost/scope/scope_exit.hpp>
+#include <copper/components/shared.hpp>
 #include <iostream>
+#include <list>
+#include <mutex>
 
 namespace copper::components {
 
-    class task_group : public shared_enabled<task_group> {
+class task_group : public shared_enabled<task_group> {
+  /**
+   * Mutex
+   */
+  std::mutex mutex_;
 
-        /**
-         * Mutex
-         */
-        std::mutex mutex_;
+  /**
+   * Timer
+   */
+  boost::asio::steady_timer timer_;
 
-        /**
-         * Timer
-         */
-        boost::asio::steady_timer timer_;
+  /**
+   * Signals
+   */
+  std::list<boost::asio::cancellation_signal> signals_;
 
-        /**
-         * Signals
-         */
-        std::list<
-                boost::asio::cancellation_signal
-        > signals_;
+ public:
+  /**
+   * Constructor
+   * @param executor
+   */
+  explicit task_group(boost::asio::any_io_executor executor)
+      : timer_{std::move(executor),
+               boost::asio::steady_timer::time_point::max()} {}
 
-    public:
+  /**
+   * Overload Constructor
+   */
+  task_group(task_group const &) = delete;
 
-        /**
-         * Constructor
-         * @param executor
-         */
-        explicit task_group(
-                boost::asio::any_io_executor executor
-        ) : timer_{
-                std::move(executor),
-                boost::asio::steady_timer::time_point::max()
-        } {}
+  /**
+   * Overload Constructor
+   */
+  task_group(task_group &&) = delete;
 
-        /**
-         * Overload Constructor
-         */
-        task_group(
-                task_group const &
-        ) = delete;
+  /**
+   * Adapt
+   *
+   * @tparam CompletionToken
+   * @param completion_token
+   * @return
+   */
+  template <typename CompletionToken>
+  auto adapt(CompletionToken &&completion_token) {
+    auto guard = std::lock_guard{mutex_};
+    auto signal = signals_.emplace(signals_.end());
 
-        /**
-         * Overload Constructor
-         */
-        task_group(
-                task_group &&
-        ) = delete;
+    boost::weak_ptr<task_group> weak_self = shared_from_this();
 
-        /**
-         * Adapt
-         *
-         * @tparam CompletionToken
-         * @param completion_token
-         * @return
-         */
-        template<
-                typename CompletionToken
-        >
-        auto adapt(
-                CompletionToken &&completion_token
-        ) {
-            auto guard = std::lock_guard{mutex_};
-            auto signal = signals_.emplace(signals_.end());
+    return boost::asio::bind_cancellation_slot(
+        signal->slot(),
+        boost::asio::consign(
+            std::forward<CompletionToken>(completion_token),
+            boost::scope::make_scope_exit([weak_self, signal]() {
+              if (auto self = weak_self.lock()) {
+                auto guard = std::lock_guard{self->mutex_};
 
-            boost::weak_ptr<task_group> weak_self = shared_from_this();
+                self->signals_.erase(signal);
 
-            return boost::asio::bind_cancellation_slot(
-                    signal->slot(),
-                    boost::asio::consign(
-                            std::forward<CompletionToken>(completion_token),
-                            boost::scope::make_scope_exit(
-                                    [weak_self, signal]() {
+                if (self->signals_.empty()) self->timer_.cancel();
+              }
+            })));
+  }
 
-                                        if (auto self = weak_self.lock()) {
-                                            auto guard = std::lock_guard{self->mutex_};
+  /**
+   * Emit cancellation signal
+   *
+   * @param type
+   */
+  void emit(boost::asio::cancellation_type type);
 
-                                            self->signals_.erase(signal);
+  // LCOV_EXCL_START
+  /**
+   * Async wait
+   *
+   * @tparam CompletionToken
+   * @param completion_token
+   * @return
+   */
+  template <typename CompletionToken = boost::asio::default_completion_token_t<
+                boost::asio::any_io_executor> >
+  auto async_wait(CompletionToken &&completion_token =
+                      boost::asio::default_completion_token_t<
+                          boost::asio::any_io_executor>{}) {
+    return boost::asio::async_compose<CompletionToken,
+                                      void(boost::system::error_code)>(
+        [this, scheduled = false](auto &&self,
+                                  boost::system::error_code ec = {}) mutable {
+          if (!scheduled)
+            self.reset_cancellation_state(
+                boost::asio::enable_total_cancellation());
 
-                                            if (self->signals_.empty()) self->timer_.cancel();
-                                        }
+          if (!self.cancelled() && ec == boost::asio::error::operation_aborted)
+            ec = {};
 
-                                    })));
-        }
+          {
+            auto lg = std::lock_guard{mutex_};
 
-        /**
-         * Emit cancellation signal
-         *
-         * @param type
-         */
-        void emit(boost::asio::cancellation_type type);
+            if (!signals_.empty() && !ec) {
+              scheduled = true;
+              return timer_.async_wait(std::move(self));
+            }
+          }
 
-        // LCOV_EXCL_START
-        /**
-         * Async wait
-         *
-         * @tparam CompletionToken
-         * @param completion_token
-         * @return
-         */
-        template<
-                typename CompletionToken = boost::asio::default_completion_token_t<boost::asio::any_io_executor>
-        >
-        auto async_wait(
-                CompletionToken &&completion_token = boost::asio::default_completion_token_t<boost::asio::any_io_executor>{}
-        ) {
-            return boost::asio::async_compose<CompletionToken, void(boost::system::error_code)>(
-                    [this, scheduled = false](
-                            auto &&self, boost::system::error_code ec = {}) mutable {
-                        if (!scheduled)
-                            self.reset_cancellation_state(
-                                    boost::asio::enable_total_cancellation());
+          if (!std::exchange(scheduled, true))
+            return boost::asio::post(boost::asio::append(std::move(self), ec));
 
-                        if (!self.cancelled() && ec == boost::asio::error::operation_aborted)
-                            ec = {};
+          self.complete(ec);
+        },
+        completion_token, timer_);
+  }
+  // LCOV_EXCL_STOP
+};
 
-                        {
-                            auto lg = std::lock_guard{mutex_};
-
-                            if (!signals_.empty() && !ec) {
-                                scheduled = true;
-                                return timer_.async_wait(std::move(self));
-                            }
-                        }
-
-                        if (!std::exchange(scheduled, true))
-                            return boost::asio::post(boost::asio::append(std::move(self), ec));
-
-                        self.complete(ec);
-                    },
-                    completion_token,
-                    timer_);
-        }
-        // LCOV_EXCL_STOP
-    };
-
-} // namespace copper::component
+}  // namespace copper::components

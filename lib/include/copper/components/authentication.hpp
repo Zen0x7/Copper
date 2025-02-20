@@ -1,43 +1,35 @@
 #pragma once
 
-#include <copper/components/uuid.hpp>
-
 #include <boost/optional.hpp>
-
+#include <copper/components/uuid.hpp>
 #include <string>
 
 namespace copper::components {
-    struct authentication_result {
-        uuid id;
-        std::string type;
-    };
+struct authentication_result {
+  uuid id;
+  std::string type;
+};
 
-    /**
-     * Decode JWT Token
-     *
-     * @param bearer
-     * @param app_key
-     * @return boost::optional<authentication_result> Result
-     */
-    boost::optional<
-            authentication_result
-    > authentication_from_bearer(
-            const std::string &bearer,
-            const std::string &app_key
-    );
+/**
+ * Decode JWT Token
+ *
+ * @param bearer
+ * @param app_key
+ * @return boost::optional<authentication_result> Result
+ */
+boost::optional<authentication_result> authentication_from_bearer(
+    const std::string &bearer, const std::string &app_key);
 
-    /**
-     * Issue JWT Token
-     *
-     * @param id
-     * @param app_key
-     * @param type
-     * @return
-     */
-    std::string authentication_to_bearer(
-            uuid id,
-            const std::string &app_key,
-            const std::string &type = "App\\Models\\User"
-    );
+/**
+ * Issue JWT Token
+ *
+ * @param id
+ * @param app_key
+ * @param type
+ * @return
+ */
+std::string authentication_to_bearer(
+    uuid id, const std::string &app_key,
+    const std::string &type = "App\\Models\\User");
 
-} // namespace copper::components
+}  // namespace copper::components

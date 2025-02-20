@@ -1,78 +1,68 @@
 #pragma once
 
+#include <boost/asio/as_tuple.hpp>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/beast/core/detect_ssl.hpp>
+#include <boost/beast/core/flat_buffer.hpp>
+#include <boost/beast/core/tcp_stream.hpp>
+#include <boost/beast/ssl/ssl_stream.hpp>
+#include <boost/beast/websocket/stream.hpp>
+#include <boost/scope/scope_exit.hpp>
 #include <copper/components/report.hpp>
 #include <copper/components/state.hpp>
 
-#include <boost/scope/scope_exit.hpp>
-#include <boost/beast/core/flat_buffer.hpp>
-#include <boost/beast/core/tcp_stream.hpp>
-#include <boost/beast/websocket/stream.hpp>
-#include <boost/beast/core/detect_ssl.hpp>
-#include <boost/beast/ssl/ssl_stream.hpp>
-#include <boost/asio/as_tuple.hpp>
-#include <boost/asio/ssl.hpp>
-
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/strand.hpp>
-
 namespace copper::components {
-    /**
-     * Run websocket session
-     *
-     * @tparam Stream
-     * @param stream
-     * @param buffer
-     * @param req
-     * @return
-     */
-    template<
-            typename Stream
-    >
-    boost::asio::awaitable<
-            void,
-            boost::asio::strand<
-                    boost::asio::io_context::executor_type
-            >
-    > websocket_session_run(
-            shared<state> &  /* state */,
-            Stream &stream,
-            boost::beast::flat_buffer &buffer,
-            http_request req,
-            boost::beast::string_view
-    ) {
-        auto cs = co_await boost::asio::this_coro::cancellation_state;
-        auto ws = boost::beast::websocket::stream<Stream &>{stream};
+/**
+ * Run websocket session
+ *
+ * @tparam Stream
+ * @param stream
+ * @param buffer
+ * @param req
+ * @return
+ */
+template <typename Stream>
+boost::asio::awaitable<
+    void, boost::asio::strand<boost::asio::io_context::executor_type> >
+websocket_session_run(shared<state> & /* state */, Stream &stream,
+                      boost::beast::flat_buffer &buffer, http_request req,
+                      boost::beast::string_view) {
+  auto cs = co_await boost::asio::this_coro::cancellation_state;
+  auto ws = boost::beast::websocket::stream<Stream &>{stream};
 
-        ws.set_option(
-                boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::server));
+  ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(
+      boost::beast::role_type::server));
 
-        ws.set_option(boost::beast::websocket::stream_base::decorator(
-                [](boost::beast::websocket::response_type &res) {
-                    res.set(boost::beast::http::field::server, "Copper");
-                }));
+  ws.set_option(boost::beast::websocket::stream_base::decorator(
+      [](boost::beast::websocket::response_type &res) {
+        res.set(boost::beast::http::field::server, "Copper");
+      }));
 
-        co_await ws.async_accept(req);
+  co_await ws.async_accept(req);
 
-        while (!cs.cancelled()) {
-            auto [ec, _] = co_await ws.async_read(buffer, boost::asio::as_tuple);
+  while (!cs.cancelled()) {
+    auto [ec, _] = co_await ws.async_read(buffer, boost::asio::as_tuple);
 
-            if (ec == boost::beast::websocket::error::closed || ec == boost::asio::ssl::error::stream_truncated)
-                co_return;
+    if (ec == boost::beast::websocket::error::closed ||
+        ec == boost::asio::ssl::error::stream_truncated)
+      co_return;
 
-            if (ec)
-                throw boost::system::system_error{ec};
+    if (ec) throw boost::system::system_error{ec};
 
-            ws.text(ws.got_text());
-            co_await ws.async_write(buffer.data());
+    ws.text(ws.got_text());
+    co_await ws.async_write(buffer.data());
 
-            buffer.consume(buffer.size());
-        }
+    buffer.consume(buffer.size());
+  }
 
-        auto [ec] = co_await ws.async_close(
-                boost::beast::websocket::close_code::service_restart, boost::asio::as_tuple);
+  auto [ec] = co_await ws.async_close(
+      boost::beast::websocket::close_code::service_restart,
+      boost::asio::as_tuple);
 
-        if (ec && ec != boost::asio::ssl::error::stream_truncated)
-            throw boost::system::system_error{ec};
-    }
+  if (ec && ec != boost::asio::ssl::error::stream_truncated)
+    throw boost::system::system_error{ec};
+}
 
-} // namespace copper::component
+}  // namespace copper::components
