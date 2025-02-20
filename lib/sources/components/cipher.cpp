@@ -214,7 +214,9 @@ std::string cipher_decrypt(const std::string &input, const std::string &key,
   // LCOV_EXCL_STOP
 
   return output;
+  // LCOV_EXCL_START
 }
+// LCOV_EXCL_STOP
 
 bool cipher_password_validator(const std::string &input,
                                const std::string &hash) {
