@@ -9,6 +9,7 @@
 #include <app/models/user.hpp>
 #include <app/models/session.hpp>
 #include <app/models/request.hpp>
+#include <app/models/response.hpp>
 
 #include <boost/mysql/connection_pool.hpp>
 #include <boost/asio/thread_pool.hpp>
@@ -39,6 +40,6 @@ namespace copper::components {
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
-      > create_request(shared<app::models::request> request);
+      > create_request(shared<app::models::request> request, shared<app::models::response> response);
     };
 }

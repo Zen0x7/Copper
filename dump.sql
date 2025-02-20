@@ -246,10 +246,8 @@ CREATE TABLE `responses` (
   `session_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `request_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status_code` smallint unsigned NOT NULL,
-  `headers` json DEFAULT NULL,
-  `body` json DEFAULT NULL,
-  `started_at` bigint NOT NULL,
-  `finished_at` bigint NOT NULL,
+  `headers` text COLLATE utf8mb4_unicode_ci,
+  `body` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   KEY `responses_session_id_index` (`session_id`),
   KEY `responses_request_id_index` (`request_id`)
@@ -321,7 +319,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('826a242e-9af8-4baf-8efa-84e4bee4b698','Ian Torres','iantorres@outlook.com','2025-02-19 05:33:29','$2y$12$wL6GSDPWsGey.tQHYjxOK.zZZ5NCX5E127wIjhuv58oIpaF4lRQ0q','Sq8f2Kga3o','2025-02-19 05:33:29','2025-02-19 05:33:29');
+INSERT INTO `users` VALUES ('b16f3b4e-5806-475c-9df5-50615ebe288a','Ian Torres','iantorres@outlook.com','2025-02-20 04:53:13','$2y$12$5TugeginzcTASbKSuFJX..syUDkrSPJoKkElnSfX4vkn0Amp5KQlG','NEj9ni9n7e','2025-02-20 04:53:13','2025-02-20 04:53:13');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -334,4 +332,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-18 23:33:35
+-- Dump completed on 2025-02-19 22:53:36

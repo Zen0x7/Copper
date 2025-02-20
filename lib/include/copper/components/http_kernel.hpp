@@ -20,6 +20,7 @@
 #include <copper/components/uuid.hpp>
 #include <app/models/session.hpp>
 #include <app/models/request.hpp>
+#include <app/models/response.hpp>
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/strand.hpp>
@@ -51,7 +52,7 @@ namespace copper::components {
       containers::vector_of<http_method> get_available_methods(const http_request &request) const;
 
       boost::asio::awaitable<
-        std::pair<shared<app::models::request>, http_response_generic>,
+        std::tuple<shared<app::models::request>, shared<app::models::response>, http_response_generic>,
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
