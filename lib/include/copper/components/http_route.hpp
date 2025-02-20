@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_HTTP_ROUTE_HPP
+#define COPPER_COMPONENTS_HTTP_ROUTE_HPP
+
 #pragma once
 
 #include <copper/components/containers.hpp>
@@ -19,3 +22,5 @@ struct http_route {
   shared<expression> expression_;
 };
 }  // namespace copper::components
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_HTTP_ROUTES_HPP
+#define COPPER_COMPONENTS_HTTP_ROUTES_HPP
+
 #pragma once
 
 #include <copper/components/containers.hpp>
@@ -9,3 +12,5 @@ namespace copper::components {
 typedef containers::vector_of_shared_pairs<http_route, http_controller>
     http_routes;
 }
+
+#endif

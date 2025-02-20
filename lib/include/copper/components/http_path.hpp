@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_HTTP_PATH_HPP
+#define COPPER_COMPONENTS_HTTP_PATH_HPP
+
 #pragma once
 
 #include <copper/components/containers.hpp>
@@ -22,3 +25,5 @@ std::string http_path_from_request(const http_request &request) {
   return path;
 }
 }  // namespace copper::components
+
+#endif

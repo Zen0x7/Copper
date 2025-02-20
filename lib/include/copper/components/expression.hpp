@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_EXPRESSION_HPP
+#define COPPER_COMPONENTS_EXPRESSION_HPP
+
 #pragma once
 
 #include <boost/smart_ptr.hpp>
@@ -106,3 +109,5 @@ class expression : public shared_enabled<expression> {
 shared<expression> expression_make(const std::string &input);
 
 }  // namespace copper::components
+
+#endif

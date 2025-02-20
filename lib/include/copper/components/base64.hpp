@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_BASE64_HPP
+#define COPPER_COMPONENTS_BASE64_HPP
+
 #pragma once
 
 #include <map>
@@ -44,3 +47,5 @@ inline std::map<char, int> base64_map = {
     {'/', 63}};
 
 }  // namespace copper::components
+
+#endif

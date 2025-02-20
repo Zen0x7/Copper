@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_SIGNAL_HANDLER_HPP
+#define COPPER_COMPONENTS_SIGNAL_HANDLER_HPP
+
 #pragma once
 
 #include <copper/components/containers.hpp>
@@ -15,3 +18,5 @@ namespace copper::components {
 containers::async_of<void> signal_handler(shared<task_group> task_group);
 
 }  // namespace copper::components
+
+#endif

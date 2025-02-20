@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_AUTHENTICATION_HPP
+#define COPPER_COMPONENTS_AUTHENTICATION_HPP
+
 #pragma once
 
 #include <boost/optional.hpp>
@@ -34,3 +37,5 @@ std::string authentication_to_bearer(
     const std::string &type = "App\\Models\\User");
 
 }  // namespace copper::components
+
+#endif

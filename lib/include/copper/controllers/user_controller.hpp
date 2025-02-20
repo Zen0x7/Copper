@@ -1,3 +1,6 @@
+#ifndef COPPER_CONTROLLERS_USER_CONTROLLER_HPP
+#define COPPER_CONTROLLERS_USER_CONTROLLER_HPP
+
 #pragma once
 
 #include <copper/components/chronos.hpp>
@@ -27,3 +30,5 @@ class user_controller final : public components::http_controller {
 };
 
 }  // namespace copper::controllers
+
+#endif

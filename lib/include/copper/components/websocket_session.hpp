@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_WEBSOCKET_SESSION_HPP
+#define COPPER_COMPONENTS_WEBSOCKET_SESSION_HPP
+
 #pragma once
 
 #include <boost/asio/as_tuple.hpp>
@@ -66,3 +69,5 @@ containers::async_of<void> websocket_session_run(
 }
 
 }  // namespace copper::components
+
+#endif

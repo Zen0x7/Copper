@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_LISTENER_HPP
+#define COPPER_COMPONENTS_LISTENER_HPP
+
 #pragma once
 
 #include <copper/components/containers.hpp>
@@ -14,3 +17,5 @@ containers::async_of<void> listener(shared<state> state,
                                     boost::beast::string_view doc_root);
 
 }  // namespace copper::components
+
+#endif

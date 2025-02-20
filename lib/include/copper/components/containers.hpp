@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_CONTAINERS_HPP
+#define COPPER_COMPONENTS_CONTAINERS_HPP
+
 #pragma once
 
 #include <boost/asio/awaitable.hpp>
@@ -34,3 +37,5 @@ template <typename T>
 using async_of = boost::asio::awaitable<
     T, boost::asio::strand<boost::asio::io_context::executor_type>>;
 }  // namespace copper::components::containers
+
+#endif
