@@ -136,6 +136,8 @@ boost::shared_ptr<validator> validator_make(
   response->success = response->errors.empty();
 
   return response;
+  // LCOV_EXCL_START
 }
+// LCOV_EXCL_STOP
 
 }  // namespace copper::components

@@ -21,7 +21,9 @@ std::string base64_encode(const std::string &input, bool padding) {
     while (output.size() % 4 != 0) output.push_back('=');
 
   return output;
+  // LCOV_EXCL_START
 }
+// LCOV_EXCL_STOP
 
 std::string base64_decode(const std::string &input) {
   std::string output;
@@ -37,6 +39,8 @@ std::string base64_decode(const std::string &input) {
     }
   }
   return output;
+  // LCOV_EXCL_START
 }
+// LCOV_EXCL_STOP
 
 }  // namespace copper::components

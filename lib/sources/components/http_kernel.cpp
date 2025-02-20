@@ -48,7 +48,9 @@ containers::vector_of<http_method> http_kernel::get_available_methods(
       methods.push_back(route.method_);
   }
   return methods;
+  // LCOV_EXCL_START
 }
+// LCOV_EXCL_STOP
 
 boost::asio::awaitable<
     std::tuple<shared<copper::models::request>,

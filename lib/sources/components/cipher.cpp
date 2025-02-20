@@ -84,7 +84,9 @@ std::string cipher_hmac(const std::string &input, const std::string &app_key) {
   output.assign(reinterpret_cast<char *>(digest), length);
 
   return output;
+// LCOV_EXCL_START
 }
+// LCOV_EXCL_STOP
 
 std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
   std::pair<std::string, std::string> output;
@@ -107,7 +109,9 @@ std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
   output.second.assign(iv.begin(), iv.end());
 
   return output;
+  // LCOV_EXCL_START
 }
+// LCOV_EXCL_STOP
 
 std::string cipher_encrypt(const std::string &input, const std::string &key,
                            const std::string &iv) {
@@ -158,7 +162,9 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
   EVP_CIPHER_CTX_free(openssl_context);
 
   return output;
+  // LCOV_EXCL_START
 }
+// LCOV_EXCL_STOP
 
 std::string cipher_decrypt(const std::string &input, const std::string &key,
                            const std::string &iv) {
