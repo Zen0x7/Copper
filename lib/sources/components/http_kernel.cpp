@@ -56,15 +56,15 @@ boost::asio::awaitable<
     std::tuple<shared<copper::models::request>,
                shared<copper::models::response>, http_response_generic>,
     boost::asio::strand<boost::asio::io_context::executor_type> >
-http_kernel::invoke(const shared<copper::models::session> &session,
-                    boost::beast::string_view, const http_request &request,
-                    const std::string &ip, const uuid &request_id,
-                    long now) const {
+http_kernel::invoke(uuid session_id, boost::beast::string_view,
+                    const http_request &request, const std::string &ip,
+                    const uuid &request_id, long now) const {
   auto _request = boost::make_shared<copper::models::request>(
-      to_string(request_id), session->id_, std::to_string(request.version()),
-      std::string(request.method_string()), http_path_from_request(request),
-      http_query_from_request(request), http_header_from_request(request),
-      std::string(request.body()), now, 0, 0);
+      to_string(request_id), to_string(session_id),
+      std::to_string(request.version()), std::string(request.method_string()),
+      http_path_from_request(request), http_query_from_request(request),
+      http_header_from_request(request), std::string(request.body()), now, 0,
+      0);
 
   if (const auto route = find_on_routes(request); route.has_value()) {
     containers::unordered_map_of_strings bindings = route.value().bindings_;
@@ -78,7 +78,7 @@ http_kernel::invoke(const shared<copper::models::session> &session,
         auto _http_response =
             http_response_too_many_requests(request, now, TTL);
         auto _response = copper::models::response_from_http_response(
-            session, _request, _http_response);
+            session_id, _request, _http_response);
         co_return std::make_tuple(_request, _response, _http_response);
       }
     }
@@ -95,7 +95,7 @@ http_kernel::invoke(const shared<copper::models::session> &session,
       if (!user_id.has_value()) {
         auto _http_response = http_response_unauthorized(request, now);
         auto _response = copper::models::response_from_http_response(
-            session, _request, _http_response);
+            session_id, _request, _http_response);
         co_return std::make_tuple(_request, _response, _http_response);
       };
 
@@ -124,7 +124,7 @@ http_kernel::invoke(const shared<copper::models::session> &session,
               request, http_status_code::unprocessable_entity,
               serialize(error_response), "application/json");
           auto _response = copper::models::response_from_http_response(
-              session, _request, _http_response);
+              session_id, _request, _http_response);
           co_return std::make_tuple(_request, _response, _http_response);
         }
       } else {
@@ -137,7 +137,7 @@ http_kernel::invoke(const shared<copper::models::session> &session,
             serialize(error_response), "application/json");
 
         auto _response = copper::models::response_from_http_response(
-            session, _request, _http_response);
+            session_id, _request, _http_response);
         co_return std::make_tuple(_request, _response, _http_response);
       }
     }
@@ -145,12 +145,12 @@ http_kernel::invoke(const shared<copper::models::session> &session,
     try {
       auto _http_response = route.value().controller_->invoke(request);
       auto _response = copper::models::response_from_http_response(
-          session, _request, _http_response);
+          session_id, _request, _http_response);
       co_return std::make_tuple(_request, _response, _http_response);
     } catch (std::exception &exception) {
       auto _http_response = http_response_exception(request, now);
       auto _response = copper::models::response_from_http_response(
-          session, _request, _http_response);
+          session_id, _request, _http_response);
       co_return std::make_tuple(_request, _response, _http_response);
     }
   }
@@ -159,20 +159,20 @@ http_kernel::invoke(const shared<copper::models::session> &session,
     auto available_verbs = get_available_methods(request);
     auto _http_response = http_response_cors(request, now, available_verbs);
     auto _response = copper::models::response_from_http_response(
-        session, _request, _http_response);
+        session_id, _request, _http_response);
     co_return std::make_tuple(_request, _response, _http_response);
   }
 
   if (http_request_is_illegal(request)) {
     auto _http_response = http_response_bad_request(request, now);
     auto _response = copper::models::response_from_http_response(
-        session, _request, _http_response);
+        session_id, _request, _http_response);
     co_return std::make_tuple(_request, _response, _http_response);
   }
 
   auto _http_response = http_response_not_found(request, now);
   auto _response = copper::models::response_from_http_response(
-      session, _request, _http_response);
+      session_id, _request, _http_response);
   co_return std::make_tuple(_request, _response, _http_response);
 }
 }  // namespace copper::components

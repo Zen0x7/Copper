@@ -6,11 +6,13 @@ namespace copper::components {
 boost::asio::awaitable<
     void, boost::asio::strand<boost::asio::io_context::executor_type>>
 detect_session(
-    shared<state> state, shared<copper::models::session> session,
+    shared<state> state, uuid session_id,
     typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type>>::other
         stream,
     boost::asio::ssl::context &ctx, boost::beast::string_view doc_root) {
+  auto executor = co_await boost::asio::this_coro::executor;
+
   boost::beast::flat_buffer buffer;
 
   co_await boost::asio::this_coro::reset_cancellation_state(
@@ -22,7 +24,9 @@ detect_session(
   stream.expires_after(std::chrono::seconds(30));
 
   if (co_await boost::beast::async_detect_ssl(stream, buffer)) {
-    state->get_database()->session_is_encrypted(session);
+    boost::asio::co_spawn(
+        executor, state->get_database()->session_is_encrypted(session_id),
+        boost::asio::detached);
 
     boost::asio::ssl::stream<typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type>>::other>
@@ -33,9 +37,12 @@ detect_session(
 
     buffer.consume(bytes_transferred);
 
-    co_await http_session_run(state, session, ssl_stream, buffer, doc_root);
+    co_await http_session_run(state, session_id, ssl_stream, buffer, doc_root);
 
-    state->get_database()->session_closed(session, "The socket was closed");
+    boost::asio::co_spawn(executor,
+                          state->get_database()->session_closed(
+                              session_id, "The socket was closed"),
+                          boost::asio::detached);
 
     if (!ssl_stream.lowest_layer().is_open()) co_return;
 
@@ -43,9 +50,12 @@ detect_session(
     if (ec && ec != boost::asio::ssl::error::stream_truncated)
       throw boost::system::system_error{ec};
   } else {
-    co_await http_session_run(state, session, stream, buffer, doc_root);
+    co_await http_session_run(state, session_id, stream, buffer, doc_root);
 
-    state->get_database()->session_closed(session, "The socket was closed");
+    boost::asio::co_spawn(executor,
+                          state->get_database()->session_closed(
+                              session_id, "The socket was closed"),
+                          boost::asio::detached);
 
     if (!stream.socket().is_open()) co_return;
 

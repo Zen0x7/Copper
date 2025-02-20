@@ -52,9 +52,9 @@ class http_kernel : public shared_enabled<http_kernel> {
       std::tuple<shared<copper::models::request>,
                  shared<copper::models::response>, http_response_generic>,
       boost::asio::strand<boost::asio::io_context::executor_type> >
-  invoke(const shared<copper::models::session> &session,
-         boost::beast::string_view /* root */, const http_request &request,
-         const std::string &ip, const uuid &request_id, long now) const;
+  invoke(uuid session_id, boost::beast::string_view /* root */,
+         const http_request &request, const std::string &ip,
+         const uuid &request_id, long now) const;
 };
 
 }  // namespace copper::components

@@ -29,26 +29,34 @@ listener(shared<state> state, shared<task_group> task_group,
 
     if (ec) throw boost::system::system_error{ec};
 
-    auto session = state->get_database()->create_session(
-        socket.remote_endpoint().address().to_string(),
-        socket.remote_endpoint().port());
+    auto session_id = boost::uuids::random_generator()();
+
+    boost::asio::co_spawn(
+        executor,
+        state->get_database()->create_session(
+            session_id, socket.remote_endpoint().address().to_string(),
+            socket.remote_endpoint().port()),
+        boost::asio::detached);
 
     boost::asio::co_spawn(
         std::move(socket_executor),
         detect_session(
-            state, session,
+            state, session_id,
             typename boost::beast::tcp_stream::rebind_executor<
                 boost::asio::strand<boost::asio::io_context::executor_type>>::
                 other{std::move(socket)},
             ctx, doc_root),
-        task_group->adapt([session, &state](std::exception_ptr e) {
+        task_group->adapt([session_id, executor, &state](std::exception_ptr e) {
           if (e) {
             // LCOV_EXCL_START
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
               std::cout << "Error in session: " << e.what() << std::endl;
-              state->get_database()->session_closed(session, e.what());
+              boost::asio::co_spawn(
+                  executor,
+                  state->get_database()->session_closed(session_id, e.what()),
+                  boost::asio::detached);
             }
             // LCOV_EXCL_STOP
           }

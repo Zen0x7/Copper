@@ -36,7 +36,6 @@ class response : public components::shared_enabled<response> {
 };
 
 components::shared<response> response_from_http_response(
-    const components::shared<session> &session,
-    const components::shared<request> &request,
+    components::uuid session, const components::shared<request> &request,
     const components::http_response &http_response);
 }  // namespace copper::models

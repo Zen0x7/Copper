@@ -34,10 +34,11 @@ namespace copper::components {
 template <typename Stream>
 boost::asio::awaitable<
     void, boost::asio::strand<boost::asio::io_context::executor_type> >
-http_session_run(shared<state> state, shared<copper::models::session> session,
-                 Stream &stream, boost::beast::flat_buffer &buffer,
+http_session_run(shared<state> state, uuid session_id, Stream &stream,
+                 boost::beast::flat_buffer &buffer,
                  boost::beast::string_view doc_root) {
   auto cs = co_await boost::asio::this_coro::cancellation_state;
+  auto executor = co_await boost::asio::this_coro::executor;
 
   auto generator = boost::uuids::random_generator();
 
@@ -53,7 +54,9 @@ http_session_run(shared<state> state, shared<copper::models::session> session,
     if (ec == boost::beast::http::error::end_of_stream) co_return;
 
     if (boost::beast::websocket::is_upgrade(parser.get())) {
-      state->get_database()->session_is_upgrade(session);
+      boost::asio::co_spawn(
+          executor, state->get_database()->session_is_upgrade(session_id),
+          boost::asio::detached);
 
       boost::beast::get_lowest_layer(stream).expires_never();
 
@@ -78,19 +81,24 @@ http_session_run(shared<state> state, shared<copper::models::session> session,
                          .to_string();
 
     auto [_request, _response, res] = co_await kernel->invoke(
-        session, doc_root, parser.release(), ip, request_id, start_at);
+        session_id, doc_root, parser.release(), ip, request_id, start_at);
 
     _request->finished_at_ = chronos::now();
     _request->duration_ = _request->finished_at_ - start_at;
 
     if (!res.keep_alive()) {
       co_await boost::beast::async_write(stream, std::move(res));
-      co_await state->get_database()->create_request(_request, _response);
+
+      boost::asio::co_spawn(
+          executor, state->get_database()->create_request(_request, _response),
+          boost::asio::detached);
       co_return;
     }
 
     co_await boost::beast::async_write(stream, std::move(res));
-    co_await state->get_database()->create_request(_request, _response);
+    boost::asio::co_spawn(
+        executor, state->get_database()->create_request(_request, _response),
+        boost::asio::detached);
   }
 }
 

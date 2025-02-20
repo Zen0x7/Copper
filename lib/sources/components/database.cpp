@@ -105,88 +105,74 @@ shared<copper::models::user> database::get_user_by_id(uuid id) {
           : chronos::to_timestamp(row.at(6).as_datetime().as_time_point()));
 }
 
-shared<copper::models::session> database::create_session(const std::string &ip,
-                                                         uint_least16_t port) {
-  std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
+boost::asio::awaitable<
+    void, boost::asio::strand<boost::asio::io_context::executor_type>>
+database::create_session(uuid session_id, std::string ip, uint_least16_t port) {
   auto now = chronos::now();
-  auto id = boost::uuids::random_generator()();
 
-  auto connection =
-      pool_
-          ->async_get_connection(boost::mysql::with_diagnostics(
-              boost::asio::cancel_after(timeout, boost::asio::use_future)))
-          .get();
+  auto connection = co_await pool_->async_get_connection(
+      boost::asio::cancel_after(std::chrono::seconds(10)));
 
   boost::mysql::results result;
 
   connection->execute(
       boost::mysql::with_params("INSERT INTO sessions (id, ip, port, "
                                 "started_at) VALUES ({}, {}, {}, {})",
-                                to_string(id), ip, port, now),
+                                to_string(session_id), ip, port, now),
       result);
 
   connection->close();
-
-  return boost::make_shared<copper::models::session>(to_string(id), ip, port,
-                                                     now, 0);
 }
 
-void database::session_closed(const shared<copper::models::session> &session,
-                              const char exception[]) {
-  std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
+boost::asio::awaitable<
+    void, boost::asio::strand<boost::asio::io_context::executor_type>>
+database::session_closed(uuid session_id, const char exception[]) {
   auto now = chronos::now();
 
-  auto connection =
-      pool_
-          ->async_get_connection(boost::mysql::with_diagnostics(
-              boost::asio::cancel_after(timeout, boost::asio::use_future)))
-          .get();
+  auto connection = co_await pool_->async_get_connection(
+      boost::asio::cancel_after(std::chrono::seconds(10)));
 
   boost::mysql::results result;
   connection->execute(
       boost::mysql::with_params(
           "UPDATE sessions SET finished_at = {}, exception = {} WHERE id = {}",
-          now, exception, session->id_),
+          now, exception, to_string(session_id)),
       result);
 
   connection->close();
 }
 
-void database::session_is_encrypted(
-    const shared<copper::models::session> &session) {
-  std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
-
-  auto connection =
-      pool_
-          ->async_get_connection(boost::mysql::with_diagnostics(
-              boost::asio::cancel_after(timeout, boost::asio::use_future)))
-          .get();
+boost::asio::awaitable<
+    void, boost::asio::strand<boost::asio::io_context::executor_type>>
+database::session_is_encrypted(uuid session_id) {
+  auto connection = co_await pool_->async_get_connection(
+      boost::asio::cancel_after(std::chrono::seconds(10)));
+  ;
 
   boost::mysql::results result;
   connection->execute(
       boost::mysql::with_params(
           "UPDATE sessions SET is_encrypted = true WHERE id = {}",
-          session->id_),
+          to_string(session_id)),
       result);
 
   connection->close();
 }
 
-void database::session_is_upgrade(
-    const shared<copper::models::session> &session) {
+boost::asio::awaitable<
+    void, boost::asio::strand<boost::asio::io_context::executor_type>>
+database::session_is_upgrade(uuid session_id) {
   std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
-  auto connection =
-      pool_
-          ->async_get_connection(boost::mysql::with_diagnostics(
-              boost::asio::cancel_after(timeout, boost::asio::use_future)))
-          .get();
+  auto connection = co_await pool_->async_get_connection(
+      boost::asio::cancel_after(std::chrono::seconds(10)));
+  ;
 
   boost::mysql::results result;
-  connection->execute(
-      boost::mysql::with_params(
-          "UPDATE sessions SET is_upgrade = true WHERE id = {}", session->id_),
-      result);
+  connection->execute(boost::mysql::with_params(
+                          "UPDATE sessions SET is_upgrade = true WHERE id = {}",
+                          to_string(session_id)),
+                      result);
 
   connection->close();
 }

@@ -28,14 +28,20 @@ class database : public shared_enabled<database> {
 
   shared<copper::models::user> get_user_by_id(uuid id);
 
-  shared<copper::models::session> create_session(const std::string &ip,
-                                                 uint_least16_t port);
+  boost::asio::awaitable<
+      void, boost::asio::strand<boost::asio::io_context::executor_type>>
+  create_session(uuid session_id, const std::string ip, uint_least16_t port);
 
-  void session_closed(const shared<copper::models::session> &session,
-                      const char exception[]);
+  boost::asio::awaitable<
+      void, boost::asio::strand<boost::asio::io_context::executor_type>>
+  session_closed(uuid session_id, const char exception[]);
 
-  void session_is_encrypted(const shared<copper::models::session> &session);
-  void session_is_upgrade(const shared<copper::models::session> &session);
+  boost::asio::awaitable<
+      void, boost::asio::strand<boost::asio::io_context::executor_type>>
+  session_is_encrypted(uuid session_id);
+  boost::asio::awaitable<
+      void, boost::asio::strand<boost::asio::io_context::executor_type>>
+  session_is_upgrade(uuid session_id);
 
   boost::asio::awaitable<
       void, boost::asio::strand<boost::asio::io_context::executor_type>>

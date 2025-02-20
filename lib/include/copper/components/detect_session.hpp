@@ -16,7 +16,7 @@ namespace copper::components {
 boost::asio::awaitable<
     void, boost::asio::strand<boost::asio::io_context::executor_type> >
 detect_session(
-    shared<state> state, shared<copper::models::session> session,
+    shared<state> state, uuid session_id,
     typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type> >::other
         stream,
