@@ -6,7 +6,6 @@
 
 #include <copper/components/base64.hpp>
 #include <copper/components/base64url.hpp>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>

@@ -6,13 +6,13 @@
 #include <copper/components/json.hpp>
 
 namespace copper::controllers {
-class user_controller final : public copper::components::http_controller {
+class user_controller final : public components::http_controller {
  public:
-  copper::components::containers::async_of<copper::components::http_response>
-  invoke(const copper::components::http_request &request) override {
+  components::containers::async_of<components::http_response> invoke(
+      const components::http_request &request) override {
     auto _user = co_await state_->get_database()->get_user_by_id(auth_id_);
 
-    const copper::components::json::object data = {
+    const components::json::object data = {
         {"id", _user->id_},
         {"name", _user->name_},
         {"email", _user->email_},
@@ -21,7 +21,7 @@ class user_controller final : public copper::components::http_controller {
         {"updated_at", _user->updated_at_},
     };
 
-    co_return response(request, copper::components::http_status_code::ok,
+    co_return response(request, components::http_status_code::ok,
                        serialize(data), "application/json");
   }
 };

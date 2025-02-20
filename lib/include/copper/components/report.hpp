@@ -10,7 +10,6 @@
 
 #include <boost/beast/core/error.hpp>
 #include <boost/stacktrace.hpp>
-#include <iostream>
 
 #ifndef BOOST_STACKTRACE_USE_BACKTRACE
 #define BOOST_STACKTRACE_USE_BACKTRACE

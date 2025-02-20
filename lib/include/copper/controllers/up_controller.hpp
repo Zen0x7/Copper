@@ -5,13 +5,13 @@
 #include <copper/components/json.hpp>
 
 namespace copper::controllers {
-class up_controller final : public copper::components::http_controller {
+class up_controller final : public components::http_controller {
  public:
-  copper::components::containers::async_of<copper::components::http_response>
-  invoke(const copper::components::http_request &request) override {
-    auto now = copper::components::chronos::now();
-    const copper::components::json::object data = {{"timestamp", now}};
-    co_return response(request, copper::components::http_status_code::ok,
+  components::containers::async_of<components::http_response> invoke(
+      const components::http_request &request) override {
+    auto now = components::chronos::now();
+    const components::json::object data = {{"timestamp", now}};
+    co_return response(request, components::http_status_code::ok,
                        serialize(data), "application/json");
   }
 };

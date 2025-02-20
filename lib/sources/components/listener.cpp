@@ -51,7 +51,8 @@ containers::async_of<void> listener(shared<state> state,
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
-              std::cout << "Error in session: " << e.what() << std::endl;
+              //              std::cout << "Error in session: " << e.what() <<
+              //              std::endl;
               boost::asio::co_spawn(
                   executor,
                   state->get_database()->session_closed(session_id, e.what()),

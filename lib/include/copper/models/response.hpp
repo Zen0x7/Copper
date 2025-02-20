@@ -17,7 +17,7 @@
 
 namespace copper::models {
 
-class response : public copper::components::shared_enabled<response> {
+class response : public components::shared_enabled<response> {
  public:
   std::string id_;
   std::string session_id_;
@@ -36,8 +36,7 @@ class response : public copper::components::shared_enabled<response> {
         body_(body) {}
 };
 
-copper::components::shared<response> response_from_http_response(
-    copper::components::uuid session,
-    const copper::components::shared<request> &request,
-    const copper::components::http_response &http_response);
+components::shared<response> response_from_http_response(
+    components::uuid session, const components::shared<request> &request,
+    const components::http_response &http_response);
 }  // namespace copper::models
