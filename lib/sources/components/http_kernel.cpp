@@ -23,8 +23,8 @@
 #include <copper/components/http_path.hpp>
 #include <copper/components/http_header.hpp>
 
-#include <app/models/request.hpp>
-#include <app/models/response.hpp>
+#include <copper/models/request.hpp>
+#include <copper/models/response.hpp>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/json/parse.hpp>
@@ -55,13 +55,13 @@ namespace copper::components {
       return methods; }
 
     boost::asio::awaitable<
-      std::tuple<shared<app::models::request>, shared<app::models::response>, http_response_generic>,
+      std::tuple<shared<copper::models::request>, shared<copper::models::response>, http_response_generic>,
       boost::asio::strand<
         boost::asio::io_context::executor_type
       >
     >
     http_kernel::invoke(
-      const shared<app::models::session> &session,
+      const shared<copper::models::session> &session,
       boost::beast::string_view,
       const http_request &request,
       const std::string &ip,
@@ -69,7 +69,7 @@ namespace copper::components {
       long now
     ) const {
 
-      auto _request = boost::make_shared<app::models::request>(
+      auto _request = boost::make_shared<copper::models::request>(
         to_string(request_id),
         session->id_,
         std::to_string(request.version()),
@@ -92,7 +92,7 @@ namespace copper::components {
           if (auto [can, TTL] = co_await state_->get_cache()->can_invoke(request, ip,
                                                                          route.value().controller_->config_.rpm); !can) {
             auto _http_response = http_response_too_many_requests(request, now, TTL);
-            auto _response = app::models::response_from_http_response(session, _request, _http_response);
+            auto _response = copper::models::response_from_http_response(session, _request, _http_response);
             co_return std::make_tuple(_request, _response, _http_response);
           }
         }
@@ -107,7 +107,7 @@ namespace copper::components {
 
           if (!user_id.has_value()) {
             auto _http_response = http_response_unauthorized(request, now);
-            auto _response = app::models::response_from_http_response(session, _request, _http_response);
+            auto _response = copper::models::response_from_http_response(session, _request, _http_response);
             co_return std::make_tuple(_request, _response, _http_response);
           };
 
@@ -133,7 +133,7 @@ namespace copper::components {
               auto _http_response = route.value().controller_->response(
                 request, http_status_code::unprocessable_entity,
                 serialize(error_response), "application/json");
-              auto _response = app::models::response_from_http_response(session, _request, _http_response);
+              auto _response = copper::models::response_from_http_response(session, _request, _http_response);
               co_return std::make_tuple(_request, _response, _http_response);
             }
           } else {
@@ -145,18 +145,18 @@ namespace copper::components {
               request, http_status_code::unprocessable_entity, serialize(error_response),
               "application/json");
 
-            auto _response = app::models::response_from_http_response(session, _request, _http_response);
+            auto _response = copper::models::response_from_http_response(session, _request, _http_response);
             co_return std::make_tuple(_request, _response, _http_response);
           }
         }
 
         try {
           auto _http_response = route.value().controller_->invoke(request);
-          auto _response = app::models::response_from_http_response(session, _request, _http_response);
+          auto _response = copper::models::response_from_http_response(session, _request, _http_response);
           co_return std::make_tuple(_request, _response, _http_response);
         } catch (std::exception &exception) {
           auto _http_response = http_response_exception(request, now);
-          auto _response = app::models::response_from_http_response(session, _request, _http_response);
+          auto _response = copper::models::response_from_http_response(session, _request, _http_response);
           co_return std::make_tuple(_request, _response, _http_response);
         }
       }
@@ -164,18 +164,18 @@ namespace copper::components {
       if (request.method() == http_method::options) {
         auto available_verbs = get_available_methods(request);
         auto _http_response = http_response_cors(request, now, available_verbs);
-        auto _response = app::models::response_from_http_response(session, _request, _http_response);
+        auto _response = copper::models::response_from_http_response(session, _request, _http_response);
         co_return std::make_tuple(_request, _response, _http_response);
       }
 
       if (http_request_is_illegal(request)) {
         auto _http_response = http_response_bad_request(request, now);
-        auto _response = app::models::response_from_http_response(session, _request, _http_response);
+        auto _response = copper::models::response_from_http_response(session, _request, _http_response);
         co_return std::make_tuple(_request, _response, _http_response);
       }
 
       auto _http_response = http_response_not_found(request, now);
-      auto _response = app::models::response_from_http_response(session, _request, _http_response);
+      auto _response = copper::models::response_from_http_response(session, _request, _http_response);
       co_return std::make_tuple(_request, _response, _http_response);
     }
 }

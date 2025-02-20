@@ -10,10 +10,8 @@
 #include <copper/components/shared.hpp>
 #include <utility>
 
-namespace app::models {
-    using namespace copper::components;
-
-    class user : public shared_enabled<user> {
+namespace copper::models {
+    class user : public components::shared_enabled<user> {
     public:
       std::string id_;
       std::string name_;

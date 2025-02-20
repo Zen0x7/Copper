@@ -6,7 +6,7 @@
 #include <copper/components/authentication.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace app::controllers {
+namespace copper::controllers {
     class auth_controller final : public copper::components::http_controller {
     public:
       copper::components::containers::map_of_strings rules() const override {

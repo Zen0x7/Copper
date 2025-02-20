@@ -1,7 +1,7 @@
 #pragma once
 
-#include <app/models/session.hpp>
-#include <app/models/request.hpp>
+#include <copper/models/session.hpp>
+#include <copper/models/request.hpp>
 
 #include <copper/components/uuid.hpp>
 #include <copper/components/shared.hpp>
@@ -17,10 +17,8 @@
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-namespace app::models {
-    using namespace copper::components;
-
-    class response : public shared_enabled<response> {
+namespace copper::models {
+class response : public components::shared_enabled<response> {
     public:
       std::string id_;
       std::string session_id_;
@@ -46,6 +44,6 @@ namespace app::models {
 
     };
 
-    shared<response> response_from_http_response(const shared<session> &session, const shared<request> &request,
-                                                        const http_response &http_response);
+    components::shared<response> response_from_http_response(const components::shared<session> &session, const components::shared<request> &request,
+                                                        const components::http_response &http_response);
 }

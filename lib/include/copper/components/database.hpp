@@ -6,10 +6,10 @@
 #include <copper/components/report.hpp>
 #include <copper/components/uuid.hpp>
 
-#include <app/models/user.hpp>
-#include <app/models/session.hpp>
-#include <app/models/request.hpp>
-#include <app/models/response.hpp>
+#include <copper/models/user.hpp>
+#include <copper/models/session.hpp>
+#include <copper/models/request.hpp>
+#include <copper/models/response.hpp>
 
 #include <boost/mysql/connection_pool.hpp>
 #include <boost/asio/thread_pool.hpp>
@@ -24,22 +24,22 @@ namespace copper::components {
 
         void start();
 
-        containers::optional_of<shared<app::models::user>> get_user_by_email(const std::string &email);
+        containers::optional_of<shared<copper::models::user>> get_user_by_email(const std::string &email);
 
-        shared<app::models::user> get_user_by_id(uuid id);
+        shared<copper::models::user> get_user_by_id(uuid id);
 
-        shared<app::models::session> create_session(const std::string & ip, uint_least16_t port);
+        shared<copper::models::session> create_session(const std::string & ip, uint_least16_t port);
 
-        void session_closed(const shared<app::models::session> & session, const char exception[]);
+        void session_closed(const shared<copper::models::session> & session, const char exception[]);
 
-        void session_is_encrypted(const shared<app::models::session> & session);
-        void session_is_upgrade(const shared<app::models::session> & session);
+        void session_is_encrypted(const shared<copper::models::session> & session);
+        void session_is_upgrade(const shared<copper::models::session> & session);
 
       boost::asio::awaitable<
         void,
         boost::asio::strand<
           boost::asio::io_context::executor_type
         >
-      > create_request(shared<app::models::request> request, shared<app::models::response> response);
+      > create_request(shared<copper::models::request> request, shared<copper::models::response> response);
     };
 }

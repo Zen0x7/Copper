@@ -1,7 +1,7 @@
 #pragma once
 
 #include <copper/components/http_session.hpp>
-#include <app/models/session.hpp>
+#include <copper/models/session.hpp>
 
 namespace copper::components {
 
@@ -20,7 +20,7 @@ namespace copper::components {
             >
     > detect_session(
             shared<state> state,
-            shared<app::models::session> session,
+            shared<copper::models::session> session,
             typename boost::beast::tcp_stream::rebind_executor<
                     boost::asio::strand<
                             boost::asio::io_context::executor_type

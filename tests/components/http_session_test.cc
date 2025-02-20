@@ -13,9 +13,9 @@
 #include <copper/components/chronos.hpp>
 #include <copper/components/shared.hpp>
 
-#include <app/controllers/auth_controller.hpp>
-#include <app/controllers/up_controller.hpp>
-#include <app/controllers/user_controller.hpp>
+#include <copper/controllers/auth_controller.hpp>
+#include <copper/controllers/up_controller.hpp>
+#include <copper/controllers/user_controller.hpp>
 
 #include <boost/asio/co_spawn.hpp>
 #include <boost/json/parse.hpp>
@@ -99,7 +99,7 @@ TEST(Components_HTTP_Session, Implementation) {
     state_->get_database()->start();
 
     state_->get_http_router()
-      ->push(http_method::get, "/api/up", boost::make_shared<app::controllers::up_controller>(), {
+      ->push(http_method::get, "/api/up", boost::make_shared<copper::controllers::up_controller>(), {
         .use_throttler = true,
         .rpm = 5
       })
@@ -111,12 +111,12 @@ TEST(Components_HTTP_Session, Implementation) {
         .use_throttler = true,
         .rpm = 5
       })
-      ->push(http_method::get, "/api/user", boost::make_shared<app::controllers::user_controller>(), {
+      ->push(http_method::get, "/api/user", boost::make_shared<copper::controllers::user_controller>(), {
         .use_auth = true,
         .use_throttler = true,
         .rpm = 5,
       })
-      ->push(http_method::post, "/api/auth", boost::make_shared<app::controllers::auth_controller>(), {
+      ->push(http_method::post, "/api/auth", boost::make_shared<copper::controllers::auth_controller>(), {
         .use_throttler = true,
         .use_validator = true,
         .rpm = 5,

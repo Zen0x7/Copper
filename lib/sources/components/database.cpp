@@ -26,7 +26,7 @@ namespace copper::components {
      * @param email
      * @return
      */
-    containers::optional_of<shared<app::models::user>> database::get_user_by_email(const std::string &email) {
+    containers::optional_of<shared<copper::models::user>> database::get_user_by_email(const std::string &email) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
       auto connection = pool_->async_get_connection(
@@ -48,7 +48,7 @@ namespace copper::components {
 
       const auto &row = result.rows().at(0);
 
-      return boost::make_shared<app::models::user>(
+      return boost::make_shared<copper::models::user>(
         row.at(0).as_string(),
         std::string(row.at(1).as_string()),
         email,
@@ -67,7 +67,7 @@ namespace copper::components {
      * @param id
      * @return
      */
-    shared<app::models::user> database::get_user_by_id(uuid id) {
+    shared<copper::models::user> database::get_user_by_id(uuid id) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
       auto connection = pool_->async_get_connection(
@@ -85,7 +85,7 @@ namespace copper::components {
 
       connection->close();
 
-      return boost::make_shared<app::models::user>(
+      return boost::make_shared<copper::models::user>(
         to_string(id),
         row.at(1).as_string(),
         row.at(2).as_string(),
@@ -96,7 +96,7 @@ namespace copper::components {
       );
     }
 
-    shared<app::models::session> database::create_session(const std::string &ip, uint_least16_t port) {
+    shared<copper::models::session> database::create_session(const std::string &ip, uint_least16_t port) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
       auto now = chronos::now();
       auto id = boost::uuids::random_generator()();
@@ -118,7 +118,7 @@ namespace copper::components {
 
       connection->close();
 
-      return boost::make_shared<app::models::session>(
+      return boost::make_shared<copper::models::session>(
         to_string(id),
         ip,
         port,
@@ -127,7 +127,7 @@ namespace copper::components {
       );
     }
 
-    void database::session_closed(const shared<app::models::session> & session, const char exception[]) {
+    void database::session_closed(const shared<copper::models::session> & session, const char exception[]) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
       auto now = chronos::now();
 
@@ -146,7 +146,7 @@ namespace copper::components {
       connection->close();
     }
 
-    void database::session_is_encrypted(const shared<app::models::session> & session) {
+    void database::session_is_encrypted(const shared<copper::models::session> & session) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
       auto connection = pool_->async_get_connection(
@@ -163,7 +163,7 @@ namespace copper::components {
       connection->close();
     }
 
-    void database::session_is_upgrade(const shared<app::models::session> & session) {
+    void database::session_is_upgrade(const shared<copper::models::session> & session) {
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
       auto connection = pool_->async_get_connection(
@@ -184,7 +184,7 @@ namespace copper::components {
       boost::asio::strand<
         boost::asio::io_context::executor_type
       >
-    > database::create_request(shared<app::models::request> request, shared<app::models::response> response) {
+    > database::create_request(shared<copper::models::request> request, shared<copper::models::response> response) {
       auto connection = co_await pool_->async_get_connection(boost::asio::cancel_after(std::chrono::seconds(10)));
 
       boost::mysql::results result;

@@ -5,7 +5,7 @@
 #include <copper/components/cipher.hpp>
 #include <copper/components/chronos.hpp>
 
-namespace app::controllers {
+namespace copper::controllers {
     class user_controller final : public copper::components::http_controller {
     public:
       copper::components::http_response invoke(const copper::components::http_request &request) override {
@@ -24,4 +24,4 @@ namespace app::controllers {
       }
     };
 
-} // namespace app::controller
+} // namespace copper::controller

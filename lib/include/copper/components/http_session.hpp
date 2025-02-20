@@ -16,9 +16,9 @@
 #include <copper/components/http_header.hpp>
 
 #include <copper/components/chronos.hpp>
-#include <app/models/session.hpp>
-#include <app/models/request.hpp>
-#include <app/models/response.hpp>
+#include <copper/models/session.hpp>
+#include <copper/models/request.hpp>
+#include <copper/models/response.hpp>
 #include <boost/beast/core/error.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/asio/co_spawn.hpp>
@@ -44,7 +44,7 @@ namespace copper::components {
       >
     > http_session_run(
       shared<state> state,
-      shared<app::models::session> session,
+      shared<copper::models::session> session,
       Stream &stream,
       boost::beast::flat_buffer &buffer,
       boost::beast::string_view doc_root

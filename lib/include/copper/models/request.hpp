@@ -9,10 +9,8 @@
 #include <copper/components/uuid.hpp>
 #include <copper/components/shared.hpp>
 
-namespace app::models {
-    using namespace copper::components;
-
-    class request : public shared_enabled<request> {
+namespace copper::models {
+    class request : public components::shared_enabled<request> {
     public:
       std::string id_;
       std::string session_id_;
