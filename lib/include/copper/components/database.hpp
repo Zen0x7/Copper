@@ -18,6 +18,7 @@
 #include <copper/models/user.hpp>
 
 namespace copper::components {
+
 class database : public shared_enabled<database> {
   shared<boost::mysql::connection_pool> pool_;
 
@@ -46,6 +47,7 @@ class database : public shared_enabled<database> {
       shared<copper::models::request> request,
       shared<copper::models::response> response);
 };
+
 }  // namespace copper::components
 
 #endif

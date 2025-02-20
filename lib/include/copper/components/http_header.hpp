@@ -9,9 +9,11 @@
 #include <string>
 
 namespace copper::components {
+
 std::string http_header_from_request(const http_request& request);
 
 std::string http_header_from_response(const http_response& response);
+
 }  // namespace copper::components
 
 #endif

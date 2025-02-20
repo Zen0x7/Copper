@@ -13,6 +13,7 @@
 #include <utility>
 
 namespace copper::models {
+
 class user : public components::shared_enabled<user> {
  public:
   std::string id_;
@@ -34,6 +35,7 @@ class user : public components::shared_enabled<user> {
         created_at_(created_at),
         updated_at_(updated_at) {}
 };
+
 }  // namespace copper::models
 
 #endif

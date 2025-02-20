@@ -8,6 +8,7 @@
 #include <copper/components/json.hpp>
 
 namespace copper::controllers {
+
 class up_controller final : public components::http_controller {
  public:
   components::containers::async_of<components::http_response> invoke(

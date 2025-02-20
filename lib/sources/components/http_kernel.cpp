@@ -58,12 +58,8 @@ containers::async_of<
 http_kernel::invoke(uuid session_id, boost::beast::string_view,
                     const http_request &request, const std::string &ip,
                     const uuid &request_id, long now) const {
-  auto _request = boost::make_shared<copper::models::request>(
-      to_string(request_id), to_string(session_id),
-      std::to_string(request.version()), std::string(request.method_string()),
-      http_path_from_request(request), http_query_from_request(request),
-      http_header_from_request(request), std::string(request.body()), now, 0,
-      0);
+  auto _request =
+      models::request_from_http_request(session_id, request_id, now, request);
 
   if (const auto route = find_on_routes(request); route.has_value()) {
     containers::unordered_map_of_strings bindings = route.value().bindings_;

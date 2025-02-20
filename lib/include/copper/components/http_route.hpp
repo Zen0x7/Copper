@@ -9,6 +9,7 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
+
 struct http_route_result {
   bool matches_;
   containers::unordered_map_of_strings bindings_;
@@ -21,6 +22,7 @@ struct http_route {
   bool is_expression_ = false;
   shared<expression> expression_;
 };
+
 }  // namespace copper::components
 
 #endif

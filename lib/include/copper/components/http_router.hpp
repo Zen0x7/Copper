@@ -12,6 +12,7 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
+
 class http_router : public shared_enabled<http_router> {
   shared<http_routes> routes_;
 
@@ -26,6 +27,7 @@ class http_router : public shared_enabled<http_router> {
 
   static http_route factory(http_method method, const char* path);
 };
+
 }  // namespace copper::components
 
 #endif

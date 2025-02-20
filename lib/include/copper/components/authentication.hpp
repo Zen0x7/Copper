@@ -9,6 +9,7 @@
 #include <string>
 
 namespace copper::components {
+
 struct authentication_result {
   uuid id;
   std::string type;

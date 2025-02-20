@@ -7,9 +7,11 @@
 #include <copper/components/http_router.hpp>
 
 namespace copper::components {
+
 http_route_result http_route_match(http_method method,
                                    const std::string_view &path,
                                    const http_route &route);
-}
+
+}  // namespace copper::components
 
 #endif

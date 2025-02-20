@@ -21,6 +21,7 @@
 #include <copper/components/uuid.hpp>
 
 namespace copper::components {
+
 class state;
 
 class http_controller : public shared_enabled<http_controller> {
@@ -61,6 +62,7 @@ class http_controller : public shared_enabled<http_controller> {
                          const std::string &data,
                          const char *type = "text/html") const;
 };
+
 }  // namespace copper::components
 
 #endif

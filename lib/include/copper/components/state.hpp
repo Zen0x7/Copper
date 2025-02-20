@@ -10,6 +10,7 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
+
 class state : public shared_enabled<state> {
   shared<http_router> http_router_;
   shared<cache> redis_;
@@ -22,6 +23,7 @@ class state : public shared_enabled<state> {
   shared<cache> get_cache();
   shared<database> get_database();
 };
+
 }  // namespace copper::components
 
 #endif

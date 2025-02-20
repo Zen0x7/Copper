@@ -22,6 +22,7 @@
 #endif
 
 namespace copper::components {
+
 class state;
 
 class http_controller;
