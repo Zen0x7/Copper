@@ -3,15 +3,14 @@
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/ssl.hpp>
 #include <copper/components/client_certificates.hpp>
+#include <copper/components/containers.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/server_certificates.hpp>
 #include <copper/components/signal_handler.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/task_group.hpp>
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-cancel_websocket_session() {
+copper::components::containers::async_of<void> cancel_websocket_session() {
   auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
 }

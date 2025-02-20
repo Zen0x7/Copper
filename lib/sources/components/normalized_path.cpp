@@ -1,6 +1,7 @@
 #include <copper/components/normalized_path.hpp>
 
 namespace copper::components {
+
 std::string normalized_path(boost::beast::string_view base,
                             boost::beast::string_view path) {
   // LCOV_EXCL_START

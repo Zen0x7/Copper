@@ -1,5 +1,8 @@
 #pragma once
 
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/optional.hpp>
 #include <copper/components/shared.hpp>
 #include <map>
@@ -26,4 +29,8 @@ using queue_of = std::queue<T>;
 
 template <typename T>
 using optional_of = boost::optional<T>;
+
+template <typename T>
+using async_of = boost::asio::awaitable<
+    T, boost::asio::strand<boost::asio::io_context::executor_type>>;
 }  // namespace copper::components::containers

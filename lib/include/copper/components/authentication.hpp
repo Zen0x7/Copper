@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/optional.hpp>
+#include <copper/components/containers.hpp>
 #include <copper/components/uuid.hpp>
 #include <string>
 
@@ -17,7 +18,7 @@ struct authentication_result {
  * @param app_key
  * @return boost::optional<authentication_result> Result
  */
-boost::optional<authentication_result> authentication_from_bearer(
+containers::optional_of<authentication_result> authentication_from_bearer(
     const std::string &bearer, const std::string &app_key);
 
 /**

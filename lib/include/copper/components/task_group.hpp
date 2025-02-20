@@ -9,7 +9,6 @@
 #include <boost/asio/steady_timer.hpp>
 #include <boost/scope/scope_exit.hpp>
 #include <copper/components/shared.hpp>
-#include <iostream>
 #include <list>
 #include <mutex>
 

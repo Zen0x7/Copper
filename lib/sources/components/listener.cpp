@@ -4,12 +4,11 @@
 
 namespace copper::components {
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-listener(shared<state> state, shared<task_group> task_group,
-         boost::asio::ssl::context &ctx,
-         boost::asio::ip::tcp::endpoint endpoint,
-         boost::beast::string_view doc_root) {
+containers::async_of<void> listener(shared<state> state,
+                                    shared<task_group> task_group,
+                                    boost::asio::ssl::context &ctx,
+                                    boost::asio::ip::tcp::endpoint endpoint,
+                                    boost::beast::string_view doc_root) {
   auto cs = co_await boost::asio::this_coro::cancellation_state;
   auto executor = co_await boost::asio::this_coro::executor;
   auto acceptor = typename boost::asio::ip::tcp::acceptor::rebind_executor<
@@ -52,7 +51,8 @@ listener(shared<state> state, shared<task_group> task_group,
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
-              std::cout << "Error in session: " << e.what() << std::endl;
+              //              std::cout << "Error in session: " << e.what() <<
+              //              std::endl;
               boost::asio::co_spawn(
                   executor,
                   state->get_database()->session_closed(session_id, e.what()),

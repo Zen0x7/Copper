@@ -23,29 +23,24 @@ class database : public shared_enabled<database> {
 
   void start();
 
-  containers::optional_of<shared<copper::models::user>> get_user_by_email(
-      const std::string &email);
+  containers::async_of<containers::optional_of<shared<copper::models::user>>>
+  get_user_by_email(const std::string &email);
 
-  shared<copper::models::user> get_user_by_id(uuid id);
+  containers::async_of<shared<copper::models::user>> get_user_by_id(uuid id);
 
-  boost::asio::awaitable<
-      void, boost::asio::strand<boost::asio::io_context::executor_type>>
-  create_session(uuid session_id, const std::string ip, uint_least16_t port);
+  containers::async_of<void> create_session(uuid session_id,
+                                            const std::string ip,
+                                            uint_least16_t port);
 
-  boost::asio::awaitable<
-      void, boost::asio::strand<boost::asio::io_context::executor_type>>
-  session_closed(uuid session_id, const char exception[]);
+  containers::async_of<void> session_closed(uuid session_id,
+                                            const char exception[]);
 
-  boost::asio::awaitable<
-      void, boost::asio::strand<boost::asio::io_context::executor_type>>
-  session_is_encrypted(uuid session_id);
-  boost::asio::awaitable<
-      void, boost::asio::strand<boost::asio::io_context::executor_type>>
-  session_is_upgrade(uuid session_id);
+  containers::async_of<void> session_is_encrypted(uuid session_id);
 
-  boost::asio::awaitable<
-      void, boost::asio::strand<boost::asio::io_context::executor_type>>
-  create_request(shared<copper::models::request> request,
-                 shared<copper::models::response> response);
+  containers::async_of<void> session_is_upgrade(uuid session_id);
+
+  containers::async_of<void> create_request(
+      shared<copper::models::request> request,
+      shared<copper::models::response> response);
 };
 }  // namespace copper::components

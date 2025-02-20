@@ -1,5 +1,6 @@
 #include <bcrypt/BCrypt.hpp>
 #include <copper/components/cipher.hpp>
+#include <copper/components/containers.hpp>
 #include <copper/components/report.hpp>
 
 #ifndef CIPHER_KEY_LENGTH
@@ -92,7 +93,7 @@ std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
   std::pair<std::string, std::string> output;
 
   // LCOV_EXCL_START
-  std::vector<unsigned char> key(CIPHER_KEY_LENGTH);
+  containers::vector_of<unsigned char> key(CIPHER_KEY_LENGTH);
 
   if (RAND_bytes(key.data(), (int)key.size()) != 1) {
     report_for_openssl();
@@ -100,7 +101,7 @@ std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
 
   output.first.assign(key.begin(), key.end());
 
-  std::vector<unsigned char> iv(CIPHER_IV_LENGTH);
+  containers::vector_of<unsigned char> iv(CIPHER_IV_LENGTH);
   if (RAND_bytes(iv.data(), (int)iv.size()) != 1) {
     report_for_openssl();
   }

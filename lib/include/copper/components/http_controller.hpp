@@ -1,5 +1,8 @@
 #pragma once
 
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/json/serialize.hpp>
 #include <boost/smart_ptr.hpp>
 #include <copper/components/chronos.hpp>
@@ -13,9 +16,6 @@
 #include <copper/components/json.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
-#include <iostream>
-#include <map>
-#include <unordered_map>
 
 namespace copper::components {
 class state;
@@ -32,9 +32,10 @@ class http_controller : public shared_enabled<http_controller> {
   // LCOV_EXCL_START
   virtual ~http_controller() = default;
 
-  virtual http_response invoke(const http_request & /*request*/) {
+  virtual containers::async_of<http_response> invoke(
+      const http_request & /*request*/) {
     http_response response;
-    return response;
+    co_return response;
   };
 
   virtual containers::map_of_strings rules() const { return {}; }

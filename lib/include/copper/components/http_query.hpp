@@ -14,7 +14,7 @@ namespace copper::components {
 std::string http_query_from_request(const http_request &request) {
   json::object object;
 
-  containers::map_of<std::string, std::vector<std::string>> map;
+  containers::map_of<std::string, containers::vector_of<std::string>> map;
 
   const size_t query_ask_symbol_position = request.target().find('?');
   const bool path_has_parameters =

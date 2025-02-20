@@ -22,6 +22,8 @@ std::string get_version() { return "2.0.0"; }
 
 // LCOV_EXCL_START
 int run(int argc, const char *argv[]) {
+  using namespace components;
+
   dotenv::init();
   boost::program_options::options_description program_description(
       "Allowed options");
@@ -41,7 +43,7 @@ int run(int argc, const char *argv[]) {
   store(parse_command_line(argc, argv, commandline_description), vm);
 
   if (vm.contains("help")) {
-    std::cout << commandline_description << std::endl;
+    //    std::cout << commandline_description << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -71,8 +73,7 @@ int run(int argc, const char *argv[]) {
     ctx.use_tmp_dh_file(
         dotenv::getenv("APP_DH_PARAMS", "./certificates/params.pem"));
 
-    auto task_group =
-        boost::make_shared<components::task_group>(ioc.get_executor());
+    auto _task_group = boost::make_shared<task_group>(ioc.get_executor());
 
     boost::mysql::pool_params database_params;
     database_params.server_address.emplace_host_and_port(
@@ -90,26 +91,26 @@ int run(int argc, const char *argv[]) {
     auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
         ioc, std::move(database_params));
 
-    auto state = boost::make_shared<components::state>(database_pool);
+    auto _state = boost::make_shared<state>(database_pool);
 
-    state->get_database()->start();
+    _state->get_database()->start();
 
-    state->get_http_router()
-        ->push(components::http_method::get, "/api/user",
-               boost::make_shared<copper::controllers::user_controller>(),
+    _state->get_http_router()
+        ->push(http_method::get, "/api/user",
+               boost::make_shared<controllers::user_controller>(),
                {
                    .use_auth = true,
                    .use_throttler = true,
                    .rpm = 5,
                })
-        ->push(components::http_method::get, "/api/up",
-               boost::make_shared<copper::controllers::up_controller>(),
+        ->push(http_method::get, "/api/up",
+               boost::make_shared<controllers::up_controller>(),
                {
                    .use_throttler = true,
                    .rpm = 5,
                })
-        ->push(components::http_method::post, "/api/auth",
-               boost::make_shared<copper::controllers::auth_controller>(),
+        ->push(http_method::post, "/api/auth",
+               boost::make_shared<controllers::auth_controller>(),
                {
                    .use_throttler = true,
                    .use_validator = true,
@@ -118,22 +119,22 @@ int run(int argc, const char *argv[]) {
 
     boost::asio::co_spawn(
         boost::asio::make_strand(ioc),
-        components::listener(state, task_group, ctx, endpoint, doc_root),
-        task_group->adapt([](std::exception_ptr e) {
+        listener(_state, _task_group, ctx, endpoint, doc_root),
+        _task_group->adapt([](std::exception_ptr e) {
           if (e) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
-              std::cerr << "Error in listener: " << e.what() << "\n";
+              //              std::cerr << "Error in listener: " << e.what() <<
+              //              "\n";
             }
           }
         }));
 
     boost::asio::co_spawn(boost::asio::make_strand(ioc),
-                          components::signal_handler(task_group),
-                          boost::asio::detached);
+                          signal_handler(_task_group), boost::asio::detached);
 
-    std::vector<std::thread> v;
+    containers::vector_of<std::thread> v;
     v.reserve(threads - 1);
     for (auto i = threads - 1; i > 0; --i)
       v.emplace_back([&ioc] { ioc.run(); });
@@ -146,10 +147,10 @@ int run(int argc, const char *argv[]) {
     const auto command = vm["command"].as<std::string>();
 
     if (command == "keygen") {
-      auto key = components::cipher_generate_aes_key_iv();
+      auto key = cipher_generate_aes_key_iv();
 
-      fmt::print("APP_KEY={}\n", components::base64_encode(key.first));
-      fmt::print("APP_KEY_IV={}\n", components::base64_encode(key.second));
+      fmt::print("APP_KEY={}\n", base64_encode(key.first));
+      fmt::print("APP_KEY_IV={}\n", base64_encode(key.second));
     }
 
     return EXIT_SUCCESS;

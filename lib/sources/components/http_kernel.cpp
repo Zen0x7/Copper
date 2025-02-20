@@ -52,10 +52,9 @@ containers::vector_of<http_method> http_kernel::get_available_methods(
 }
 // LCOV_EXCL_STOP
 
-boost::asio::awaitable<
+containers::async_of<
     std::tuple<shared<copper::models::request>,
-               shared<copper::models::response>, http_response_generic>,
-    boost::asio::strand<boost::asio::io_context::executor_type> >
+               shared<copper::models::response>, http_response_generic>>
 http_kernel::invoke(uuid session_id, boost::beast::string_view,
                     const http_request &request, const std::string &ip,
                     const uuid &request_id, long now) const {
@@ -143,7 +142,7 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
     }
 
     try {
-      auto _http_response = route.value().controller_->invoke(request);
+      auto _http_response = co_await route.value().controller_->invoke(request);
       auto _response = copper::models::response_from_http_response(
           session_id, _request, _http_response);
       co_return std::make_tuple(_request, _response, _http_response);

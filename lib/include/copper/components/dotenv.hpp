@@ -41,7 +41,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <functional>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 
 ///
@@ -259,7 +259,7 @@ inline std::string dotenv::trim_copy(std::string s) {
 /// \returns pair with <resolved, true> if ok, or <partial, false> if error
 ///
 inline std::pair<std::string, bool> dotenv::resolve_vars(
-    size_t iline, const std::string& str) {
+    size_t /* iline */, const std::string& str) {
   std::string resolved;
 
   size_t pos = 0;
@@ -302,8 +302,9 @@ inline std::pair<std::string, bool> dotenv::resolve_vars(
           nvar--;  // decrement to indicate variable resolved
         } else {
           // could not resolve the variable, so don't decrement
-          std::cout << "dotenv: Variable " << var << " is not defined on line "
-                    << iline << std::endl;
+          //          std::cout << "dotenv: Variable " << var << " is not
+          //          defined on line "
+          //                    << iline << std::endl;
         }
 
         // skip end tag
@@ -337,8 +338,9 @@ inline void dotenv::do_init(int flags, const char* filename) {
       const auto pos = line.find("=");
 
       if (pos == std::string::npos) {
-        std::cout << "dotenv: Ignoring ill-formed assignment on line " << i
-                  << ": '" << line << "'" << std::endl;
+        //        std::cout << "dotenv: Ignoring ill-formed assignment on line "
+        //        << i
+        //                  << ": '" << line << "'" << std::endl;
       } else {
         auto name = trim_copy(line.substr(0, pos));
         auto line_stripped = strip_quotes(trim_copy(line.substr(pos + 1)));
@@ -347,8 +349,9 @@ inline void dotenv::do_init(int flags, const char* filename) {
         auto p = resolve_vars(i, line_stripped);
         bool ok = p.second;
         if (!ok) {
-          std::cout << "dotenv: Ignoring ill-formed assignment on line " << i
-                    << ": '" << line << "'" << std::endl;
+          //          std::cout << "dotenv: Ignoring ill-formed assignment on
+          //          line " << i
+          //                    << ": '" << line << "'" << std::endl;
         } else {
           // variable resolved ok, set as environment variable
           const auto& val = p.first;

@@ -12,6 +12,7 @@
 #include <boost/beast/core/error.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <copper/components/chronos.hpp>
+#include <copper/components/containers.hpp>
 #include <copper/components/http_header.hpp>
 #include <copper/components/http_kernel.hpp>
 #include <copper/components/report.hpp>
@@ -32,11 +33,9 @@ namespace copper::components {
  * @return
  */
 template <typename Stream>
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type> >
-http_session_run(shared<state> state, uuid session_id, Stream &stream,
-                 boost::beast::flat_buffer &buffer,
-                 boost::beast::string_view doc_root) {
+containers::async_of<void> http_session_run(
+    shared<state> state, uuid session_id, Stream &stream,
+    boost::beast::flat_buffer &buffer, boost::beast::string_view doc_root) {
   auto cs = co_await boost::asio::this_coro::cancellation_state;
   auto executor = co_await boost::asio::this_coro::executor;
 

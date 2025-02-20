@@ -16,6 +16,7 @@
 #include <cstdint>
 
 namespace copper::models {
+
 class response : public components::shared_enabled<response> {
  public:
   std::string id_;

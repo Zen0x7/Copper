@@ -14,21 +14,10 @@ namespace copper::components {
 
 void database::start() { pool_->async_run(boost::asio::detached); }
 
-/**
- * Find user by email
- *
- * @param email
- * @return
- */
-containers::optional_of<shared<copper::models::user>>
+containers::async_of<containers::optional_of<shared<copper::models::user>>>
 database::get_user_by_email(const std::string &email) {
-  std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
-
-  auto connection =
-      pool_
-          ->async_get_connection(boost::mysql::with_diagnostics(
-              boost::asio::cancel_after(timeout, boost::asio::use_future)))
-          .get();
+  auto connection = co_await pool_->async_get_connection(
+      boost::asio::cancel_after(std::chrono::seconds(10)));
 
   boost::mysql::results result;
 
@@ -41,12 +30,12 @@ database::get_user_by_email(const std::string &email) {
   connection->close();
 
   if (result.rows().empty()) {
-    return boost::none;
+    co_return boost::none;
   }
 
   const auto &row = result.rows().at(0);
 
-  return boost::make_shared<copper::models::user>(
+  co_return boost::make_shared<copper::models::user>(
       row.at(0).as_string(), std::string(row.at(1).as_string()), email,
       row.at(2).as_string(),
       row.at(3).is_null()
@@ -63,20 +52,10 @@ database::get_user_by_email(const std::string &email) {
 database::database(const shared<boost::mysql::connection_pool> &pool)
     : pool_(pool) {}
 
-/**
- * Find existing user by id
- *
- * @param id
- * @return
- */
-shared<copper::models::user> database::get_user_by_id(uuid id) {
-  std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
-
-  auto connection =
-      pool_
-          ->async_get_connection(boost::mysql::with_diagnostics(
-              boost::asio::cancel_after(timeout, boost::asio::use_future)))
-          .get();
+containers::async_of<shared<copper::models::user>> database::get_user_by_id(
+    uuid id) {
+  auto connection = co_await pool_->async_get_connection(
+      boost::asio::cancel_after(std::chrono::seconds(10)));
 
   boost::mysql::results result;
 
@@ -91,7 +70,7 @@ shared<copper::models::user> database::get_user_by_id(uuid id) {
 
   connection->close();
 
-  return boost::make_shared<copper::models::user>(
+  co_return boost::make_shared<copper::models::user>(
       to_string(id), row.at(1).as_string(), row.at(2).as_string(),
       row.at(3).as_string(),
       row.at(4).is_null()
@@ -105,9 +84,9 @@ shared<copper::models::user> database::get_user_by_id(uuid id) {
           : chronos::to_timestamp(row.at(6).as_datetime().as_time_point()));
 }
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-database::create_session(uuid session_id, std::string ip, uint_least16_t port) {
+containers::async_of<void> database::create_session(uuid session_id,
+                                                    std::string ip,
+                                                    uint_least16_t port) {
   auto now = chronos::now();
 
   auto connection = co_await pool_->async_get_connection(
@@ -124,9 +103,8 @@ database::create_session(uuid session_id, std::string ip, uint_least16_t port) {
   connection->close();
 }
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-database::session_closed(uuid session_id, const char exception[]) {
+containers::async_of<void> database::session_closed(uuid session_id,
+                                                    const char exception[]) {
   auto now = chronos::now();
 
   auto connection = co_await pool_->async_get_connection(
@@ -142,9 +120,7 @@ database::session_closed(uuid session_id, const char exception[]) {
   connection->close();
 }
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-database::session_is_encrypted(uuid session_id) {
+containers::async_of<void> database::session_is_encrypted(uuid session_id) {
   auto connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
   ;
@@ -159,9 +135,7 @@ database::session_is_encrypted(uuid session_id) {
   connection->close();
 }
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-database::session_is_upgrade(uuid session_id) {
+containers::async_of<void> database::session_is_upgrade(uuid session_id) {
   std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
 
   auto connection = co_await pool_->async_get_connection(
@@ -177,10 +151,9 @@ database::session_is_upgrade(uuid session_id) {
   connection->close();
 }
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-database::create_request(shared<copper::models::request> request,
-                         shared<copper::models::response> response) {
+containers::async_of<void> database::create_request(
+    shared<copper::models::request> request,
+    shared<copper::models::response> response) {
   auto connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
 

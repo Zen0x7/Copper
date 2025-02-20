@@ -8,7 +8,7 @@
 
 namespace copper::components {
 
-class validator : public std::enable_shared_from_this<validator> {
+class validator : public shared_enabled<validator> {
  public:
   /**
    * Errors container

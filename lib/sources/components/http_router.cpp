@@ -1,6 +1,7 @@
 #include <copper/components/http_router.hpp>
 
 namespace copper::components {
+
 http_route http_router::factory(http_method method, const char *path) {
   std::string route(path);
 
