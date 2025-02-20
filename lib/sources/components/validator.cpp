@@ -2,6 +2,9 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <copper/components/validator.hpp>
+#include <copper/components/shared.hpp>
+#include <copper/components/containers.hpp>
+#include <copper/components/json.hpp>
 
 namespace copper::components {
 
@@ -12,9 +15,9 @@ void validator::insert_or_push(const std::string &key,
   this->errors.at(key).as_array().emplace_back(message);
 }
 
-boost::shared_ptr<validator> validator_make(
-    const std::map<std::string, std::string> &rules,
-    const boost::json::value &value) {
+shared<validator> validator_make(
+    const containers::map_of_strings &rules,
+    const json::value &value) {
   auto response = boost::make_shared<validator>();
 
   for (auto &rule : rules) {
@@ -29,7 +32,7 @@ boost::shared_ptr<validator> validator_make(
         std::string error_message = "Attribute " + rule.first + " is required.";
         response->insert_or_push(rule.first, error_message);
       } else {
-        std::vector<std::string> scoped_rules;
+        containers::vector_of<std::string> scoped_rules;
 
         size_t start = 0;
         size_t end = rule.second.find(",");

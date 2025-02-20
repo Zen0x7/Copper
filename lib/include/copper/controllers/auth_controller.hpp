@@ -7,6 +7,7 @@
 #include <copper/components/json.hpp>
 
 namespace copper::controllers {
+
 class auth_controller final : public copper::components::http_controller {
  public:
   copper::components::containers::map_of_strings rules() const override {

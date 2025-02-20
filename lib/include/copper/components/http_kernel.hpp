@@ -12,6 +12,7 @@
 #include <boost/asio/strand.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/http_request.hpp>
+#include <copper/components/http_response.hpp>
 #include <copper/components/http_response_generic.hpp>
 #include <copper/components/http_route.hpp>
 #include <copper/components/normalized_path.hpp>

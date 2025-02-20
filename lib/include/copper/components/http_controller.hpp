@@ -16,9 +16,6 @@
 #include <copper/components/json.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
-#include <iostream>
-#include <map>
-#include <unordered_map>
 
 namespace copper::components {
 class state;
