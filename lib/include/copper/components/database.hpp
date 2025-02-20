@@ -23,10 +23,15 @@ class database : public shared_enabled<database> {
 
   void start();
 
-  containers::optional_of<shared<copper::models::user>> get_user_by_email(
-      const std::string &email);
+  boost::asio::awaitable<
+      containers::optional_of<shared<copper::models::user>>,
+      boost::asio::strand<boost::asio::io_context::executor_type>>
+  get_user_by_email(const std::string &email);
 
-  shared<copper::models::user> get_user_by_id(uuid id);
+  boost::asio::awaitable<
+      shared<copper::models::user>,
+      boost::asio::strand<boost::asio::io_context::executor_type>>
+  get_user_by_id(uuid id);
 
   boost::asio::awaitable<
       void, boost::asio::strand<boost::asio::io_context::executor_type>>
@@ -39,6 +44,7 @@ class database : public shared_enabled<database> {
   boost::asio::awaitable<
       void, boost::asio::strand<boost::asio::io_context::executor_type>>
   session_is_encrypted(uuid session_id);
+
   boost::asio::awaitable<
       void, boost::asio::strand<boost::asio::io_context::executor_type>>
   session_is_upgrade(uuid session_id);

@@ -22,7 +22,7 @@
 using namespace copper::components;
 
 boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type> >
+    void, boost::asio::strand<boost::asio::io_context::executor_type>>
 cancel_http_sessions() {
   auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
@@ -30,28 +30,34 @@ cancel_http_sessions() {
 
 class exception_controller final : public http_controller {
  public:
-  http_response invoke(const http_request &request) override {
+  boost::asio::awaitable<
+      copper::components::http_response,
+      boost::asio::strand<boost::asio::io_context::executor_type>>
+  invoke(const http_request &request) override {
     throw std::runtime_error("Something went wrong");
     auto now = chronos::now();
     const json::object data = {{"message", "Request has been processed."},
                                {"data", "pong"},
                                {"timestamp", now},
                                {"status", 200}};
-    return response(request, http_status_code::ok, serialize(data),
-                    "application/json");
+    co_return response(request, http_status_code::ok, serialize(data),
+                       "application/json");
   }
 };
 
 class params_controller final : public http_controller {
  public:
-  http_response invoke(const http_request &request) override {
+  boost::asio::awaitable<
+      copper::components::http_response,
+      boost::asio::strand<boost::asio::io_context::executor_type>>
+  invoke(const http_request &request) override {
     auto now = chronos::now();
     const json::object data = {{"message", "Request has been processed."},
                                {"data", this->bindings_.at("name")},
                                {"timestamp", now},
                                {"status", 200}};
-    return response(request, http_status_code::ok, serialize(data),
-                    "application/json");
+    co_return response(request, http_status_code::ok, serialize(data),
+                       "application/json");
   }
 };
 

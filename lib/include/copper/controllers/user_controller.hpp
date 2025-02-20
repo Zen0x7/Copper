@@ -8,9 +8,11 @@
 namespace copper::controllers {
 class user_controller final : public copper::components::http_controller {
  public:
-  copper::components::http_response invoke(
-      const copper::components::http_request &request) override {
-    auto _user = state_->get_database()->get_user_by_id(auth_id_);
+  boost::asio::awaitable<
+      copper::components::http_response,
+      boost::asio::strand<boost::asio::io_context::executor_type>>
+  invoke(const copper::components::http_request &request) override {
+    auto _user = co_await state_->get_database()->get_user_by_id(auth_id_);
 
     const copper::components::json::object data = {
         {"id", _user->id_},
@@ -21,8 +23,8 @@ class user_controller final : public copper::components::http_controller {
         {"updated_at", _user->updated_at_},
     };
 
-    return response(request, copper::components::http_status_code::ok,
-                    serialize(data), "application/json");
+    co_return response(request, copper::components::http_status_code::ok,
+                       serialize(data), "application/json");
   }
 };
 

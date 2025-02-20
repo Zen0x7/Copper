@@ -143,7 +143,7 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
     }
 
     try {
-      auto _http_response = route.value().controller_->invoke(request);
+      auto _http_response = co_await route.value().controller_->invoke(request);
       auto _response = copper::models::response_from_http_response(
           session_id, _request, _http_response);
       co_return std::make_tuple(_request, _response, _http_response);
