@@ -11,10 +11,14 @@
 
 #include <copper/components/report.hpp>
 #include <copper/components/websocket_session.hpp>
+
 #include <copper/components/http_kernel.hpp>
+#include <copper/components/http_header.hpp>
+
 #include <copper/components/chronos.hpp>
 #include <app/models/session.hpp>
 #include <app/models/request.hpp>
+#include <app/models/response.hpp>
 #include <boost/beast/core/error.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/asio/co_spawn.hpp>
@@ -85,19 +89,19 @@ namespace copper::components {
 
         std::string ip = boost::beast::get_lowest_layer(stream).socket().remote_endpoint().address().to_string();
 
-        auto [_request, res] = co_await kernel->invoke(session, doc_root, parser.release(), ip, request_id, start_at);
+        auto [_request, _response, res] = co_await kernel->invoke(session, doc_root, parser.release(), ip, request_id, start_at);
 
         _request->finished_at_ = chronos::now();
         _request->duration_ = _request->finished_at_ - start_at;
 
         if (!res.keep_alive()) {
           co_await boost::beast::async_write(stream, std::move(res));
-          co_await state->get_database()->create_request(_request);
+          co_await state->get_database()->create_request(_request, _response);
           co_return;
         }
 
         co_await boost::beast::async_write(stream, std::move(res));
-        co_await state->get_database()->create_request(_request);
+        co_await state->get_database()->create_request(_request, _response);
       }
     }
 

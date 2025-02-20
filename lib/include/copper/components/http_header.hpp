@@ -3,19 +3,11 @@
 #include <string>
 
 #include <copper/components/http_request.hpp>
+#include <copper/components/http_response.hpp>
 #include <copper/components/json.hpp>
 
 namespace copper::components {
-    std::string http_header_from_request(const http_request & request) {
-      json::object headers;
-      for (const auto& header : request.base()) {
-        if (header.name_string() != "Authorization") {
-          headers[header.name_string()] = header.value();
-        } else {
-          headers[header.name_string()] = "***";
-        }
-      }
+    std::string http_header_from_request(const http_request & request);
 
-      return serialize(headers);
-    }
+    std::string http_header_from_response(const http_response & response);
 }

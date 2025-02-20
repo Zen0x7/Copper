@@ -24,6 +24,7 @@
 #include <copper/components/http_header.hpp>
 
 #include <app/models/request.hpp>
+#include <app/models/response.hpp>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/json/parse.hpp>
@@ -51,10 +52,11 @@ namespace copper::components {
         if (auto [matches, bindings] = http_route_find(request.target(), route); matches)
           methods.push_back(route.method_);
       }
-      return methods; }
+      return methods;
+    }
 
     boost::asio::awaitable<
-      std::pair<shared<app::models::request>, http_response_generic>,
+      std::tuple<shared<app::models::request>, shared<app::models::response>, http_response_generic>,
       boost::asio::strand<
         boost::asio::io_context::executor_type
       >
@@ -90,7 +92,9 @@ namespace copper::components {
         if (route.value().controller_->config_.use_throttler) {
           if (auto [can, TTL] = co_await state_->get_cache()->can_invoke(request, ip,
                                                                          route.value().controller_->config_.rpm); !can) {
-            co_return std::make_pair(_request, http_response_too_many_requests(request, now, TTL));
+            auto _http_response = http_response_too_many_requests(request, now, TTL);
+            auto _response = app::models::response_from_http_response(session, _request, _http_response);
+            co_return std::make_tuple(_request, _response, _http_response);
           }
         }
 
@@ -102,7 +106,11 @@ namespace copper::components {
           boost::optional<authentication_result> user_id;
           user_id = authentication_from_bearer(bearer, dotenv::getenv("APP_KEY"));
 
-          if (!user_id.has_value()) co_return std::make_pair(_request, http_response_unauthorized(request, now));
+          if (!user_id.has_value()) {
+            auto _http_response = http_response_unauthorized(request, now);
+            auto _response = app::models::response_from_http_response(session, _request, _http_response);
+            co_return std::make_tuple(_request, _response, _http_response);
+          };
 
           route.value().controller_->set_user(user_id.get().id);
         }
@@ -112,50 +120,63 @@ namespace copper::components {
 
         if (route.value().controller_->config_.use_validator) {
           boost::system::error_code json_parse_error_code;
-          boost::json::value value = boost::json::parse(request.body(), json_parse_error_code);
+          json::value value = boost::json::parse(request.body(), json_parse_error_code);
 
           if (!json_parse_error_code) {
             route.value().controller_->set_data(value);
             auto rules = route.value().controller_->rules();
 
             if (auto validator = validator_make(rules, value); !validator->success) {
-              auto error_response = boost::json::object(
+              auto error_response = json::object(
                 {{"message", "The given data was invalid."},
                  {"errors",  validator->errors}});
 
-              co_return std::make_pair(_request, route.value().controller_->response(
+              auto _http_response = route.value().controller_->response(
                 request, http_status_code::unprocessable_entity,
-                serialize(error_response), "application/json"));
+                serialize(error_response), "application/json");
+              auto _response = app::models::response_from_http_response(session, _request, _http_response);
+              co_return std::make_tuple(_request, _response, _http_response);
             }
           } else {
             auto error_response
-              = boost::json::object({{"message", "The given data was invalid."},
-                                     {"errors",  {{"*", "The body must be a valid JSON."}}}});
+              = json::object({{"message", "The given data was invalid."},
+                              {"errors",  {{"*", "The body must be a valid JSON."}}}});
 
-            co_return std::make_pair(_request, route.value().controller_->response(
+            auto _http_response = route.value().controller_->response(
               request, http_status_code::unprocessable_entity, serialize(error_response),
-              "application/json"));
+              "application/json");
+
+            auto _response = app::models::response_from_http_response(session, _request, _http_response);
+            co_return std::make_tuple(_request, _response, _http_response);
           }
         }
 
         try {
-          co_return std::make_pair(_request, route.value().controller_->invoke(request));
+          auto _http_response = route.value().controller_->invoke(request);
+          auto _response = app::models::response_from_http_response(session, _request, _http_response);
+          co_return std::make_tuple(_request, _response, _http_response);
         } catch (std::exception &exception) {
-          std::cout << exception.what() << std::endl;
-
-          co_return std::make_pair(_request, http_response_exception(request, now));
+          auto _http_response = http_response_exception(request, now);
+          auto _response = app::models::response_from_http_response(session, _request, _http_response);
+          co_return std::make_tuple(_request, _response, _http_response);
         }
       }
 
       if (request.method() == http_method::options) {
         auto available_verbs = get_available_methods(request);
-        co_return std::make_pair(_request, http_response_cors(request, now, available_verbs));
+        auto _http_response = http_response_cors(request, now, available_verbs);
+        auto _response = app::models::response_from_http_response(session, _request, _http_response);
+        co_return std::make_tuple(_request, _response, _http_response);
       }
 
       if (http_request_is_illegal(request)) {
-        co_return std::make_pair(_request, http_response_bad_request(request, now));
+        auto _http_response = http_response_bad_request(request, now);
+        auto _response = app::models::response_from_http_response(session, _request, _http_response);
+        co_return std::make_tuple(_request, _response, _http_response);
       }
 
-      co_return std::make_pair(_request, http_response_not_found(request, now));
+      auto _http_response = http_response_not_found(request, now);
+      auto _response = app::models::response_from_http_response(session, _request, _http_response);
+      co_return std::make_tuple(_request, _response, _http_response);
     }
 }
