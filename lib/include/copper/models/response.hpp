@@ -1,3 +1,6 @@
+#ifndef COPPER_MODELS_RESPONSE_HPP
+#define COPPER_MODELS_RESPONSE_HPP
+
 #pragma once
 
 #include <boost/core/span.hpp>
@@ -40,3 +43,5 @@ components::shared<response> response_from_http_response(
     components::uuid session, const components::shared<request> &request,
     const components::http_response &http_response);
 }  // namespace copper::models
+
+#endif

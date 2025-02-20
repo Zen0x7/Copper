@@ -1,3 +1,6 @@
+#ifndef COPPER_MODELS_REQUEST_HPP
+#define COPPER_MODELS_REQUEST_HPP
+
 #pragma once
 
 #include <boost/core/span.hpp>
@@ -40,3 +43,5 @@ class request : public components::shared_enabled<request> {
         duration_(duration) {}
 };
 }  // namespace copper::models
+
+#endif

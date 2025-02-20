@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_HTTP_CONTROLLER_HPP
+#define COPPER_COMPONENTS_HTTP_CONTROLLER_HPP
+
 #pragma once
 
 #include <boost/asio/awaitable.hpp>
@@ -59,3 +62,5 @@ class http_controller : public shared_enabled<http_controller> {
                          const char *type = "text/html") const;
 };
 }  // namespace copper::components
+
+#endif

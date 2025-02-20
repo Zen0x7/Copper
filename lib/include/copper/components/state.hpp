@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_STATE_HPP
+#define COPPER_COMPONENTS_STATE_HPP
+
 #pragma once
 
 #include <copper/components/cache.hpp>
@@ -20,3 +23,5 @@ class state : public shared_enabled<state> {
   shared<database> get_database();
 };
 }  // namespace copper::components
+
+#endif

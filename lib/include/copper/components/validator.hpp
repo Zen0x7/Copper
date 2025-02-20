@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_VALIDATOR_HPP
+#define COPPER_COMPONENTS_VALIDATOR_HPP
+
 #pragma once
 
 #include <copper/components/containers.hpp>
@@ -45,3 +48,5 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
                                  const json::value &value);
 
 }  // namespace copper::components
+
+#endif

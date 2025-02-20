@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_HTTP_ROUTER_HPP
+#define COPPER_COMPONENTS_HTTP_ROUTER_HPP
+
 #pragma once
 
 #include <copper/components/containers.hpp>
@@ -24,3 +27,5 @@ class http_router : public shared_enabled<http_router> {
   static http_route factory(http_method method, const char* path);
 };
 }  // namespace copper::components
+
+#endif

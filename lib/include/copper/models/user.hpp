@@ -1,3 +1,6 @@
+#ifndef COPPER_MODELS_USER_HPP
+#define COPPER_MODELS_USER_HPP
+
 #pragma once
 
 #include <boost/core/span.hpp>
@@ -32,3 +35,5 @@ class user : public components::shared_enabled<user> {
         updated_at_(updated_at) {}
 };
 }  // namespace copper::models
+
+#endif

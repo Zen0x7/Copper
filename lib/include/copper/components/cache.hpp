@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_CACHE_HPP
+#define COPPER_COMPONENTS_CACHE_HPP
+
 #pragma once
 
 #include <boost/asio/awaitable.hpp>
@@ -47,3 +50,5 @@ class cache : public shared_enabled<cache> {
                                  const std::string &ip);
 };
 }  // namespace copper::components
+
+#endif

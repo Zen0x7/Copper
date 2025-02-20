@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_DETECT_SESSION_HPP
+#define COPPER_COMPONENTS_DETECT_SESSION_HPP
+
 #pragma once
 
 #include <copper/components/http_session.hpp>
@@ -21,3 +24,5 @@ containers::async_of<void> detect_session(
     boost::asio::ssl::context &ctx, boost::beast::string_view doc_root);
 
 }  // namespace copper::components
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_CIPHER_HPP
+#define COPPER_COMPONENTS_CIPHER_HPP
+
 #pragma once
 
 #include <openssl/err.h>
@@ -65,3 +68,5 @@ bool cipher_password_validator(const std::string &input,
 std::string cipher_password_hash(const std::string &input, int workload = 12);
 
 }  // namespace copper::components
+
+#endif

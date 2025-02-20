@@ -1,3 +1,6 @@
+#ifndef COPPER_CONTROLLERS_AUTH_CONTROLLER_HPP
+#define COPPER_CONTROLLERS_AUTH_CONTROLLER_HPP
+
 #pragma once
 
 #include <boost/lexical_cast.hpp>
@@ -55,3 +58,5 @@ class auth_controller final : public components::http_controller {
 };
 
 }  // namespace copper::controllers
+
+#endif

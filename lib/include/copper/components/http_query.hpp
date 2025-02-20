@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_HTTP_QUERY_HPP
+#define COPPER_COMPONENTS_HTTP_QUERY_HPP
+
 #pragma once
 
 #include <copper/components/containers.hpp>
@@ -53,3 +56,5 @@ std::string http_query_from_request(const http_request &request) {
   return std::string(serialize(object));
 }
 }  // namespace copper::components
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef COPPER_MODELS_SESSION_HPP
+#define COPPER_MODELS_SESSION_HPP
+
 #pragma once
 
 #include <boost/core/span.hpp>
@@ -26,3 +29,5 @@ class session : public components::shared_enabled<session> {
         finished_at_(finished_at) {}
 };
 }  // namespace copper::models
+
+#endif

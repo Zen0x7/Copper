@@ -1,3 +1,6 @@
+#ifndef COPPER_CONTROLLERS_UP_CONTROLLER_HPP
+#define COPPER_CONTROLLERS_UP_CONTROLLER_HPP
+
 #pragma once
 
 #include <copper/components/cipher.hpp>
@@ -17,3 +20,5 @@ class up_controller final : public components::http_controller {
 };
 
 }  // namespace copper::controllers
+
+#endif

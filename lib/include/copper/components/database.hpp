@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_DATABASE_HPP
+#define COPPER_COMPONENTS_DATABASE_HPP
+
 #pragma once
 
 #include <boost/asio/awaitable.hpp>
@@ -44,3 +47,5 @@ class database : public shared_enabled<database> {
       shared<copper::models::response> response);
 };
 }  // namespace copper::components
+
+#endif

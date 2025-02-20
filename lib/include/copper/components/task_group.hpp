@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_TASK_GROUP_HPP
+#define COPPER_COMPONENTS_TASK_GROUP_HPP
+
 #pragma once
 
 #include <boost/asio/append.hpp>
@@ -129,3 +132,5 @@ class task_group : public shared_enabled<task_group> {
 };
 
 }  // namespace copper::components
+
+#endif

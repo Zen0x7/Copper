@@ -1,3 +1,6 @@
+#ifndef COPPER_COMPONENTS_JSON_HPP
+#define COPPER_COMPONENTS_JSON_HPP
+
 #pragma once
 
 #include <boost/json/array.hpp>
@@ -12,3 +15,5 @@ typedef boost::json::object object;
 typedef boost::json::array array;
 typedef boost::json::string string;
 }  // namespace copper::components::json
+
+#endif
