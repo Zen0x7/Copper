@@ -35,8 +35,8 @@ class http_controller : public shared_enabled<http_controller> {
   // LCOV_EXCL_START
   virtual ~http_controller() = default;
 
-  virtual containers::async_of<http_response>
-  invoke(const http_request & /*request*/) {
+  virtual containers::async_of<http_response> invoke(
+      const http_request & /*request*/) {
     http_response response;
     co_return response;
   };

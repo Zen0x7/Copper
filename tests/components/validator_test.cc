@@ -7,7 +7,7 @@
 TEST(Components_Validator, OnSuccess) {
   using namespace copper::components;
 
-  const std::map<std::string, std::string> rules = {
+  const containers::map_of_strings rules = {
       {"*", "is_object"},      {"uuid", "is_uuid"},
       {"string", "is_string"}, {"string", "confirmed"},
       {"number", "is_number"}, {"array_of_strings", "is_array_of_strings"},
@@ -26,7 +26,7 @@ TEST(Components_Validator, OnSuccess) {
 TEST(Components_Validator, OnEmptiness) {
   using namespace copper::components;
 
-  const std::map<std::string, std::string> rules = {
+  const containers::map_of_strings rules = {
       {"*", "is_object"},      {"uuid", "is_uuid"},
       {"string", "is_string"}, {"string", "confirmed"},
       {"number", "is_number"}, {"array_of_strings", "is_array_of_strings"},
@@ -47,7 +47,7 @@ TEST(Components_Validator, OnEmptiness) {
 TEST(Components_Validator, OnErrors) {
   using namespace copper::components;
 
-  const std::map<std::string, std::string> rules = {
+  const containers::map_of_strings rules = {
       {"*", "is_object"},
       {"uuid", "is_string,is_uuid"},
       {"uuid_v4", "is_uuid"},

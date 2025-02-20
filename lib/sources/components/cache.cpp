@@ -1,10 +1,10 @@
 #include <copper/components/cache.hpp>
 
 namespace copper::components {
-boost::asio::awaitable<
-    int, boost::asio::strand<boost::asio::io_context::executor_type>>
-cache::has(const std::string &key,
-           const shared<boost::redis::connection> &connection) {
+
+containers::async_of<int> cache::has(
+    const std::string &key,
+    const shared<boost::redis::connection> &connection) {
   boost::redis::request request;
   boost::redis::response<int> response;
   request.push("EXISTS", key);
@@ -12,10 +12,9 @@ cache::has(const std::string &key,
   co_return std::get<0>(response).value();
 }
 
-boost::asio::awaitable<
-    int64_t, boost::asio::strand<boost::asio::io_context::executor_type>>
-cache::counter_of(const std::string &key,
-                  const shared<boost::redis::connection> &connection) {
+containers::async_of<int64_t> cache::counter_of(
+    const std::string &key,
+    const shared<boost::redis::connection> &connection) {
   boost::redis::request request;
   boost::redis::response<int64_t> response;
   request.push("GET", key);
@@ -23,10 +22,9 @@ cache::counter_of(const std::string &key,
   co_return std::get<0>(response).value();
 }
 
-boost::asio::awaitable<
-    int64_t, boost::asio::strand<boost::asio::io_context::executor_type>>
-cache::get_expiration_of(const std::string &key,
-                         const shared<boost::redis::connection> &connection) {
+containers::async_of<int64_t> cache::get_expiration_of(
+    const std::string &key,
+    const shared<boost::redis::connection> &connection) {
   boost::redis::request request;
   boost::redis::response<int64_t> response;
   request.push("TTL", key);
@@ -34,20 +32,18 @@ cache::get_expiration_of(const std::string &key,
   co_return std::get<0>(response).value();
 }
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-cache::increase(const std::string &key,
-                const shared<boost::redis::connection> &connection) {
+containers::async_of<void> cache::increase(
+    const std::string &key,
+    const shared<boost::redis::connection> &connection) {
   boost::redis::request request;
   boost::redis::response<std::string> response;
   request.push("INCR", key);
   co_await connection->async_exec(request, response, boost::asio::deferred);
 }
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
-cache::set(const std::string &key,
-           const shared<boost::redis::connection> &connection) {
+containers::async_of<void> cache::set(
+    const std::string &key,
+    const shared<boost::redis::connection> &connection) {
   boost::redis::request request;
   boost::redis::response<std::string> response;
   request.push("SET", key, 1, "EX", 60);
@@ -69,11 +65,9 @@ std::string cache::get_key_for(const http_request &request,
   return key;
 }
 
-boost::asio::awaitable<
-    std::tuple<bool, int>,
-    boost::asio::strand<boost::asio::io_context::executor_type>>
-cache::can_invoke(const http_request &request, const std::string &ip,
-                  const int &max_requests) {
+containers::async_of<std::tuple<bool, int>> cache::can_invoke(
+    const http_request &request, const std::string &ip,
+    const int &max_requests) {
   const auto key = get_key_for(request, ip);
   auto connection = co_await this->get_connection();
 
@@ -113,10 +107,7 @@ cache::cache() : config_(boost::make_shared<boost::redis::config>()) {
   config_->clientname = dotenv::getenv("REDIS_CLIENT_NAME", "Copper");
 }
 
-boost::asio::awaitable<
-    shared<boost::redis::connection>,
-    boost::asio::strand<boost::asio::io_context::executor_type>>
-cache::get_connection() {
+containers::async_of<shared<boost::redis::connection>> cache::get_connection() {
   auto conn = boost::make_shared<boost::redis::connection>(
       co_await boost::asio::this_coro::executor);
   conn->async_run(*this->config_, {},

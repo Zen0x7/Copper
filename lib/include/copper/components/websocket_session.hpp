@@ -10,9 +10,9 @@
 #include <boost/beast/ssl/ssl_stream.hpp>
 #include <boost/beast/websocket/stream.hpp>
 #include <boost/scope/scope_exit.hpp>
+#include <copper/components/containers.hpp>
 #include <copper/components/report.hpp>
 #include <copper/components/state.hpp>
-#include <copper/components/containers.hpp>
 
 namespace copper::components {
 /**
@@ -25,10 +25,10 @@ namespace copper::components {
  * @return
  */
 template <typename Stream>
-containers::async_of<void>
-websocket_session_run(shared<state> & /* state */, Stream &stream,
-                      boost::beast::flat_buffer &buffer, http_request req,
-                      boost::beast::string_view) {
+containers::async_of<void> websocket_session_run(
+    shared<state> & /* state */, Stream &stream,
+    boost::beast::flat_buffer &buffer, http_request req,
+    boost::beast::string_view) {
   auto cs = co_await boost::asio::this_coro::cancellation_state;
   auto ws = boost::beast::websocket::stream<Stream &>{stream};
 

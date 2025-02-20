@@ -26,23 +26,21 @@ class database : public shared_enabled<database> {
   containers::async_of<containers::optional_of<shared<copper::models::user>>>
   get_user_by_email(const std::string &email);
 
-  containers::async_of<shared<copper::models::user>>
-  get_user_by_id(uuid id);
+  containers::async_of<shared<copper::models::user>> get_user_by_id(uuid id);
 
-  containers::async_of<void>
-  create_session(uuid session_id, const std::string ip, uint_least16_t port);
+  containers::async_of<void> create_session(uuid session_id,
+                                            const std::string ip,
+                                            uint_least16_t port);
 
-  containers::async_of<void>
-  session_closed(uuid session_id, const char exception[]);
+  containers::async_of<void> session_closed(uuid session_id,
+                                            const char exception[]);
 
-  containers::async_of<void>
-  session_is_encrypted(uuid session_id);
+  containers::async_of<void> session_is_encrypted(uuid session_id);
 
-  containers::async_of<void>
-  session_is_upgrade(uuid session_id);
+  containers::async_of<void> session_is_upgrade(uuid session_id);
 
-  containers::async_of<void>
-  create_request(shared<copper::models::request> request,
-                 shared<copper::models::response> response);
+  containers::async_of<void> create_request(
+      shared<copper::models::request> request,
+      shared<copper::models::response> response);
 };
 }  // namespace copper::components

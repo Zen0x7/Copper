@@ -1,5 +1,8 @@
 #pragma once
 
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/optional.hpp>
 #include <copper/components/shared.hpp>
 #include <map>
@@ -7,9 +10,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/strand.hpp>
-#include <boost/asio/io_context.hpp>
 
 namespace copper::components::containers {
 typedef std::unordered_map<std::string, std::string> unordered_map_of_strings;
@@ -31,5 +31,6 @@ template <typename T>
 using optional_of = boost::optional<T>;
 
 template <typename T>
-using async_of = boost::asio::awaitable<T, boost::asio::strand<boost::asio::io_context::executor_type>>;
+using async_of = boost::asio::awaitable<
+    T, boost::asio::strand<boost::asio::io_context::executor_type>>;
 }  // namespace copper::components::containers

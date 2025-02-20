@@ -2,6 +2,7 @@
 #include <copper/components/state.hpp>
 
 namespace copper::components {
+
 state::state(const shared<boost::mysql::connection_pool>& pool)
     : http_router_(boost::make_shared<http_router>()),
       redis_(boost::make_shared<cache>()),

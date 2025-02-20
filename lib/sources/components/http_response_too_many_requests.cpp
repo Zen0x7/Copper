@@ -6,6 +6,7 @@
 #include <copper/components/http_status_code.hpp>
 
 namespace copper::components {
+
 http_response http_response_too_many_requests(const http_request &request,
                                               long start_at, const int ttl) {
   const auto now = chronos::now();

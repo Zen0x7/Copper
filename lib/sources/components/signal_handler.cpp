@@ -2,9 +2,7 @@
 
 namespace copper::components {
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type> >
-signal_handler(shared<task_group> task_group) {
+containers::async_of<void> signal_handler(shared<task_group> task_group) {
   auto executor = co_await boost::asio::this_coro::executor;
   auto signal_set = boost::asio::signal_set{executor, SIGINT, SIGTERM};
 

@@ -52,10 +52,9 @@ containers::vector_of<http_method> http_kernel::get_available_methods(
 }
 // LCOV_EXCL_STOP
 
-boost::asio::awaitable<
+containers::async_of<
     std::tuple<shared<copper::models::request>,
-               shared<copper::models::response>, http_response_generic>,
-    boost::asio::strand<boost::asio::io_context::executor_type> >
+               shared<copper::models::response>, http_response_generic>>
 http_kernel::invoke(uuid session_id, boost::beast::string_view,
                     const http_request &request, const std::string &ip,
                     const uuid &request_id, long now) const {
