@@ -7,48 +7,41 @@
 #include <copper/components/dotenv.hpp>
 #include <copper/components/http_request.hpp>
 #include <copper/components/shared.hpp>
+#include <copper/components/containers.hpp>
 
 namespace copper::components {
 class cache : public shared_enabled<cache> {
   shared<boost::redis::config> config_;
 
-  boost::asio::awaitable<
-      shared<boost::redis::connection>,
-      boost::asio::strand<boost::asio::io_context::executor_type> >
+  containers::async_of<shared<boost::redis::connection>>
   get_connection();
 
  public:
   cache();
 
-  boost::asio::awaitable<
-      std::tuple<bool, int>,
-      boost::asio::strand<boost::asio::io_context::executor_type> >
+  containers::async_of<std::tuple<bool, int>>
   can_invoke(const http_request &request, const std::string &ip,
              const int &max_requests);
 
  private:
-  static boost::asio::awaitable<
-      int, boost::asio::strand<boost::asio::io_context::executor_type> >
+
+  static containers::async_of<int>
   has(const std::string &key,
       const shared<boost::redis::connection> &connection);
 
-  static boost::asio::awaitable<
-      int64_t, boost::asio::strand<boost::asio::io_context::executor_type> >
+  static containers::async_of<int64_t>
   counter_of(const std::string &key,
              const shared<boost::redis::connection> &connection);
 
-  static boost::asio::awaitable<
-      int64_t, boost::asio::strand<boost::asio::io_context::executor_type> >
+  static containers::async_of<int64_t>
   get_expiration_of(const std::string &key,
                     const shared<boost::redis::connection> &connection);
 
-  static boost::asio::awaitable<
-      void, boost::asio::strand<boost::asio::io_context::executor_type> >
+  static containers::async_of<void>
   increase(const std::string &key,
            const shared<boost::redis::connection> &connection);
 
-  static boost::asio::awaitable<
-      void, boost::asio::strand<boost::asio::io_context::executor_type> >
+  static containers::async_of<void>
   set(const std::string &key,
       const shared<boost::redis::connection> &connection);
 

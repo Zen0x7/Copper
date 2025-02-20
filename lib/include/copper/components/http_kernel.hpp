@@ -48,10 +48,8 @@ class http_kernel : public shared_enabled<http_kernel> {
   containers::vector_of<http_method> get_available_methods(
       const http_request &request) const;
 
-  boost::asio::awaitable<
-      std::tuple<shared<copper::models::request>,
-                 shared<copper::models::response>, http_response_generic>,
-      boost::asio::strand<boost::asio::io_context::executor_type> >
+  containers::async_of<std::tuple<shared<copper::models::request>,
+    shared<copper::models::response>, http_response_generic>>
   invoke(uuid session_id, boost::beast::string_view /* root */,
          const http_request &request, const std::string &ip,
          const uuid &request_id, long now) const;

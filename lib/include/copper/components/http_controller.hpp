@@ -35,9 +35,7 @@ class http_controller : public shared_enabled<http_controller> {
   // LCOV_EXCL_START
   virtual ~http_controller() = default;
 
-  virtual boost::asio::awaitable<
-      http_response,
-      boost::asio::strand<boost::asio::io_context::executor_type>>
+  virtual containers::async_of<http_response>
   invoke(const http_request & /*request*/) {
     http_response response;
     co_return response;

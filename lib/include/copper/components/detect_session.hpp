@@ -13,8 +13,7 @@ namespace copper::components {
  * @param doc_root
  * @return boost::asio::awaitable<T, U> Callback
  */
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type> >
+containers::async_of<void>
 detect_session(
     shared<state> state, uuid session_id,
     typename boost::beast::tcp_stream::rebind_executor<

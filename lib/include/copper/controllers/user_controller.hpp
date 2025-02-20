@@ -8,9 +8,7 @@
 namespace copper::controllers {
 class user_controller final : public copper::components::http_controller {
  public:
-  boost::asio::awaitable<
-      copper::components::http_response,
-      boost::asio::strand<boost::asio::io_context::executor_type>>
+  copper::components::containers::async_of<copper::components::http_response>
   invoke(const copper::components::http_request &request) override {
     auto _user = co_await state_->get_database()->get_user_by_id(auth_id_);
 

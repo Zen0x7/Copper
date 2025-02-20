@@ -12,6 +12,7 @@
 #include <boost/scope/scope_exit.hpp>
 #include <copper/components/report.hpp>
 #include <copper/components/state.hpp>
+#include <copper/components/containers.hpp>
 
 namespace copper::components {
 /**
@@ -24,8 +25,7 @@ namespace copper::components {
  * @return
  */
 template <typename Stream>
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type> >
+containers::async_of<void>
 websocket_session_run(shared<state> & /* state */, Stream &stream,
                       boost::beast::flat_buffer &buffer, http_request req,
                       boost::beast::string_view) {

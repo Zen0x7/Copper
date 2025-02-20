@@ -2,12 +2,12 @@
 
 #include <copper/components/detect_session.hpp>
 #include <copper/components/task_group.hpp>
+#include <copper/components/containers.hpp>
 
 namespace copper::components {
 class state;
 
-boost::asio::awaitable<
-    void, boost::asio::strand<boost::asio::io_context::executor_type>>
+containers::async_of<void>
 listener(shared<state> state, shared<task_group> task_group,
          boost::asio::ssl::context &ctx,
          boost::asio::ip::tcp::endpoint endpoint,

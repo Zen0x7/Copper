@@ -7,9 +7,7 @@
 namespace copper::controllers {
 class up_controller final : public copper::components::http_controller {
  public:
-  boost::asio::awaitable<
-      copper::components::http_response,
-      boost::asio::strand<boost::asio::io_context::executor_type>>
+  copper::components::containers::async_of<copper::components::http_response>
   invoke(const copper::components::http_request &request) override {
     auto now = copper::components::chronos::now();
     const copper::components::json::object data = {{"timestamp", now}};
