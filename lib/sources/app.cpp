@@ -133,7 +133,7 @@ int run(int argc, const char *argv[]) {
                           components::signal_handler(task_group),
                           boost::asio::detached);
 
-    std::vector<std::thread> v;
+    copper::components::containers::vector_of<std::thread> v;
     v.reserve(threads - 1);
     for (auto i = threads - 1; i > 0; --i)
       v.emplace_back([&ioc] { ioc.run(); });

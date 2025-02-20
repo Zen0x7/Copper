@@ -2,14 +2,12 @@
 
 namespace copper::components {
 expression_result::expression_result(
-    const bool matches,
-    const std::unordered_map<std::string, std::string> &bindings)
+    const bool matches, const containers::unordered_map_of_strings &bindings)
     : matches_(matches), bindings_(bindings) {}
 
 bool expression_result::matches() const { return matches_; }
 
-std::unordered_map<std::string, std::string> expression_result::get_bindings()
-    const {
+containers::unordered_map_of_strings expression_result::get_bindings() const {
   return bindings_;
 }
 
@@ -25,18 +23,17 @@ std::string expression_result::get(const std::string &name) const {
 // LCOV_EXCL_STOP
 
 expression::expression(std::string regex,
-                       const std::vector<std::string> &arguments)
+                       const containers::vector_of<std::string> &arguments)
     : regex_(std::move(regex)), arguments_(arguments) {}
 
-std::vector<std::string> expression::get_arguments() const {
+containers::vector_of<std::string> expression::get_arguments() const {
   return arguments_;
 }
 
 std::string expression::get_regex() const { return regex_; }
 
-boost::shared_ptr<expression_result> expression::query(
-    const std::string &input) const {
-  std::unordered_map<std::string, std::string> _bindings;
+shared<expression_result> expression::query(const std::string &input) const {
+  containers::unordered_map_of_strings _bindings;
   const std::regex _pattern(regex_);
   bool _matches = false;
   if (std::smatch _match; std::regex_match(input, _match, _pattern)) {
@@ -51,12 +48,12 @@ boost::shared_ptr<expression_result> expression::query(
   return boost::make_shared<expression_result>(_matches, _bindings);
 }
 
-boost::shared_ptr<expression> expression_make(const std::string &input) {
+shared<expression> expression_make(const std::string &input) {
   std::size_t _open = input.find('{');
   std::size_t _close = input.find('}');
   std::size_t _position = 0;
 
-  std::vector<std::string> _arguments;
+  containers::vector_of<std::string> _arguments;
   std::string _regex;
 
   if (_open == std::string::npos && _close == std::string::npos)
