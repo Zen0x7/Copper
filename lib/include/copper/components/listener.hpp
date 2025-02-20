@@ -4,15 +4,13 @@
 #include <copper/components/task_group.hpp>
 
 namespace copper::components {
-    class state;
+class state;
 
-    boost::asio::awaitable<void, boost::asio::strand<boost::asio::io_context::executor_type>>
-    listener(
-            shared<state> state,
-            shared<task_group> task_group,
-            boost::asio::ssl::context &ctx,
-            boost::asio::ip::tcp::endpoint endpoint,
-            boost::beast::string_view doc_root
-    );
+boost::asio::awaitable<
+    void, boost::asio::strand<boost::asio::io_context::executor_type>>
+listener(shared<state> state, shared<task_group> task_group,
+         boost::asio::ssl::context &ctx,
+         boost::asio::ip::tcp::endpoint endpoint,
+         boost::beast::string_view doc_root);
 
-} // namespace copper::component
+}  // namespace copper::components

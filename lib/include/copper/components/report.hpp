@@ -8,10 +8,9 @@
 //
 // Official repository: https://github.com/boostorg/beast
 
-
 #include <boost/beast/core/error.hpp>
-#include <iostream>
 #include <boost/stacktrace.hpp>
+#include <iostream>
 
 #ifndef BOOST_STACKTRACE_USE_BACKTRACE
 #define BOOST_STACKTRACE_USE_BACKTRACE
@@ -19,20 +18,17 @@
 
 namespace copper::components {
 
-    /**
-     * Report
-     *
-     * @param ec
-     * @param what
-     */
-    void report(
-            boost::beast::error_code ec,
-            char const *what
-    );
+/**
+ * Report
+ *
+ * @param ec
+ * @param what
+ */
+void report(boost::beast::error_code ec, char const *what);
 
-    /**
-     * Report for OpenSSL
-     */
-    void report_for_openssl();
+/**
+ * Report for OpenSSL
+ */
+void report_for_openssl();
 
-}  // namespace copper::component
+}  // namespace copper::components
