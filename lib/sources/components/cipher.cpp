@@ -84,7 +84,7 @@ std::string cipher_hmac(const std::string &input, const std::string &app_key) {
   output.assign(reinterpret_cast<char *>(digest), length);
 
   return output;
-// LCOV_EXCL_START
+  // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP
 
