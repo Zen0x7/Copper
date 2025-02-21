@@ -8,9 +8,11 @@
 #include <string>
 
 namespace copper {
+
 std::string get_version();
 
 int run(int argc, const char* argv[]);
+
 }  // namespace copper
 
 #endif  // COPPER_APP_HPP

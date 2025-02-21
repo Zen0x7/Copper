@@ -12,6 +12,7 @@
 #include <cstdint>
 
 namespace copper::models {
+
 class session : public components::shared_enabled<session> {
  public:
   std::string id_;
@@ -28,6 +29,7 @@ class session : public components::shared_enabled<session> {
         started_at_(started_at),
         finished_at_(finished_at) {}
 };
+
 }  // namespace copper::models
 
 #endif

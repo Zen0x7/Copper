@@ -21,13 +21,12 @@ database::get_user_by_email(const std::string &email) {
 
   boost::mysql::results result;
 
-  connection->execute(boost::mysql::with_params(
-                          "SELECT id, name, password, email_verified_at, "
-                          "created_at, updated_at FROM users WHERE email = {}",
-                          email),
-                      result);
-
-  connection->close();
+  co_await connection->async_execute(
+      boost::mysql::with_params(
+          "SELECT id, name, password, email_verified_at, "
+          "created_at, updated_at FROM users WHERE email = {}",
+          email),
+      result);
 
   if (result.rows().empty()) {
     co_return boost::none;
@@ -59,7 +58,7 @@ containers::async_of<shared<copper::models::user>> database::get_user_by_id(
 
   boost::mysql::results result;
 
-  connection->execute(
+  co_await connection->async_execute(
       boost::mysql::with_params(
           "SELECT id, name, email, password, email_verified_at, created_at, "
           "updated_at FROM users WHERE id = {}",
@@ -67,8 +66,6 @@ containers::async_of<shared<copper::models::user>> database::get_user_by_id(
       result);
 
   const auto &row = result.rows().at(0);
-
-  connection->close();
 
   co_return boost::make_shared<copper::models::user>(
       to_string(id), row.at(1).as_string(), row.at(2).as_string(),
@@ -94,13 +91,11 @@ containers::async_of<void> database::create_session(uuid session_id,
 
   boost::mysql::results result;
 
-  connection->execute(
+  co_await connection->async_execute(
       boost::mysql::with_params("INSERT INTO sessions (id, ip, port, "
                                 "started_at) VALUES ({}, {}, {}, {})",
                                 to_string(session_id), ip, port, now),
       result);
-
-  connection->close();
 }
 
 containers::async_of<void> database::session_closed(uuid session_id,
@@ -111,13 +106,11 @@ containers::async_of<void> database::session_closed(uuid session_id,
       boost::asio::cancel_after(std::chrono::seconds(10)));
 
   boost::mysql::results result;
-  connection->execute(
+  co_await connection->async_execute(
       boost::mysql::with_params(
           "UPDATE sessions SET finished_at = {}, exception = {} WHERE id = {}",
           now, exception, to_string(session_id)),
       result);
-
-  connection->close();
 }
 
 containers::async_of<void> database::session_is_encrypted(uuid session_id) {
@@ -126,13 +119,11 @@ containers::async_of<void> database::session_is_encrypted(uuid session_id) {
   ;
 
   boost::mysql::results result;
-  connection->execute(
+  co_await connection->async_execute(
       boost::mysql::with_params(
           "UPDATE sessions SET is_encrypted = true WHERE id = {}",
           to_string(session_id)),
       result);
-
-  connection->close();
 }
 
 containers::async_of<void> database::session_is_upgrade(uuid session_id) {
@@ -143,12 +134,11 @@ containers::async_of<void> database::session_is_upgrade(uuid session_id) {
   ;
 
   boost::mysql::results result;
-  connection->execute(boost::mysql::with_params(
-                          "UPDATE sessions SET is_upgrade = true WHERE id = {}",
-                          to_string(session_id)),
-                      result);
-
-  connection->close();
+  co_await connection->async_execute(
+      boost::mysql::with_params(
+          "UPDATE sessions SET is_upgrade = true WHERE id = {}",
+          to_string(session_id)),
+      result);
 }
 
 containers::async_of<void> database::create_request(
@@ -159,6 +149,9 @@ containers::async_of<void> database::create_request(
 
   boost::mysql::results result;
 
+  auto request_body =  response->protected_ == true ? "" : request->body_;
+  auto response_body =  response->protected_ == true ? "" : response->body_;
+
   co_await connection->async_execute(
       boost::mysql::with_params(
           "INSERT INTO requests (id, session_id, version, method, path, query, "
@@ -166,7 +159,7 @@ containers::async_of<void> database::create_request(
           "{}, {}, {}, {}, {}, {}, {}, {}, {})",
           request->id_, request->session_id_, request->version_,
           request->method_, request->path_, request->query_, request->headers_,
-          request->body_, request->started_at_, request->finished_at_,
+          request_body, request->started_at_, request->finished_at_,
           request->duration_),
       result);
 
@@ -175,9 +168,7 @@ containers::async_of<void> database::create_request(
           "INSERT INTO responses (id, session_id, request_id, status_code, "
           "headers, body) VALUES ({}, {}, {}, {}, {}, {})",
           response->id_, response->session_id_, response->request_id_,
-          response->status_code_, response->headers_, response->body_),
+          response->status_code_, response->headers_, response_body),
       result);
-
-  connection->close();
 }
 }  // namespace copper::components

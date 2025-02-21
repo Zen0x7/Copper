@@ -9,8 +9,10 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
+
 typedef containers::vector_of_shared_pairs<http_route, http_controller>
     http_routes;
-}
+
+}  // namespace copper::components
 
 #endif

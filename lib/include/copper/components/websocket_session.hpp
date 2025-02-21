@@ -18,6 +18,7 @@
 #include <copper/components/state.hpp>
 
 namespace copper::components {
+
 /**
  * Run websocket session
  *

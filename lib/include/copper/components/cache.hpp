@@ -13,6 +13,7 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
+
 class cache : public shared_enabled<cache> {
   shared<boost::redis::config> config_;
 

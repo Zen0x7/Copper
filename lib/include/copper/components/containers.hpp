@@ -15,7 +15,9 @@
 #include <vector>
 
 namespace copper::components::containers {
+
 typedef std::unordered_map<std::string, std::string> unordered_map_of_strings;
+
 typedef std::map<std::string, std::string> map_of_strings;
 
 template <typename T, typename S>
@@ -36,6 +38,7 @@ using optional_of = boost::optional<T>;
 template <typename T>
 using async_of = boost::asio::awaitable<
     T, boost::asio::strand<boost::asio::io_context::executor_type>>;
+
 }  // namespace copper::components::containers
 
 #endif

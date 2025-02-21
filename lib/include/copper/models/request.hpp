@@ -7,11 +7,15 @@
 #include <boost/describe/class.hpp>
 #include <boost/mysql/datetime.hpp>
 #include <boost/optional.hpp>
+#include <copper/components/http_header.hpp>
+#include <copper/components/http_path.hpp>
+#include <copper/components/http_query.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
 #include <cstdint>
 
 namespace copper::models {
+
 class request : public components::shared_enabled<request> {
  public:
   std::string id_;
@@ -42,6 +46,11 @@ class request : public components::shared_enabled<request> {
         finished_at_(finished_at),
         duration_(duration) {}
 };
+
+components::shared<request> request_from_http_request(
+    components::uuid session_id, components::uuid request_id, long now,
+    const components::http_request &request);
+
 }  // namespace copper::models
 
 #endif

@@ -8,6 +8,7 @@
 #include <copper/components/task_group.hpp>
 
 namespace copper::components {
+
 class state;
 
 containers::async_of<void> listener(shared<state> state,

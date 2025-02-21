@@ -7,8 +7,10 @@
 #include <copper/components/http_response.hpp>
 
 namespace copper::components {
+
 http_response http_response_exception(const http_request& request,
                                       long start_at);
-}
+
+}  // namespace copper::components
 
 #endif
