@@ -149,6 +149,9 @@ containers::async_of<void> database::create_request(
 
   boost::mysql::results result;
 
+  auto request_body =  response->protected_ == true ? "" : request->body_;
+  auto response_body =  response->protected_ == true ? "" : response->body_;
+
   co_await connection->async_execute(
       boost::mysql::with_params(
           "INSERT INTO requests (id, session_id, version, method, path, query, "
@@ -156,7 +159,7 @@ containers::async_of<void> database::create_request(
           "{}, {}, {}, {}, {}, {}, {}, {}, {})",
           request->id_, request->session_id_, request->version_,
           request->method_, request->path_, request->query_, request->headers_,
-          request->body_, request->started_at_, request->finished_at_,
+          request_body, request->started_at_, request->finished_at_,
           request->duration_),
       result);
 
@@ -165,7 +168,7 @@ containers::async_of<void> database::create_request(
           "INSERT INTO responses (id, session_id, request_id, status_code, "
           "headers, body) VALUES ({}, {}, {}, {}, {}, {})",
           response->id_, response->session_id_, response->request_id_,
-          response->status_code_, response->headers_, response->body_),
+          response->status_code_, response->headers_, response_body),
       result);
 }
 }  // namespace copper::components

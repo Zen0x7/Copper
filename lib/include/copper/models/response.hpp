@@ -28,7 +28,7 @@ class response : public components::shared_enabled<response> {
   int status_code_;
   std::string headers_;
   std::string body_;
-  bool protected_ = false;
+  bool protected_;
 
   response(std::string id, std::string session_id, std::string request_id,
            int status_code, std::string headers, std::string body)
@@ -37,7 +37,8 @@ class response : public components::shared_enabled<response> {
         request_id_(request_id),
         status_code_(status_code),
         headers_(headers),
-        body_(body) {}
+        body_(body),
+        protected_(false) {}
 };
 
 components::shared<response> response_from_http_response(

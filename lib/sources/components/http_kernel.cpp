@@ -161,6 +161,9 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
       auto _response = copper::models::response_from_http_response(
           session_id, _request, _http_response);
 
+      _response->protected_ =
+        route.value().controller_->config_.use_protector == true;
+
       co_return std::make_tuple(_request, _response, _http_response);
     } catch (std::exception &exception) {
       auto _http_response = http_response_exception(request, now);
