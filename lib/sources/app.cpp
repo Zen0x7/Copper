@@ -57,7 +57,7 @@ int run(int argc, const char *argv[]) {
     auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
     auto const doc_root = std::string_view{"."};
     auto const threads =
-        std::max<int>(1, std::stoi(dotenv::getenv("APP_THREADS", "1")));
+        std::max<int>(1, std::stoi(dotenv::getenv("APP_THREADS", "8")));
 
     boost::asio::io_context ioc{threads};
 
@@ -114,7 +114,6 @@ int run(int argc, const char *argv[]) {
                {
                    .use_throttler = true,
                    .use_validator = true,
-                   .use_protector = true,
                    .rpm = 5,
                });
 

@@ -95,18 +95,19 @@ TEST(Components_HTTP_Session, Implementation) {
     state_->get_http_router()
         ->push(http_method::get, "/api/up",
                boost::make_shared<copper::controllers::up_controller>(),
-               {.use_throttler = true, .rpm = 5})
+               {.use_throttler = true, .use_protector = false, .rpm = 5})
         ->push(http_method::get, "/api/params/{name}",
                boost::make_shared<params_controller>(),
-               {.use_throttler = true, .rpm = 5})
+               {.use_throttler = true, .use_protector = false, .rpm = 5})
         ->push(http_method::get, "/api/exception",
                boost::make_shared<exception_controller>(),
-               {.use_throttler = true, .rpm = 5})
+               {.use_throttler = true, .use_protector = false, .rpm = 5})
         ->push(http_method::get, "/api/user",
                boost::make_shared<copper::controllers::user_controller>(),
                {
                    .use_auth = true,
                    .use_throttler = true,
+                   .use_protector = false,
                    .rpm = 5,
                })
         ->push(http_method::post, "/api/auth",
