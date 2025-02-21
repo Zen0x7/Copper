@@ -114,6 +114,7 @@ TEST(Components_HTTP_Session, Implementation) {
                {
                    .use_throttler = true,
                    .use_validator = true,
+                   .use_protector = true,
                    .rpm = 5,
                });
 

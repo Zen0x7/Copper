@@ -166,8 +166,8 @@ containers::async_of<void> database::create_request(
           "{}, {}, {}, {}, {}, {}, {}, {}, {})",
           request->id_, request->session_id_, request->version_,
           request->method_, request->path_, request->query_, request->headers_,
-          request->body_, request->started_at_, request->finished_at_,
-          request->duration_),
+          response->protected_ ? "" : request->body_, request->started_at_,
+          request->finished_at_, request->duration_),
       result);
 
   co_await connection->async_execute(
@@ -175,7 +175,8 @@ containers::async_of<void> database::create_request(
           "INSERT INTO responses (id, session_id, request_id, status_code, "
           "headers, body) VALUES ({}, {}, {}, {}, {}, {})",
           response->id_, response->session_id_, response->request_id_,
-          response->status_code_, response->headers_, response->body_),
+          response->status_code_, response->headers_,
+          response->protected_ ? "" : response->body_),
       result);
 
   connection->close();

@@ -114,6 +114,7 @@ int run(int argc, const char *argv[]) {
                {
                    .use_throttler = true,
                    .use_validator = true,
+                   .use_protector = true,
                    .rpm = 5,
                });
 

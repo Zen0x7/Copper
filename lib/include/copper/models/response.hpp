@@ -28,6 +28,7 @@ class response : public components::shared_enabled<response> {
   int status_code_;
   std::string headers_;
   std::string body_;
+  bool protected_ = false;
 
   response(std::string id, std::string session_id, std::string request_id,
            int status_code, std::string headers, std::string body)

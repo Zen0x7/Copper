@@ -72,8 +72,10 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
           !can) {
         auto _http_response =
             http_response_too_many_requests(request, now, TTL);
+
         auto _response = copper::models::response_from_http_response(
             session_id, _request, _http_response);
+
         co_return std::make_tuple(_request, _response, _http_response);
       }
     }
@@ -89,8 +91,13 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
 
       if (!user_id.has_value()) {
         auto _http_response = http_response_unauthorized(request, now);
+
         auto _response = copper::models::response_from_http_response(
             session_id, _request, _http_response);
+
+        _response->protected_ =
+            route.value().controller_->config_.use_protector;
+
         co_return std::make_tuple(_request, _response, _http_response);
       };
 
@@ -102,11 +109,13 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
 
     if (route.value().controller_->config_.use_validator) {
       boost::system::error_code json_parse_error_code;
+
       json::value value =
           boost::json::parse(request.body(), json_parse_error_code);
 
       if (!json_parse_error_code) {
         route.value().controller_->set_data(value);
+
         auto rules = route.value().controller_->rules();
 
         if (auto validator = validator_make(rules, value);
@@ -118,8 +127,13 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
           auto _http_response = route.value().controller_->response(
               request, http_status_code::unprocessable_entity,
               serialize(error_response), "application/json");
+
           auto _response = copper::models::response_from_http_response(
               session_id, _request, _http_response);
+
+          _response->protected_ =
+              route.value().controller_->config_.use_protector;
+
           co_return std::make_tuple(_request, _response, _http_response);
         }
       } else {
@@ -133,41 +147,58 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
 
         auto _response = copper::models::response_from_http_response(
             session_id, _request, _http_response);
+
+        _response->protected_ =
+            route.value().controller_->config_.use_protector;
+
         co_return std::make_tuple(_request, _response, _http_response);
       }
     }
 
     try {
       auto _http_response = co_await route.value().controller_->invoke(request);
+
       auto _response = copper::models::response_from_http_response(
           session_id, _request, _http_response);
+
       co_return std::make_tuple(_request, _response, _http_response);
     } catch (std::exception &exception) {
       auto _http_response = http_response_exception(request, now);
+
       auto _response = copper::models::response_from_http_response(
           session_id, _request, _http_response);
+
+      _response->protected_ = route.value().controller_->config_.use_protector;
+
       co_return std::make_tuple(_request, _response, _http_response);
     }
   }
 
   if (request.method() == http_method::options) {
     auto available_verbs = get_available_methods(request);
+
     auto _http_response = http_response_cors(request, now, available_verbs);
+
     auto _response = copper::models::response_from_http_response(
         session_id, _request, _http_response);
+
     co_return std::make_tuple(_request, _response, _http_response);
   }
 
   if (http_request_is_illegal(request)) {
     auto _http_response = http_response_bad_request(request, now);
+
     auto _response = copper::models::response_from_http_response(
         session_id, _request, _http_response);
+
     co_return std::make_tuple(_request, _response, _http_response);
   }
 
   auto _http_response = http_response_not_found(request, now);
+
   auto _response = copper::models::response_from_http_response(
       session_id, _request, _http_response);
+
   co_return std::make_tuple(_request, _response, _http_response);
 }
 }  // namespace copper::components
