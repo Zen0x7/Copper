@@ -1,3 +1,4 @@
+#include <boost/algorithm/string/predicate.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/dotenv.hpp>
@@ -5,6 +6,7 @@
 #include <copper/components/http_response_not_found.hpp>
 #include <copper/components/http_status_code.hpp>
 #include <copper/components/state.hpp>
+#include <copper/components/views.hpp>
 
 namespace copper::components {
 
@@ -14,7 +16,14 @@ http_response http_response_not_found(const http_request &request,
   const auto now = chronos::now();
 
   http_response response{http_status_code::not_found, request.version()};
-  response.set(http_fields::content_type, "application/json");
+
+  bool requires_html = request.count(http_fields::accept) > 0 &&
+                       boost::contains(request.at(http_fields::accept), "html");
+  if (requires_html) {
+    response.set(http_fields::content_type, "text/html");
+  } else {
+    response.set(http_fields::content_type, "application/json");
+  }
 
   const std::string allowed_headers =
       "Accept,Authorization,Content-Type,X-Requested-With";
@@ -31,7 +40,11 @@ http_response http_response_not_found(const http_request &request,
   response.version(request.version());
   response.keep_alive(request.keep_alive());
 
-  response.body() = std::string(R"({"message":"not_found"})");
+  if (requires_html) {
+    response.body() = state->get_views()->render("404");
+  } else {
+    response.body() = std::string(R"({"message":"not_found"})");
+  }
 
   response.prepare_payload();
 

@@ -19,6 +19,7 @@
 #include <copper/controllers/auth_controller.hpp>
 #include <copper/controllers/up_controller.hpp>
 #include <copper/controllers/user_controller.hpp>
+#include <nlohmann/json.hpp>
 
 using namespace copper::components;
 
@@ -26,6 +27,15 @@ containers::async_of<void> cancel_http_sessions() {
   auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
 }
+
+class templated_controller final : public http_controller {
+ public:
+  containers::async_of<copper::components::http_response> invoke(
+      const http_request &request) override {
+    json::json data;
+    co_return make_view(request, http_status_code::ok, "template", data);
+  }
+};
 
 class exception_controller final : public http_controller {
  public:
@@ -99,6 +109,9 @@ TEST(Components_HTTP_Session, Implementation) {
         ->push(http_method::get, "/api/up",
                boost::make_shared<copper::controllers::up_controller>(),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
+        ->push(http_method::get, "/api/templated",
+               boost::make_shared<templated_controller>(),
+               {.use_throttler_ = false, .use_protector_ = false})
         ->push(http_method::get, "/api/params/{name}",
                boost::make_shared<params_controller>(),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
@@ -326,6 +339,30 @@ TEST(Components_HTTP_Session, Implementation) {
       http_request request{http_method::get, "/", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::user_agent, "Copper");
+      boost::beast::http::write(stream, request);
+      boost::beast::http::read(stream, buffer, response);
+      buffer.clear();
+      response.clear();
+    }
+
+    {
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::response<boost::beast::http::string_body> response;
+      http_request request{http_method::get, "/", 11};
+      request.set(http_fields::host, host);
+      request.set(http_fields::accept, "text/html");
+      boost::beast::http::write(stream, request);
+      boost::beast::http::read(stream, buffer, response);
+      buffer.clear();
+      response.clear();
+    }
+
+    {
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::response<boost::beast::http::string_body> response;
+      http_request request{http_method::get, "/api/templated", 11};
+      request.set(http_fields::host, host);
+      request.set(http_fields::accept, "text/html");
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();

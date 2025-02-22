@@ -8,8 +8,14 @@
 #include <boost/json/serialize.hpp>
 #include <boost/json/value.hpp>
 #include <boost/json/value_from.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace copper::components::json {
+
+/**
+ * JSON
+ */
+typedef nlohmann::json json;
 
 /**
  * JSON value

@@ -1,6 +1,7 @@
 #include <copper/components/configuration.hpp>
 #include <copper/components/http_controller.hpp>
 #include <copper/components/state.hpp>
+#include <copper/components/views.hpp>
 
 namespace copper::components {
 
@@ -48,6 +49,36 @@ http_response http_controller::make_response(const http_request &request,
   response.keep_alive(request.keep_alive());
   response.result(status);
   response.body() = data;
+  response.prepare_payload();
+  return response;
+}
+
+http_response http_controller::make_view(const http_request &request,
+                                         http_status_code status,
+                                         const std::string view,
+                                         const json::json &data,
+                                         const char *type) const {
+  const auto resolved_at = chronos::now();
+
+  http_response response{};
+
+  response.set(http_fields::content_type, type);
+  response.set(http_fields::allow, request.method_string());
+  const std::string allowed_headers =
+      "Accept,Authorization,Content-Type,X-Requested-With";
+
+  response.set(http_fields::access_control_allow_headers, allowed_headers);
+  const auto allowed_origins =
+      state_->get_configuration()->get()->http_allowed_origins_;
+
+  response.set(http_fields::access_control_allow_origin, allowed_origins);
+
+  response.set("X-Server", "Copper");
+  response.set("X-Time", std::to_string(resolved_at - start_at_));
+  response.version(request.version());
+  response.keep_alive(request.keep_alive());
+  response.result(status);
+  response.body() = state_->get_views()->render(view, data);
   response.prepare_payload();
   return response;
 }
