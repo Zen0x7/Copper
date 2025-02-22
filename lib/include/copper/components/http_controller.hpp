@@ -131,11 +131,24 @@ class http_controller : public shared_enabled<http_controller> {
    * @param status
    * @param data
    * @param type
-   * @return
+   * @return http_response
    */
   http_response make_response(const http_request &request,
                               http_status_code status, const std::string &data,
                               const char *type = "text/html") const;
+
+  /**
+   * Make view
+   *
+   * @param request
+   * @param status
+   * @param data
+   * @param type
+   * @return http_response
+   */
+  http_response make_view(const http_request &request, http_status_code status,
+                          const std::string view, const json::json &data,
+                          const char *type = "text/html") const;
 };
 
 }  // namespace copper::components

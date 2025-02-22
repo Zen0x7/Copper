@@ -29,16 +29,11 @@ class views : public shared_enabled<views> {
   /**
    * Constructor
    */
-  views() : environment_(boost::make_shared<inja::Environment>()), items_() {
-
-    // Default routes ...
-    push("404", "404");
-  }
+  views() : environment_(boost::make_shared<inja::Environment>()), items_() {}
 
   shared<views> push(std::string name, std::string path) {
-    items_.insert(std::make_pair(
-      name,
-      boost::make_shared<view>(path, environment_)));
+    items_.insert(
+        std::make_pair(name, boost::make_shared<view>(path, environment_)));
 
     return shared_from_this();
   }
@@ -51,7 +46,7 @@ class views : public shared_enabled<views> {
    * @return string
    */
   std::string render(std::string name, json::json data = {}) {
-    for (auto & item : items_) {
+    for (auto& item : items_) {
       if (item.first == name) {
         return environment_->render(item.second->template_, data);
       }

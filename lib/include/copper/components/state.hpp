@@ -99,6 +99,13 @@ class state : public shared_enabled<state> {
    * @return shared<database>
    */
   shared<database> get_database();
+
+  /**
+   * Get views
+   *
+   * @return shared<database>
+   */
+  shared<views> get_views();
 };
 
 }  // namespace copper::components
