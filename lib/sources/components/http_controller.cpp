@@ -1,4 +1,6 @@
+#include <copper/components/configuration.hpp>
 #include <copper/components/http_controller.hpp>
+#include <copper/components/state.hpp>
 
 namespace copper::components {
 
@@ -31,10 +33,12 @@ http_response http_controller::make_response(const http_request &request,
 
   response.set(http_fields::content_type, type);
   response.set(http_fields::allow, request.method_string());
-  response.set(http_fields::access_control_allow_headers,
-               "Accept,Authorization,Content-Type,X-Requested-With");
+  const std::string allowed_headers =
+      "Accept,Authorization,Content-Type,X-Requested-With";
 
-  const auto allowed_origins = dotenv::getenv("HTTP_ALLOWED_ORIGINS", "*");
+  response.set(http_fields::access_control_allow_headers, allowed_headers);
+  const auto allowed_origins =
+      state_->get_configuration()->get()->http_allowed_origins_;
 
   response.set(http_fields::access_control_allow_origin, allowed_origins);
 

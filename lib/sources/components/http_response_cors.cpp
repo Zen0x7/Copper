@@ -1,17 +1,20 @@
 #include <boost/algorithm/string/join.hpp>
 #include <copper/components/chronos.hpp>
+#include <copper/components/configuration.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/http_fields.hpp>
 #include <copper/components/http_method.hpp>
 #include <copper/components/http_response_cors.hpp>
 #include <copper/components/http_status_code.hpp>
+#include <copper/components/state.hpp>
 
 namespace copper::components {
 
 http_response http_response_cors(
     const http_request &request, long start_at,
-    const containers::vector_of<http_method> methods) {
+    const containers::vector_of<http_method> methods,
+    const shared<state> &state) {
   const auto now = chronos::now();
 
   http_response response{methods.empty() ? http_status_code::method_not_allowed
@@ -25,9 +28,13 @@ http_response http_response_cors(
   response.set(http_fields::access_control_allow_methods,
                methods.empty() ? "" : methods_as_string);
 
-  response.set(http_fields::access_control_allow_headers,
-               "Accept,Authorization,Content-Type,X-Requested-With");
-  const auto allowed_origins = dotenv::getenv("HTTP_ALLOWED_ORIGINS", "*");
+  const std::string allowed_headers =
+      "Accept,Authorization,Content-Type,X-Requested-With";
+
+  response.set(http_fields::access_control_allow_headers, allowed_headers);
+  const auto allowed_origins =
+      state->get_configuration()->get()->http_allowed_origins_;
+
   response.set(http_fields::access_control_allow_origin, allowed_origins);
 
   response.set("X-Server", "Copper");

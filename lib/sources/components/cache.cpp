@@ -1,4 +1,5 @@
 #include <copper/components/cache.hpp>
+#include <copper/components/configuration.hpp>
 
 namespace copper::components {
 
@@ -87,30 +88,30 @@ containers::async_of<std::tuple<bool, int>> cache::can_invoke(
   co_return std::tuple{true, 0};
 }
 
-cache::cache() : configuration_(boost::make_shared<boost::redis::config>()) {
-  configuration_->addr =
-      boost::redis::address{dotenv::getenv("REDIS_HOST", "127.0.0.1"),
-                            dotenv::getenv("REDIS_PORT", "6379")};
+cache::cache(const shared<configuration> &configuration)
+    : configuration_(configuration),
+      redis_configuration_(boost::make_shared<boost::redis::config>()) {
+  std::string _redis_port = std::to_string(configuration_->get()->redis_port_);
 
-  configuration_->health_check_interval = std::chrono::seconds{
-      std::stoi(dotenv::getenv("REDIS_HEALTH_CHECK_INTERVAL", "60")),
-  };
+  redis_configuration_->addr =
+      boost::redis::address{configuration_->get()->redis_host_, _redis_port};
 
-  configuration_->connect_timeout = std::chrono::seconds{
-      std::stoi(dotenv::getenv("REDIS_CONNECTION_TIMEOUT", "60")),
-  };
+  redis_configuration_->health_check_interval =
+      std::chrono::seconds{configuration_->get()->redis_health_check_interval_};
 
-  configuration_->reconnect_wait_interval = std::chrono::seconds{
-      std::stoi(dotenv::getenv("REDIS_RECONNECTION_WAIT_INTERVAL", "5")),
-  };
+  redis_configuration_->connect_timeout =
+      std::chrono::seconds{configuration_->get()->redis_connection_timeout_};
 
-  configuration_->clientname = dotenv::getenv("REDIS_CLIENT_NAME", "Copper");
+  redis_configuration_->reconnect_wait_interval = std::chrono::seconds{
+      configuration_->get()->redis_reconnection_wait_interval_};
+
+  redis_configuration_->clientname = configuration_->get()->redis_client_name_;
 }
 
 containers::async_of<shared<boost::redis::connection>> cache::get_connection() {
   auto conn = boost::make_shared<boost::redis::connection>(
       co_await boost::asio::this_coro::executor);
-  conn->async_run(*this->configuration_, {},
+  conn->async_run(*this->redis_configuration_, {},
                   boost::asio::consign(boost::asio::detached, conn));
   co_return conn;
 }

@@ -4,13 +4,17 @@
 #pragma once
 
 #include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
 #include <boost/beast/core/error.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <copper/components/chronos.hpp>
+#include <copper/components/configuration.hpp>
 #include <copper/components/containers.hpp>
+#include <copper/components/database.hpp>
 #include <copper/components/http_header.hpp>
 #include <copper/components/http_kernel.hpp>
 #include <copper/components/report.hpp>
+#include <copper/components/state.hpp>
 #include <copper/components/websocket_session.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
@@ -38,7 +42,7 @@ containers::async_of<void> http_session_run(
 
   while (!cs.cancelled()) {
     boost::beast::http::request_parser<boost::beast::http::string_body> parser;
-    parser.body_limit(std::stoi(dotenv::getenv("HTTP_BODY_LIMIT", "10000")));
+    parser.body_limit(state->get_configuration()->get()->http_body_limit_);
 
     auto [ec, _] = co_await boost::beast::http::async_read(
         stream, buffer, parser, boost::asio::as_tuple);

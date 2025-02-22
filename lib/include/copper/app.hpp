@@ -5,6 +5,7 @@
 #ifndef COPPER_APP_HPP
 #define COPPER_APP_HPP
 
+#include <copper/components/configuration.hpp>
 #include <string>
 
 namespace copper {

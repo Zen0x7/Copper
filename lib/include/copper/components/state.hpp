@@ -3,15 +3,38 @@
 
 #pragma once
 
-#include <copper/components/cache.hpp>
+#include <boost/mysql/connection_pool.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/database.hpp>
-#include <copper/components/http_router.hpp>
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
 
+/**
+ * Forward cache
+ */
+class cache;
+
+/**
+ * Forward HTTP router
+ */
+class http_router;
+
+/**
+ * Forward configuration
+ */
+class configuration;
+
+/**
+ * Forward database
+ */
+class database;
+
 class state : public shared_enabled<state> {
+  /**
+   *
+   */
+  shared<configuration> configuration_;
+
   /**
    * HTTP router
    */
@@ -33,7 +56,15 @@ class state : public shared_enabled<state> {
    *
    * @param pool
    */
-  state(const shared<boost::mysql::connection_pool>& pool);
+  state(const shared<configuration>& configuration,
+        const shared<boost::mysql::connection_pool>& pool);
+
+  /**
+   * Get configuration
+   *
+   * @return shared<configuration>
+   */
+  shared<configuration> get_configuration();
 
   /**
    * Get HTTP router

@@ -54,7 +54,7 @@ class auth_controller final : public components::http_controller {
                                               user.value()->password_)) {
       std::string token = components::authentication_to_bearer(
           boost::lexical_cast<components::uuid>(user.value()->id_),
-          dotenv::getenv("APP_KEY"), "user");
+          state_->get_configuration()->get()->app_key_);
 
       const components::json::object data = {{"token", token}};
 

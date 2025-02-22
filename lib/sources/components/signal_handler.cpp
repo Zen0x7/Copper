@@ -1,3 +1,4 @@
+#include <boost/asio/cancel_after.hpp>
 #include <copper/components/signal_handler.hpp>
 
 namespace copper::components {
