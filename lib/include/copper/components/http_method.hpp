@@ -7,6 +7,9 @@
 
 namespace copper::components {
 
+/**
+ * HTTP method
+ */
 typedef boost::beast::http::verb http_method;
 
 }  // namespace copper::components

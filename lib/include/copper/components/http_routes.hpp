@@ -10,6 +10,9 @@
 
 namespace copper::components {
 
+/**
+ * HTTP routes
+ */
 typedef containers::vector_of_shared_pairs<http_route, http_controller>
     http_routes;
 

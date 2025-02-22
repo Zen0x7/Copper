@@ -55,20 +55,20 @@ containers::vector_of<http_method> http_kernel::get_available_methods(
 containers::async_of<
     std::tuple<shared<copper::models::request>,
                shared<copper::models::response>, http_response_generic>>
-http_kernel::invoke(uuid session_id, boost::beast::string_view,
-                    const http_request &request, const std::string &ip,
-                    const uuid &request_id, long now) const {
+http_kernel::call(uuid session_id, boost::beast::string_view,
+                  const http_request &request, const std::string &ip,
+                  const uuid &request_id, long now) const {
   auto _request =
       models::request_from_http_request(session_id, request_id, now, request);
 
   if (const auto route = find_on_routes(request); route.has_value()) {
     containers::unordered_map_of_strings bindings = route.value().bindings_;
 
-    route.value().controller_->set_start(now);
+    route.value().controller_->set_start_at(now);
 
-    if (route.value().controller_->config_.use_throttler) {
+    if (route.value().controller_->configuration_.use_throttler_) {
       if (auto [can, TTL] = co_await state_->get_cache()->can_invoke(
-              request, ip, route.value().controller_->config_.rpm);
+              request, ip, route.value().controller_->configuration_.rpm_);
           !can) {
         auto _http_response =
             http_response_too_many_requests(request, now, TTL);
@@ -80,7 +80,7 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
       }
     }
 
-    if (route.value().controller_->config_.use_auth) {
+    if (route.value().controller_->configuration_.use_auth_) {
       std::string bearer{request["Authorization"]};
 
       std::string token =
@@ -96,35 +96,35 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
             session_id, _request, _http_response);
 
         _response->protected_ =
-            route.value().controller_->config_.use_protector == true;
+            route.value().controller_->configuration_.use_protector_ == true;
 
         co_return std::make_tuple(_request, _response, _http_response);
       };
 
-      route.value().controller_->set_user(user_id.get().id);
+      route.value().controller_->set_user(user_id.get().id_);
     }
 
     route.value().controller_->set_bindings(bindings);
     route.value().controller_->set_state(state_);
 
-    if (route.value().controller_->config_.use_validator) {
+    if (route.value().controller_->configuration_.use_validator_) {
       boost::system::error_code json_parse_error_code;
 
       json::value value =
           boost::json::parse(request.body(), json_parse_error_code);
 
       if (!json_parse_error_code) {
-        route.value().controller_->set_data(value);
+        route.value().controller_->set_body(value);
 
         auto rules = route.value().controller_->rules();
 
         if (auto validator = validator_make(rules, value);
-            !validator->success) {
+            !validator->success_) {
           auto error_response =
               json::object({{"message", "The given data was invalid."},
-                            {"errors", validator->errors}});
+                            {"errors", validator->errors_}});
 
-          auto _http_response = route.value().controller_->response(
+          auto _http_response = route.value().controller_->make_response(
               request, http_status_code::unprocessable_entity,
               serialize(error_response), "application/json");
 
@@ -132,7 +132,7 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
               session_id, _request, _http_response);
 
           _response->protected_ =
-              route.value().controller_->config_.use_protector == true;
+              route.value().controller_->configuration_.use_protector_ == true;
 
           co_return std::make_tuple(_request, _response, _http_response);
         }
@@ -141,7 +141,7 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
             {{"message", "The given data was invalid."},
              {"errors", {{"*", "The body must be a valid JSON."}}}});
 
-        auto _http_response = route.value().controller_->response(
+        auto _http_response = route.value().controller_->make_response(
             request, http_status_code::unprocessable_entity,
             serialize(error_response), "application/json");
 
@@ -149,7 +149,7 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
             session_id, _request, _http_response);
 
         _response->protected_ =
-            route.value().controller_->config_.use_protector == true;
+            route.value().controller_->configuration_.use_protector_ == true;
 
         co_return std::make_tuple(_request, _response, _http_response);
       }
@@ -162,7 +162,7 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
           session_id, _request, _http_response);
 
       _response->protected_ =
-        route.value().controller_->config_.use_protector == true;
+          route.value().controller_->configuration_.use_protector_ == true;
 
       co_return std::make_tuple(_request, _response, _http_response);
     } catch (std::exception &exception) {
@@ -172,7 +172,7 @@ http_kernel::invoke(uuid session_id, boost::beast::string_view,
           session_id, _request, _http_response);
 
       _response->protected_ =
-          route.value().controller_->config_.use_protector == true;
+          route.value().controller_->configuration_.use_protector_ == true;
 
       co_return std::make_tuple(_request, _response, _http_response);
     }

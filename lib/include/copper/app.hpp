@@ -9,8 +9,19 @@
 
 namespace copper {
 
+/**
+ * Get version
+ * @return
+ */
 std::string get_version();
 
+/**
+ * Run
+ *
+ * @param argc
+ * @param argv
+ * @return int
+ */
 int run(int argc, const char* argv[]);
 
 }  // namespace copper

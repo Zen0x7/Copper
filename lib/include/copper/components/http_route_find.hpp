@@ -7,6 +7,13 @@
 
 namespace copper::components {
 
+/**
+ * HTTP route find
+ *
+ * @param path
+ * @param route
+ * @return http_route_result
+ */
 http_route_result http_route_find(const std::string_view &path,
                                   const http_route &route);
 

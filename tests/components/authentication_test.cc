@@ -17,8 +17,8 @@ TEST(Components_Authenticator, IssueAndCheck) {
   auto result = authentication_from_bearer(bearer, base64_decode(app_key));
 
   ASSERT_TRUE(result.has_value());
-  ASSERT_EQ(id, result.value().id);
-  ASSERT_EQ("CI", result.value().type);
+  ASSERT_EQ(id, result.value().id_);
+  ASSERT_EQ("CI", result.value().type_);
 }
 
 TEST(Components_Authenticator, Empty) {

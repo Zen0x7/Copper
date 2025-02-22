@@ -10,13 +10,23 @@
 
 namespace copper::components {
 
+/**
+ * Authentication result
+ */
 struct authentication_result {
-  uuid id;
-  std::string type;
+  /**
+   * ID
+   */
+  uuid id_;
+
+  /**
+   * Type
+   */
+  std::string type_;
 };
 
 /**
- * Decode JWT Token
+ * Authentication from bearer
  *
  * @param bearer
  * @param app_key
@@ -26,7 +36,7 @@ containers::optional_of<authentication_result> authentication_from_bearer(
     const std::string &bearer, const std::string &app_key);
 
 /**
- * Issue JWT Token
+ * Authentication to bearer
  *
  * @param id
  * @param app_key

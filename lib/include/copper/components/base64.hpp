@@ -3,38 +3,39 @@
 
 #pragma once
 
+#include <copper/components/containers.hpp>
 #include <map>
 #include <string>
 
 namespace copper::components {
 
 /**
- * Converts from string to Base64
+ * Encodes to Base64
  *
  * @param input
  * @param padding
- * @return std::string Encoded output
+ * @return string
  */
 std::string base64_encode(const std::string &input, bool padding = true);
 
 /**
- * Converts from Base64 to string
+ * Decodes from Base64
  *
  * @param input
- * @return std::string Decoded output
+ * @return string
  */
 std::string base64_decode(const std::string &input);
 
 /**
- * Chars used on Base64 encode
+ * Base64 charset
  */
-const std::string base64_chars =
+const std::string base64_charset_ =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 /**
- * Map of chars used on Base64 decode
+ * Base64 charset as map
  */
-inline std::map<char, int> base64_map = {
+inline containers::map_of<char, int> base64_map_charset_ = {
     {'A', 0},  {'B', 1},  {'C', 2},  {'D', 3},  {'E', 4},  {'F', 5},  {'G', 6},
     {'H', 7},  {'I', 8},  {'J', 9},  {'K', 10}, {'L', 11}, {'M', 12}, {'N', 13},
     {'O', 14}, {'P', 15}, {'Q', 16}, {'R', 17}, {'S', 18}, {'T', 19}, {'U', 20},

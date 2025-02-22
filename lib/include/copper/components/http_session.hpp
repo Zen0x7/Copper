@@ -74,7 +74,7 @@ containers::async_of<void> http_session_run(
                          .address()
                          .to_string();
 
-    auto [_request, _response, res] = co_await kernel->invoke(
+    auto [_request, _response, res] = co_await kernel->call(
         session_id, doc_root, parser.release(), ip, request_id, start_at);
 
     _request->finished_at_ = chronos::now();
@@ -84,14 +84,15 @@ containers::async_of<void> http_session_run(
       co_await boost::beast::async_write(stream, std::move(res));
 
       boost::asio::co_spawn(
-          executor, state->get_database()->create_request(_request, _response),
+          executor,
+          state->get_database()->create_invocation(_request, _response),
           boost::asio::detached);
       co_return;
     }
 
     co_await boost::beast::async_write(stream, std::move(res));
     boost::asio::co_spawn(
-        executor, state->get_database()->create_request(_request, _response),
+        executor, state->get_database()->create_invocation(_request, _response),
         boost::asio::detached);
   }
 }

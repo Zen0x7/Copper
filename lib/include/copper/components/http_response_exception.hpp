@@ -8,6 +8,13 @@
 
 namespace copper::components {
 
+/**
+ * Generates HTTP response on exception
+ *
+ * @param request
+ * @param start_at
+ * @return http_response
+ */
 http_response http_response_exception(const http_request& request,
                                       long start_at);
 

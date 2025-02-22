@@ -12,15 +12,48 @@
 namespace copper::components {
 
 class state : public shared_enabled<state> {
+  /**
+   * HTTP router
+   */
   shared<http_router> http_router_;
+
+  /**
+   * Cache
+   */
   shared<cache> redis_;
+
+  /**
+   * Database
+   */
   shared<database> database_;
 
  public:
+  /**
+   * Constructor
+   *
+   * @param pool
+   */
   state(const shared<boost::mysql::connection_pool>& pool);
 
+  /**
+   * Get HTTP router
+   *
+   * @return shared<http_router>
+   */
   shared<http_router> get_http_router();
+
+  /**
+   * Get cache
+   *
+   * @return shared<cache>
+   */
   shared<cache> get_cache();
+
+  /**
+   * Get database
+   *
+   * @return shared<database>
+   */
   shared<database> get_database();
 };
 

@@ -87,30 +87,30 @@ containers::async_of<std::tuple<bool, int>> cache::can_invoke(
   co_return std::tuple{true, 0};
 }
 
-cache::cache() : config_(boost::make_shared<boost::redis::config>()) {
-  config_->addr =
+cache::cache() : configuration_(boost::make_shared<boost::redis::config>()) {
+  configuration_->addr =
       boost::redis::address{dotenv::getenv("REDIS_HOST", "127.0.0.1"),
                             dotenv::getenv("REDIS_PORT", "6379")};
 
-  config_->health_check_interval = std::chrono::seconds{
+  configuration_->health_check_interval = std::chrono::seconds{
       std::stoi(dotenv::getenv("REDIS_HEALTH_CHECK_INTERVAL", "60")),
   };
 
-  config_->connect_timeout = std::chrono::seconds{
+  configuration_->connect_timeout = std::chrono::seconds{
       std::stoi(dotenv::getenv("REDIS_CONNECTION_TIMEOUT", "60")),
   };
 
-  config_->reconnect_wait_interval = std::chrono::seconds{
+  configuration_->reconnect_wait_interval = std::chrono::seconds{
       std::stoi(dotenv::getenv("REDIS_RECONNECTION_WAIT_INTERVAL", "5")),
   };
 
-  config_->clientname = dotenv::getenv("REDIS_CLIENT_NAME", "Copper");
+  configuration_->clientname = dotenv::getenv("REDIS_CLIENT_NAME", "Copper");
 }
 
 containers::async_of<shared<boost::redis::connection>> cache::get_connection() {
   auto conn = boost::make_shared<boost::redis::connection>(
       co_await boost::asio::this_coro::executor);
-  conn->async_run(*this->config_, {},
+  conn->async_run(*this->configuration_, {},
                   boost::asio::consign(boost::asio::detached, conn));
   co_return conn;
 }

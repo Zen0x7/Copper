@@ -8,6 +8,9 @@
 
 namespace copper::components {
 
+/**
+ * UUID
+ */
 using uuid = boost::uuids::uuid;
 
 }  // namespace copper::components

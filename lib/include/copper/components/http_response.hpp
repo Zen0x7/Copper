@@ -7,6 +7,9 @@
 
 namespace copper::components {
 
+/**
+ * HTTP response
+ */
 typedef boost::beast::http::response<boost::beast::http::string_body>
     http_response;
 

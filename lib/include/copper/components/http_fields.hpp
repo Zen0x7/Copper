@@ -7,8 +7,11 @@
 
 namespace copper::components {
 
+/**
+ * HTTP fields
+ */
 typedef boost::beast::http::field http_fields;
 
-}
+}  // namespace copper::components
 
 #endif

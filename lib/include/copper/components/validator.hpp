@@ -11,20 +11,23 @@
 
 namespace copper::components {
 
+/**
+ * Validator
+ */
 class validator : public shared_enabled<validator> {
  public:
   /**
-   * Errors container
+   * Errors
    */
-  json::object errors;
+  json::object errors_;
 
   /**
    * Status
    */
-  bool success = false;
+  bool success_ = false;
 
   /**
-   * Insert message to errors
+   * Insert or push message to errors
    *
    * @param key
    * @param message

@@ -11,7 +11,7 @@
 #include <copper/components/chronos.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/dotenv.hpp>
-#include <copper/components/http_controller_config.hpp>
+#include <copper/components/http_controller_configuration.hpp>
 #include <copper/components/http_fields.hpp>
 #include <copper/components/http_request.hpp>
 #include <copper/components/http_response.hpp>
@@ -26,41 +26,116 @@ class state;
 
 class http_controller : public shared_enabled<http_controller> {
  public:
+  /**
+   * Bindings
+   */
   containers::unordered_map_of_strings bindings_;
-  json::value data_;
+
+  /**
+   * Body
+   */
+  json::value body_;
+
+  /**
+   * State
+   */
   shared<state> state_;
+
+  /**
+   * Auth ID
+   */
   uuid auth_id_;
-  long start_ = 0;
-  http_controller_config config_;
+
+  /**
+   * Start at
+   */
+  long start_at_ = 0;
+
+  /**
+   * Configuration
+   */
+  http_controller_configuration configuration_;
 
   // LCOV_EXCL_START
+  /**
+   * Constructor
+   */
   virtual ~http_controller() = default;
 
+  /**
+   * Invoke
+   *
+   * @return async_of<http_response>
+   */
   virtual containers::async_of<http_response> invoke(
       const http_request & /*request*/) {
     http_response response;
     co_return response;
   };
 
+  /**
+   * Rules
+   *
+   * @return map_of_strings
+   */
   virtual containers::map_of_strings rules() const { return {}; }
 
   // LCOV_EXCL_STOP
 
+  /**
+   * Set state
+   *
+   * @param state
+   */
   void set_state(const shared<state> &state);
 
-  void set_config(http_controller_config config);
+  /**
+   * Set configuration
+   *
+   * @param configuration
+   */
+  void set_configuration(http_controller_configuration configuration);
 
-  void set_start(long at);
+  /**
+   * Set start at
+   *
+   * @param start_at
+   */
+  void set_start_at(long start_at);
 
+  /**
+   * Set bindings
+   *
+   * @param bindings
+   */
   void set_bindings(containers::unordered_map_of_strings &bindings);
 
-  void set_data(const json::value &data);
+  /**
+   * Set body
+   *
+   * @param body
+   */
+  void set_body(const json::value &body);
 
+  /**
+   * Set user
+   *
+   * @param id
+   */
   void set_user(uuid id);
 
-  http_response response(http_request const &request, http_status_code status,
-                         const std::string &data,
-                         const char *type = "text/html") const;
+  /**
+   * Make response
+   *
+   * @param request
+   * @param status
+   * @param data
+   * @param type
+   * @return
+   */
+  http_response make_response(const http_request &request,
+                              http_status_code status, const std::string &data,
+                              const char *type = "text/html") const;
 };
 
 }  // namespace copper::components

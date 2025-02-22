@@ -10,6 +10,14 @@
 
 namespace copper::components {
 
+/**
+ * Generates HTTP response on CORS
+ *
+ * @param request
+ * @param start_at
+ * @param methods
+ * @return http_response
+ */
 http_response http_response_cors(const http_request& request, long start_at,
                                  containers::vector_of<http_method> methods);
 

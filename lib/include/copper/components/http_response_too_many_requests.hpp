@@ -8,6 +8,14 @@
 
 namespace copper::components {
 
+/**
+ * Generate HTTP response on rate limit exceeded
+ *
+ * @param request
+ * @param start_at
+ * @param ttl
+ * @return http_response
+ */
 http_response http_response_too_many_requests(const http_request& request,
                                               long start_at, int ttl);
 

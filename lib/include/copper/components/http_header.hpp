@@ -10,8 +10,20 @@
 
 namespace copper::components {
 
+/**
+ * Retrieves headers from request
+ *
+ * @param request
+ * @return
+ */
 std::string http_header_from_request(const http_request& request);
 
+/**
+ * Retrieves headers from response
+ *
+ * @param response
+ * @return
+ */
 std::string http_header_from_response(const http_response& response);
 
 }  // namespace copper::components

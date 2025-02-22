@@ -99,22 +99,22 @@ int run(int argc, const char *argv[]) {
         ->push(http_method::get, "/api/user",
                boost::make_shared<controllers::user_controller>(),
                {
-                   .use_auth = true,
-                   .use_throttler = true,
-                   .rpm = 5,
+                   .use_auth_ = true,
+                   .use_throttler_ = true,
+                   .rpm_ = 5,
                })
         ->push(http_method::get, "/api/up",
                boost::make_shared<controllers::up_controller>(),
                {
-                   .use_throttler = true,
-                   .rpm = 5,
+                   .use_throttler_ = true,
+                   .rpm_ = 5,
                })
         ->push(http_method::post, "/api/auth",
                boost::make_shared<controllers::auth_controller>(),
                {
-                   .use_throttler = true,
-                   .use_validator = true,
-                   .rpm = 5,
+                   .use_throttler_ = true,
+                   .use_validator_ = true,
+                   .rpm_ = 5,
                });
 
     boost::asio::co_spawn(

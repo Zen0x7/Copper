@@ -25,8 +25,8 @@ class user_controller final : public components::http_controller {
         {"updated_at", _user->updated_at_},
     };
 
-    co_return response(request, components::http_status_code::ok,
-                       serialize(data), "application/json");
+    co_return make_response(request, components::http_status_code::ok,
+                            serialize(data), "application/json");
   }
 };
 

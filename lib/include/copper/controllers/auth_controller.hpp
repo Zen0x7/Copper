@@ -23,8 +23,8 @@ class auth_controller final : public components::http_controller {
 
   components::containers::async_of<components::http_response> invoke(
       const components::http_request &request) override {
-    std::string email{data_.as_object().at("email").as_string()};
-    std::string password{data_.as_object().at("password").as_string()};
+    std::string email{body_.as_object().at("email").as_string()};
+    std::string password{body_.as_object().at("password").as_string()};
 
     const auto user = co_await state_->get_database()->get_user_by_email(email);
 
@@ -32,8 +32,8 @@ class auth_controller final : public components::http_controller {
       const components::json::object errors = {
           {"message", "Email provided isn't registered."}};
 
-      co_return response(request, components::http_status_code::not_found,
-                         serialize(errors), "application/json");
+      co_return make_response(request, components::http_status_code::not_found,
+                              serialize(errors), "application/json");
     }
 
     if (components::cipher_password_validator(password,
@@ -45,15 +45,15 @@ class auth_controller final : public components::http_controller {
       const components::json::object data = {{"token", token}};
 
       auto shared_token = std::make_shared<std::string>(token.data());
-      co_return response(request, components::http_status_code::ok,
-                         serialize(data), "application/json");
+      co_return make_response(request, components::http_status_code::ok,
+                              serialize(data), "application/json");
     }
 
     const components::json::object errors = {
         {"message", "Password provided doesn't match."}};
 
-    co_return response(request, components::http_status_code::unauthorized,
-                       serialize(errors), "application/json");
+    co_return make_response(request, components::http_status_code::unauthorized,
+                            serialize(errors), "application/json");
   }
 };
 

@@ -8,6 +8,13 @@
 
 namespace copper::components {
 
+/**
+ * Generates HTTP response on bad requests
+ *
+ * @param request
+ * @param start_at
+ * @return http_response
+ */
 http_response http_response_bad_request(const http_request& request,
                                         long start_at);
 

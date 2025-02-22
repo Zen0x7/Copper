@@ -16,20 +16,81 @@
 
 namespace copper::models {
 
+/**
+ * Request
+ */
 class request : public components::shared_enabled<request> {
  public:
+  /**
+   * ID
+   */
   std::string id_;
+
+  /**
+   * Session ID
+   */
   std::string session_id_;
+
+  /**
+   * Version
+   */
   std::string version_;
+
+  /**
+   * Method
+   */
   std::string method_;
+
+  /**
+   * Path
+   */
   std::string path_;
+
+  /**
+   * Query
+   */
   std::string query_;
+
+  /**
+   * Headers
+   */
   std::string headers_;
+
+  /**
+   * Body
+   */
   std::string body_;
+
+  /**
+   * Started at
+   */
   long started_at_;
+
+  /**
+   * Finished at
+   */
   long finished_at_;
+
+  /**
+   * Duration
+   */
   long duration_;
 
+  /**
+   * Constructor
+   *
+   * @param id
+   * @param session_id
+   * @param version
+   * @param method
+   * @param path
+   * @param query
+   * @param headers
+   * @param body
+   * @param started_at
+   * @param finished_at
+   * @param duration
+   */
   request(std::string id, std::string session_id, std::string version,
           std::string method, std::string path, std::string query,
           std::string headers, std::string body, long started_at,
@@ -47,6 +108,15 @@ class request : public components::shared_enabled<request> {
         duration_(duration) {}
 };
 
+/**
+ * Create request from HTTP request
+ *
+ * @param session_id
+ * @param request_id
+ * @param now
+ * @param request
+ * @return
+ */
 components::shared<request> request_from_http_request(
     components::uuid session_id, components::uuid request_id, long now,
     const components::http_request &request);

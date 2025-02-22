@@ -10,9 +10,9 @@ namespace copper::components {
 
 void validator::insert_or_push(const std::string &key,
                                const std::string &message) {
-  if (!this->errors.contains(key)) this->errors[key] = boost::json::array({});
+  if (!this->errors_.contains(key)) this->errors_[key] = boost::json::array({});
 
-  this->errors.at(key).as_array().emplace_back(message);
+  this->errors_.at(key).as_array().emplace_back(message);
 }
 
 shared<validator> validator_make(const containers::map_of_strings &rules,
@@ -135,7 +135,7 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
     }
   }
 
-  response->success = response->errors.empty();
+  response->success_ = response->errors_.empty();
 
   return response;
   // LCOV_EXCL_START

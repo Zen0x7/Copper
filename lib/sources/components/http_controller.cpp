@@ -10,20 +10,21 @@ void http_controller::set_bindings(
 }
 
 // LCOV_EXCL_START
-void http_controller::set_data(const json::value &data) { data_ = data; }
+void http_controller::set_body(const json::value &body) { body_ = body; }
 
 void http_controller::set_user(const uuid id) { auth_id_ = id; }
 
-void http_controller::set_start(long at) { start_ = at; }
+void http_controller::set_start_at(long start_at) { start_at_ = start_at; }
 
-void http_controller::set_config(http_controller_config config) {
-  config_ = config;
+void http_controller::set_configuration(
+    http_controller_configuration configuration) {
+  configuration_ = configuration;
 }
 
-http_response http_controller::response(const http_request &request,
-                                        const http_status_code status,
-                                        const std::string &data,
-                                        const char *type) const {
+http_response http_controller::make_response(const http_request &request,
+                                             http_status_code status,
+                                             const std::string &data,
+                                             const char *type) const {
   const auto resolved_at = chronos::now();
 
   http_response response{};
@@ -38,7 +39,7 @@ http_response http_controller::response(const http_request &request,
   response.set(http_fields::access_control_allow_origin, allowed_origins);
 
   response.set("X-Server", "Copper");
-  response.set("X-Time", std::to_string(resolved_at - start_));
+  response.set("X-Time", std::to_string(resolved_at - start_at_));
   response.version(request.version());
   response.keep_alive(request.keep_alive());
   response.result(status);

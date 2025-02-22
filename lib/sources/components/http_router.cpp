@@ -18,8 +18,8 @@ http_route http_router::factory(http_method method, const char *path) {
 
 shared<http_router> http_router::push(http_method method, const char *path,
                                       const shared<http_controller> &controller,
-                                      http_controller_config config) {
-  controller->set_config(config);
+                                      http_controller_configuration config) {
+  controller->set_configuration(config);
 
   get_routes()->push_back(
       std::pair(components::http_router::factory(method, path), controller));
