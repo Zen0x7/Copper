@@ -1,3 +1,4 @@
+#include <copper/components/views.hpp>
 #include <copper/components/cache.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/database.hpp>
@@ -12,7 +13,8 @@ state::state(const shared<configuration>& configuration,
     : configuration_(configuration),
       http_router_(boost::make_shared<http_router>()),
       redis_(boost::make_shared<cache>(configuration)),
-      database_(boost::make_shared<database>(pool)) {}
+      database_(boost::make_shared<database>(pool)),
+      views_(boost::make_shared<views>()){}
 
 shared<configuration> state::get_configuration() { return configuration_; }
 

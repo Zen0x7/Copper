@@ -16,6 +16,9 @@ find_package(
         REQUIRED
 )
 
+find_package(nlohmann_json 3.11.3 REQUIRED)
+find_package(inja REQUIRED)
+
 include(FetchContent)
 include_directories(lib/include)
 
@@ -47,7 +50,7 @@ if (BUILD_TESTS)
 
     enable_testing()
     add_executable(tests deps/asio.cpp deps/beast.cpp deps/redis.cpp deps/mysql.cpp ${SOURCES} ${TESTS})
-    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt bcrypt)
+    target_link_libraries(tests GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt bcrypt nlohmann_json::nlohmann_json)
     target_compile_definitions(tests PRIVATE BOOST_ASIO_SEPARATE_COMPILATION)
     target_compile_definitions(tests PRIVATE BOOST_REDIS_SEPARATE_COMPILATION)
     target_compile_definitions(tests PRIVATE BOOST_BEAST_SEPARATE_COMPILATION)
@@ -57,7 +60,7 @@ if (BUILD_TESTS)
 endif ()
 
 add_executable(copper deps/asio.cpp deps/beast.cpp deps/redis.cpp deps/mysql.cpp main.cpp ${SOURCES})
-target_link_libraries(copper ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt bcrypt)
+target_link_libraries(copper ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt bcrypt nlohmann_json::nlohmann_json)
 target_compile_definitions(copper PRIVATE BOOST_ASIO_SEPARATE_COMPILATION)
 target_compile_definitions(copper PRIVATE BOOST_REDIS_SEPARATE_COMPILATION)
 target_compile_definitions(copper PRIVATE BOOST_BEAST_SEPARATE_COMPILATION)

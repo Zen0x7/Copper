@@ -29,6 +29,14 @@ class configuration;
  */
 class database;
 
+/**
+ * Forward views
+ */
+class views;
+
+/**
+ * State
+ */
 class state : public shared_enabled<state> {
   /**
    *
@@ -49,6 +57,11 @@ class state : public shared_enabled<state> {
    * Database
    */
   shared<database> database_;
+
+  /**
+   * Views
+   */
+  shared<views> views_;
 
  public:
   /**
