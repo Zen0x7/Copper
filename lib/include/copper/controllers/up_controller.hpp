@@ -9,8 +9,17 @@
 
 namespace copper::controllers {
 
+/**
+ * UP Controller
+ */
 class up_controller final : public components::http_controller {
  public:
+  /**
+   * Invoke
+   *
+   * @param request
+   * @return async_of<http_response>
+   */
   components::containers::async_of<components::http_response> invoke(
       const components::http_request &request) override {
     auto now = components::chronos::now();

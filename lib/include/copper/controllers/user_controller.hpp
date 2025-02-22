@@ -10,8 +10,17 @@
 
 namespace copper::controllers {
 
+/**
+ * User controller
+ */
 class user_controller final : public components::http_controller {
  public:
+  /**
+   * Invoke
+   *
+   * @param request
+   * @return async_of<http_response>
+   */
   components::containers::async_of<components::http_response> invoke(
       const components::http_request &request) override {
     auto _user = co_await state_->get_database()->get_user_by_id(auth_id_);

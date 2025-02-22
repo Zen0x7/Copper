@@ -11,8 +11,16 @@
 
 namespace copper::controllers {
 
+/**
+ * Auth controller
+ */
 class auth_controller final : public components::http_controller {
  public:
+  /**
+   * Rules
+   *
+   * @return map_of_strings
+   */
   components::containers::map_of_strings rules() const override {
     return {
         {"*", "is_object"},
@@ -21,6 +29,12 @@ class auth_controller final : public components::http_controller {
     };
   }
 
+  /**
+   * Invoke
+   *
+   * @param request
+   * @return async_of<http_response>
+   */
   components::containers::async_of<components::http_response> invoke(
       const components::http_request &request) override {
     std::string email{body_.as_object().at("email").as_string()};

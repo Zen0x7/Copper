@@ -11,7 +11,8 @@ namespace copper {
 
 /**
  * Get version
- * @return
+ *
+ * @return string
  */
 std::string get_version();
 
