@@ -4,10 +4,11 @@
 #include <boost/json/parse.hpp>
 #include <boost/json/serialize.hpp>
 #include <copper/components/chronos.hpp>
-#include <copper/components/dotenv.hpp>
+#include <copper/components/configuration.hpp>
 #include <copper/components/http_controller.hpp>
 #include <copper/components/http_fields.hpp>
 #include <copper/components/http_response.hpp>
+#include <copper/components/http_router.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/server_certificates.hpp>
@@ -56,8 +57,9 @@ class params_controller final : public http_controller {
 };
 
 TEST(Components_HTTP_Session, Implementation) {
-  dotenv::init();
   try {
+    auto _configuration = boost::make_shared<configuration>();
+
     auto const address = boost::asio::ip::make_address("0.0.0.0");
     auto const port = 9001;
     auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
@@ -74,21 +76,22 @@ TEST(Components_HTTP_Session, Implementation) {
 
     boost::mysql::pool_params database_params;
     database_params.server_address.emplace_host_and_port(
-        dotenv::getenv("DATABASE_HOST", "127.0.0.1"),
-        std::stoi(dotenv::getenv("DATABASE_PORT", "3306")));
+        _configuration->get()->database_host_,
+        _configuration->get()->database_port_);
 
-    database_params.username = dotenv::getenv("DATABASE_USER", "user");
-    database_params.password =
-        dotenv::getenv("DATABASE_PASSWORD", "user_password");
-    database_params.database = dotenv::getenv("DATABASE_NAME", "copper");
-    database_params.thread_safe = true;
-    database_params.initial_size = 10;
-    database_params.max_size = 100;
+    database_params.username = _configuration->get()->database_user_;
+    database_params.password = _configuration->get()->database_password_;
+    database_params.database = _configuration->get()->database_name_;
+    database_params.thread_safe =
+        _configuration->get()->database_pool_thread_safe_;
+    database_params.initial_size =
+        _configuration->get()->database_pool_initial_size_;
+    database_params.max_size = _configuration->get()->database_pool_max_size_;
 
     auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
         ioc, std::move(database_params));
 
-    auto state_ = boost::make_shared<state>(database_pool);
+    auto state_ = boost::make_shared<state>(_configuration, database_pool);
 
     state_->get_database()->start();
 
@@ -230,7 +233,8 @@ TEST(Components_HTTP_Session, Implementation) {
       response.clear();
 
       {
-        std::cout << "Key used: " << dotenv::getenv("APP_KEY") << std::endl
+        std::cout << "Key used: " << _configuration->get()->app_key_
+                  << std::endl
                   << std::endl;
         std::cout << "Token that will be used: "
                   << json_response.as_object().at("token").as_string()

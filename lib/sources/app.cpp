@@ -5,6 +5,8 @@
 #include <copper/app.hpp>
 #include <copper/components/base64.hpp>
 #include <copper/components/cipher.hpp>
+#include <copper/components/configuration.hpp>
+#include <copper/components/http_router.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/server_certificates.hpp>
 #include <copper/components/shared.hpp>
@@ -24,7 +26,6 @@ std::string get_version() { return "3.0.0"; }
 int run(int argc, const char *argv[]) {
   using namespace components;
 
-  dotenv::init();
   boost::program_options::options_description program_description(
       "Allowed options");
 
@@ -47,17 +48,17 @@ int run(int argc, const char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  auto _configuration = boost::make_shared<configuration>();
+
   const auto as = vm["as"].as<std::string>();
 
   if (as == "service") {
     auto const address =
-        boost::asio::ip::make_address(dotenv::getenv("APP_HOST", "0.0.0.0"));
-    auto const port =
-        (unsigned short)std::stoi(dotenv::getenv("APP_PORT", "9000"));
+        boost::asio::ip::make_address(_configuration->get()->app_host_);
+    auto const port = (unsigned short)_configuration->get()->app_port_;
     auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
     auto const doc_root = std::string_view{"."};
-    auto const threads =
-        std::max<int>(1, std::stoi(dotenv::getenv("APP_THREADS", "8")));
+    auto const threads = std::max<int>(1, _configuration->get()->app_threads_);
 
     boost::asio::io_context ioc{threads};
 
@@ -65,33 +66,31 @@ int run(int argc, const char *argv[]) {
 
     ctx.set_options(boost::asio::ssl::context::default_workarounds |
                     boost::asio::ssl::context::single_dh_use);
-    ctx.use_certificate_chain_file(
-        dotenv::getenv("APP_PUBLIC_KEY", "./certificates/public.pem"));
-    ctx.use_private_key_file(
-        dotenv::getenv("APP_PRIVATE_KEY", "./certificates/private.pem"),
-        boost::asio::ssl::context::pem);
-    ctx.use_tmp_dh_file(
-        dotenv::getenv("APP_DH_PARAMS", "./certificates/params.pem"));
+    ctx.use_certificate_chain_file(_configuration->get()->app_public_key_);
+    ctx.use_private_key_file(_configuration->get()->app_private_key_,
+                             boost::asio::ssl::context::pem);
+    ctx.use_tmp_dh_file(_configuration->get()->app_dh_params_);
 
     auto _task_group = boost::make_shared<task_group>(ioc.get_executor());
 
     boost::mysql::pool_params database_params;
     database_params.server_address.emplace_host_and_port(
-        dotenv::getenv("DATABASE_HOST", "127.0.0.1"),
-        std::stoi(dotenv::getenv("DATABASE_PORT", "3306")));
+        _configuration->get()->database_host_,
+        _configuration->get()->database_port_);
 
-    database_params.username = dotenv::getenv("DATABASE_USER", "user");
-    database_params.password =
-        dotenv::getenv("DATABASE_PASSWORD", "user_password");
-    database_params.database = dotenv::getenv("DATABASE_NAME", "copper");
-    database_params.thread_safe = true;
-    database_params.initial_size = 10;
-    database_params.max_size = 100;
+    database_params.username = _configuration->get()->database_user_;
+    database_params.password = _configuration->get()->database_password_;
+    database_params.database = _configuration->get()->database_name_;
+    database_params.thread_safe =
+        _configuration->get()->database_pool_thread_safe_;
+    database_params.initial_size =
+        _configuration->get()->database_pool_initial_size_;
+    database_params.max_size = _configuration->get()->database_pool_max_size_;
 
     auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
         ioc, std::move(database_params));
 
-    auto _state = boost::make_shared<state>(database_pool);
+    auto _state = boost::make_shared<state>(_configuration, database_pool);
 
     _state->get_database()->start();
 

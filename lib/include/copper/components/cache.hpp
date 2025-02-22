@@ -13,15 +13,21 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
+/**
+ * Forward configuration
+ */
+class configuration;
 
 /**
  * Cache
  */
 class cache : public shared_enabled<cache> {
+  shared<configuration> configuration_;
+
   /**
    * Configuration
    */
-  shared<boost::redis::config> configuration_;
+  shared<boost::redis::config> redis_configuration_;
 
   /**
    * Retrieve connection
@@ -33,8 +39,9 @@ class cache : public shared_enabled<cache> {
  public:
   /**
    * Constructor
+   * @param configuration
    */
-  cache();
+  cache(const shared<configuration> &configuration);
 
   /**
    * Determines if request can be invoked
