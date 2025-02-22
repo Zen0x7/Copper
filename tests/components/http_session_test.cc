@@ -141,10 +141,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     std::vector<std::thread> v;
     v.reserve(threads);
-    for (auto i = threads; i > 0; --i)
-      v.emplace_back([&ioc, i] {
-        ioc.run();
-      });
+    for (auto i = threads; i > 0; --i) v.emplace_back([&ioc, i] { ioc.run(); });
 
     sleep(1);
 
