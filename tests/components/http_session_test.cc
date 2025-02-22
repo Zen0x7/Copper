@@ -130,7 +130,6 @@ TEST(Components_HTTP_Session, Implementation) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
-              std::cerr << "Error in listener: " << e.what() << "\n";
             }
           }
         }));
@@ -144,9 +143,7 @@ TEST(Components_HTTP_Session, Implementation) {
     v.reserve(threads);
     for (auto i = threads; i > 0; --i)
       v.emplace_back([&ioc, i] {
-        std::cout << "Thread " << i << " starting " << std::endl;
         ioc.run();
-        std::cout << "Thread " << i << " stopped " << std::endl;
       });
 
     sleep(1);
@@ -181,7 +178,6 @@ TEST(Components_HTTP_Session, Implementation) {
         boost::beast::http::write(stream, request);
         boost::beast::http::read(stream, buffer, response);
         buffer.clear();
-        std::cout << "Too Many Request: " << response << std::endl << std::endl;
         response.clear();
       }
     }
@@ -207,7 +203,6 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();
-      std::cout << "Exception Request: " << response << std::endl << std::endl;
       response.clear();
     }
 
@@ -225,22 +220,11 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();
-      std::cout << "Success auth Request: " << response << std::endl
-                << std::endl;
-
       auto json_response = boost::json::parse(response.body());
 
       response.clear();
 
       {
-        std::cout << "Key used: " << _configuration->get()->app_key_
-                  << std::endl
-                  << std::endl;
-        std::cout << "Token that will be used: "
-                  << json_response.as_object().at("token").as_string()
-                  << std::endl
-                  << std::endl;
-
         boost::beast::flat_buffer user_buffer;
         boost::beast::http::response<boost::beast::http::string_body>
             user_response;
@@ -252,8 +236,6 @@ TEST(Components_HTTP_Session, Implementation) {
         boost::beast::http::write(stream, user_request);
         boost::beast::http::read(stream, user_buffer, user_response);
         user_buffer.clear();
-        std::cout << "Authenticated Request: " << user_response << std::endl
-                  << std::endl;
         user_response.clear();
       }
     }
@@ -271,8 +253,6 @@ TEST(Components_HTTP_Session, Implementation) {
       request.body() = serialize(wrong_user);
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
-      std::cout << "Wrong password auth Request: " << response << std::endl
-                << std::endl;
       buffer.clear();
       response.clear();
     }
@@ -291,8 +271,6 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();
-      std::cout << "Wrong email auth Request: " << response << std::endl
-                << std::endl;
       response.clear();
     }
 
@@ -304,7 +282,6 @@ TEST(Components_HTTP_Session, Implementation) {
       request.set(http_fields::user_agent, "Copper");
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
-      std::cout << "Params Request: " << response << std::endl << std::endl;
       buffer.clear();
       response.clear();
     }
@@ -318,7 +295,6 @@ TEST(Components_HTTP_Session, Implementation) {
       request.set(http_fields::user_agent, "Copper");
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
-      std::cout << "Query Request: " << response << std::endl << std::endl;
       buffer.clear();
       response.clear();
     }
@@ -332,7 +308,6 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();
-      std::cout << "Bad Request: " << response << std::endl << std::endl;
       response.clear();
     }
 
@@ -345,7 +320,6 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();
-      std::cout << "User Request: " << response << std::endl << std::endl;
       response.clear();
     }
 
@@ -358,7 +332,6 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
       buffer.clear();
-      std::cout << "Close Request: " << response << std::endl << std::endl;
       response.clear();
     }
 
@@ -366,7 +339,6 @@ TEST(Components_HTTP_Session, Implementation) {
 
     stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     if (ec && ec != boost::system::errc::not_connected) {
-      std::cerr << "Error en shutdown: " << ec.message() << std::endl;
     }
 
     stream.close();

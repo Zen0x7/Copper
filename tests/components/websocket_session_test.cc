@@ -68,7 +68,6 @@ TEST(Components_WebSocket_Session, Implementation) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
-              std::cerr << "Error in listener: " << e.what() << "\n";
             }
           }
         }));
@@ -82,9 +81,7 @@ TEST(Components_WebSocket_Session, Implementation) {
     v.reserve(threads);
     for (auto i = threads; i > 0; --i)
       v.emplace_back([&ioc, i] {
-        std::cout << "Thread " << i << " starting " << std::endl;
         ioc.run();
-        std::cout << "Thread " << i << " stopped " << std::endl;
       });
 
     sleep(1);
@@ -126,10 +123,7 @@ TEST(Components_WebSocket_Session, Implementation) {
     boost::beast::error_code ec;
     ws.close(boost::beast::websocket::close_code::normal, ec);
     if (ec) {
-      std::cerr << "Error en shutdown: " << ec.message() << std::endl;
     }
-
-    std::cout << boost::beast::make_printable(buffer.data()) << std::endl;
 
     client_ioc.run();
 
