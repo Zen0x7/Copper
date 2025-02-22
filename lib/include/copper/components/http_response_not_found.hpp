@@ -8,6 +8,13 @@
 
 namespace copper::components {
 
+/**
+ * Generate HTTP response on not found
+ *
+ * @param request
+ * @param start_at
+ * @return http_response
+ */
 http_response http_response_not_found(const http_request& request,
                                       long start_at);
 

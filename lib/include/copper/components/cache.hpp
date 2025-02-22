@@ -14,39 +14,103 @@
 
 namespace copper::components {
 
+/**
+ * Cache
+ */
 class cache : public shared_enabled<cache> {
-  shared<boost::redis::config> config_;
+  /**
+   * Configuration
+   */
+  shared<boost::redis::config> configuration_;
 
+  /**
+   * Retrieve connection
+   *
+   * @return shared<redis::connection>
+   */
   containers::async_of<shared<boost::redis::connection>> get_connection();
 
  public:
+  /**
+   * Constructor
+   */
   cache();
 
-  containers::async_of<std::tuple<bool, int>> can_invoke(
+  /**
+   * Determines if request can be invoked
+   *
+   * @param request
+   * @param ip
+   * @param max_requests
+   * @return async_of<tuple_of<bool, int>>
+   */
+  containers::async_of<containers::tuple_of<bool, int>> can_invoke(
       const http_request &request, const std::string &ip,
       const int &max_requests);
 
  private:
+  /**
+   * Determines if cache has key
+   *
+   * @param key
+   * @param connection
+   * @return async_of<int>
+   */
   static containers::async_of<int> has(
       const std::string &key,
       const shared<boost::redis::connection> &connection);
 
+  /**
+   * Retrieves key's invoked times
+   *
+   * @param key
+   * @param connection
+   * @return async_of<int64_t>
+   */
   static containers::async_of<int64_t> counter_of(
       const std::string &key,
       const shared<boost::redis::connection> &connection);
 
+  /**
+   * Retrieve key's expiration at
+   *
+   * @param key
+   * @param connection
+   * @return async_of<void>
+   */
   static containers::async_of<int64_t> get_expiration_of(
       const std::string &key,
       const shared<boost::redis::connection> &connection);
 
+  /**
+   * Increase key
+   *
+   * @param key
+   * @param connection
+   * @return async_of<void>
+   */
   static containers::async_of<void> increase(
       const std::string &key,
       const shared<boost::redis::connection> &connection);
 
+  /**
+   * Set key
+   *
+   * @param key
+   * @param connection
+   * @return async_of<void>
+   */
   static containers::async_of<void> set(
       const std::string &key,
       const shared<boost::redis::connection> &connection);
 
+  /**
+   * Generate request based key
+   *
+   * @param request
+   * @param ip
+   * @return async_of<void>
+   */
   static std::string get_key_for(const http_request &request,
                                  const std::string &ip);
 };

@@ -10,8 +10,17 @@
 
 namespace copper::controllers {
 
+/**
+ * User controller
+ */
 class user_controller final : public components::http_controller {
  public:
+  /**
+   * Invoke
+   *
+   * @param request
+   * @return async_of<http_response>
+   */
   components::containers::async_of<components::http_response> invoke(
       const components::http_request &request) override {
     auto _user = co_await state_->get_database()->get_user_by_id(auth_id_);
@@ -25,8 +34,8 @@ class user_controller final : public components::http_controller {
         {"updated_at", _user->updated_at_},
     };
 
-    co_return response(request, components::http_status_code::ok,
-                       serialize(data), "application/json");
+    co_return make_response(request, components::http_status_code::ok,
+                            serialize(data), "application/json");
   }
 };
 

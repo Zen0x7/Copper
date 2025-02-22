@@ -20,16 +20,56 @@
 
 namespace copper::models {
 
+/**
+ * Response
+ */
 class response : public components::shared_enabled<response> {
  public:
+  /**
+   * ID
+   */
   std::string id_;
+
+  /**
+   * Session ID
+   */
   std::string session_id_;
+
+  /**
+   * Request ID
+   */
   std::string request_id_;
+
+  /**
+   * Status code
+   */
   int status_code_;
+
+  /**
+   * Headers
+   */
   std::string headers_;
+
+  /**
+   * Body
+   */
   std::string body_;
+
+  /**
+   * Protected
+   */
   bool protected_;
 
+  /**
+   * Constructor
+   *
+   * @param id
+   * @param session_id
+   * @param request_id
+   * @param status_code
+   * @param headers
+   * @param body
+   */
   response(std::string id, std::string session_id, std::string request_id,
            int status_code, std::string headers, std::string body)
       : id_(id),
@@ -41,6 +81,14 @@ class response : public components::shared_enabled<response> {
         protected_(false) {}
 };
 
+/**
+ * Create response from HTTP response
+ *
+ * @param session
+ * @param request
+ * @param http_response
+ * @return
+ */
 components::shared<response> response_from_http_response(
     components::uuid session, const components::shared<request> &request,
     const components::http_response &http_response);

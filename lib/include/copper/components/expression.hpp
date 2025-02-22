@@ -13,6 +13,9 @@
 
 namespace copper::components {
 
+/**
+ * Expression result
+ */
 class expression_result : public shared_enabled<expression_result> {
   /**
    * Matches flag
@@ -44,7 +47,7 @@ class expression_result : public shared_enabled<expression_result> {
   /**
    * Retrieves the bindings
    *
-   * @return
+   * @return unordered_map_of_strings
    */
   containers::unordered_map_of_strings get_bindings() const;
 
@@ -52,11 +55,14 @@ class expression_result : public shared_enabled<expression_result> {
    * Retrieves the value of attribute
    *
    * @param name
-   * @return
+   * @return string
    */
   std::string get(const std::string &name) const;
 };
 
+/**
+ * Expression
+ */
 class expression : public shared_enabled<expression> {
   /**
    * Regex expression
@@ -81,13 +87,13 @@ class expression : public shared_enabled<expression> {
   /**
    * Retrieves arguments
    *
-   * @return
+   * @return vector<string>
    */
   containers::vector_of<std::string> get_arguments() const;
 
   /**
    * Retrieves regex expression
-   * @return
+   * @return string
    */
   std::string get_regex() const;
 
@@ -95,16 +101,16 @@ class expression : public shared_enabled<expression> {
    * Retrieves a expression_result
    *
    * @param input
-   * @return
+   * @return shared<expression_result>
    */
   shared<expression_result> query(const std::string &input) const;
 };
 
 /**
- * Factory
+ * Expression factory
  *
  * @param input
- * @return
+ * @return shared<expression>
  */
 shared<expression> expression_make(const std::string &input);
 

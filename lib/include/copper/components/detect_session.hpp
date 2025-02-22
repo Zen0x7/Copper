@@ -14,7 +14,7 @@ namespace copper::components {
  * @param stream
  * @param ctx
  * @param doc_root
- * @return containers::async_of<void>
+ * @return async_of<void>
  */
 containers::async_of<void> detect_session(
     shared<state> state, uuid session_id,

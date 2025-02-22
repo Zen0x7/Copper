@@ -36,8 +36,8 @@ class exception_controller final : public http_controller {
                                {"data", "pong"},
                                {"timestamp", now},
                                {"status", 200}};
-    co_return response(request, http_status_code::ok, serialize(data),
-                       "application/json");
+    co_return make_response(request, http_status_code::ok, serialize(data),
+                            "application/json");
   }
 };
 
@@ -50,8 +50,8 @@ class params_controller final : public http_controller {
                                {"data", this->bindings_.at("name")},
                                {"timestamp", now},
                                {"status", 200}};
-    co_return response(request, http_status_code::ok, serialize(data),
-                       "application/json");
+    co_return make_response(request, http_status_code::ok, serialize(data),
+                            "application/json");
   }
 };
 
@@ -95,28 +95,28 @@ TEST(Components_HTTP_Session, Implementation) {
     state_->get_http_router()
         ->push(http_method::get, "/api/up",
                boost::make_shared<copper::controllers::up_controller>(),
-               {.use_throttler = true, .use_protector = false, .rpm = 5})
+               {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(http_method::get, "/api/params/{name}",
                boost::make_shared<params_controller>(),
-               {.use_throttler = true, .use_protector = false, .rpm = 5})
+               {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(http_method::get, "/api/exception",
                boost::make_shared<exception_controller>(),
-               {.use_throttler = true, .use_protector = false, .rpm = 5})
+               {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(http_method::get, "/api/user",
                boost::make_shared<copper::controllers::user_controller>(),
                {
-                   .use_auth = true,
-                   .use_throttler = true,
-                   .use_protector = false,
-                   .rpm = 5,
+                   .use_auth_ = true,
+                   .use_throttler_ = true,
+                   .use_protector_ = false,
+                   .rpm_ = 5,
                })
         ->push(http_method::post, "/api/auth",
                boost::make_shared<copper::controllers::auth_controller>(),
                {
-                   .use_throttler = true,
-                   .use_validator = true,
-                   .use_protector = true,
-                   .rpm = 5,
+                   .use_throttler_ = true,
+                   .use_validator_ = true,
+                   .use_protector_ = true,
+                   .rpm_ = 5,
                });
 
     boost::asio::co_spawn(

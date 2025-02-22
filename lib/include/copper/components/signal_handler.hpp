@@ -13,7 +13,7 @@ namespace copper::components {
  * Signal handler
  *
  * @param task_group
- * @return
+ * @return async_of<void>
  */
 containers::async_of<void> signal_handler(shared<task_group> task_group);
 

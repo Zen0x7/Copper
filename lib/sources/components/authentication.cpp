@@ -44,7 +44,7 @@ boost::optional<authentication_result> authentication_from_bearer(
           };
 
           if (auto instance = validator_make(rules, payload);
-              instance->success) {
+              instance->success_) {
             const std::string id{payload.as_object().at("sub").as_string()};
             const std::string type{payload.as_object().at("typ").as_string()};
             auto expires_at_ = payload.as_object().at("exp").as_int64();
@@ -59,8 +59,8 @@ boost::optional<authentication_result> authentication_from_bearer(
             // LCOV_EXCL_STOP
 
             return authentication_result{
-                .id = id_,
-                .type = type,
+                .id_ = id_,
+                .type_ = type,
             };
           }
         }

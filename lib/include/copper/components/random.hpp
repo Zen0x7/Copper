@@ -8,10 +8,10 @@
 namespace copper::components {
 
 /**
- * Generate a random string
+ * Get random string
  *
  * @param size
- * @return
+ * @return string
  */
 std::string random_string(int size = 16);
 

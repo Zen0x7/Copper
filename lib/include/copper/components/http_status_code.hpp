@@ -7,6 +7,9 @@
 
 namespace copper::components {
 
+/**
+ * HTTP status codes
+ */
 typedef boost::beast::http::status http_status_code;
 
 }  // namespace copper::components

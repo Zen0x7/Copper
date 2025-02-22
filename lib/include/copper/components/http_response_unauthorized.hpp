@@ -8,6 +8,13 @@
 
 namespace copper::components {
 
+/**
+ * Generate HTTP response on unauthorized
+ *
+ * @param request
+ * @param start_at
+ * @return http_response
+ */
 http_response http_response_unauthorized(const http_request& request,
                                          long start_at);
 

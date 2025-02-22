@@ -8,7 +8,7 @@
 namespace copper::components {
 
 /**
- * Get MIME type of path
+ * Get MIME type
  *
  * @param path
  * @return std::string Output

@@ -11,9 +11,24 @@
 
 namespace copper::components::json {
 
+/**
+ * JSON value
+ */
 typedef boost::json::value value;
+
+/**
+ * JSON object
+ */
 typedef boost::json::object object;
+
+/**
+ * JSON array
+ */
 typedef boost::json::array array;
+
+/**
+ * JSON string
+ */
 typedef boost::json::string string;
 
 }  // namespace copper::components::json

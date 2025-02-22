@@ -13,14 +13,45 @@
 
 namespace copper::models {
 
+/**
+ * Session
+ */
 class session : public components::shared_enabled<session> {
  public:
+  /**
+   * ID
+   */
   std::string id_;
+
+  /**
+   * IP
+   */
   std::string ip_;
+
+  /**
+   * Port
+   */
   uint_least16_t port_;
+
+  /**
+   * Started at
+   */
   long started_at_;
+
+  /**
+   * Finished at
+   */
   long finished_at_;
 
+  /**
+   * Constructor
+   *
+   * @param id
+   * @param ip
+   * @param port
+   * @param started_at
+   * @param finished_at
+   */
   session(std::string id, std::string ip, uint_least16_t port, long started_at,
           long finished_at)
       : id_(id),

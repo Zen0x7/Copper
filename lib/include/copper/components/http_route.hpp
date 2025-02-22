@@ -10,16 +10,48 @@
 
 namespace copper::components {
 
+/**
+ * HTTP route result
+ */
 struct http_route_result {
+  /**
+   * Matches
+   */
   bool matches_;
+
+  /**
+   * Bindings
+   */
   containers::unordered_map_of_strings bindings_;
 };
 
+/**
+ * HTTP route
+ */
 struct http_route {
+  /**
+   * Method
+   */
   http_method method_;
+
+  /**
+   * URL
+   */
   std::string url_;
+
+  /**
+   * Signature
+   */
   std::string signature_;
+
+  /**
+   * Is expression
+   */
   bool is_expression_ = false;
+
+  /**
+   * Expression
+   */
   shared<expression> expression_;
 };
 

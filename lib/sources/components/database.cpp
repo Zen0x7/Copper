@@ -141,7 +141,7 @@ containers::async_of<void> database::session_is_upgrade(uuid session_id) {
       result);
 }
 
-containers::async_of<void> database::create_request(
+containers::async_of<void> database::create_invocation(
     shared<copper::models::request> request,
     shared<copper::models::response> response) {
   auto connection = co_await pool_->async_get_connection(
@@ -149,8 +149,8 @@ containers::async_of<void> database::create_request(
 
   boost::mysql::results result;
 
-  auto request_body =  response->protected_ == true ? "" : request->body_;
-  auto response_body =  response->protected_ == true ? "" : response->body_;
+  auto request_body = response->protected_ == true ? "" : request->body_;
+  auto response_body = response->protected_ == true ? "" : response->body_;
 
   co_await connection->async_execute(
       boost::mysql::with_params(

@@ -14,6 +14,12 @@
 
 namespace copper::components {
 
+/**
+ * HTTP query from request
+ *
+ * @param request
+ * @return string
+ */
 std::string http_query_from_request(const http_request &request);
 
 }  // namespace copper::components

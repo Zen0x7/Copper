@@ -8,6 +8,14 @@
 
 namespace copper::components {
 
+/**
+ * HTTP route match
+ *
+ * @param method
+ * @param path
+ * @param route
+ * @return http_route_result
+ */
 http_route_result http_route_match(http_method method,
                                    const std::string_view &path,
                                    const http_route &route);
