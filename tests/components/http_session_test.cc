@@ -332,6 +332,19 @@ TEST(Components_HTTP_Session, Implementation) {
       response.clear();
     }
 
+
+    {
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::response<boost::beast::http::string_body> response;
+      http_request request{http_method::get, "/", 11};
+      request.set(http_fields::host, host);
+      request.set(http_fields::accept, "text/html");
+      boost::beast::http::write(stream, request);
+      boost::beast::http::read(stream, buffer, response);
+      buffer.clear();
+      response.clear();
+    }
+
     boost::system::error_code ec;
 
     stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
