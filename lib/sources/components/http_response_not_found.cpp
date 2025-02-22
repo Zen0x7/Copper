@@ -18,7 +18,8 @@ http_response http_response_not_found(const http_request &request,
 
   http_response response{http_status_code::not_found, request.version()};
 
-  bool requires_html = boost::contains(request.at(http_fields::accept), "html");
+  bool requires_html = request.count(http_fields::accept) > 0
+      && boost::contains(request.at(http_fields::accept), "html");
   if (requires_html) {
     response.set(http_fields::content_type, "text/html");
   } else {
