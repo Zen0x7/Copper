@@ -319,7 +319,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('b16f3b4e-5806-475c-9df5-50615ebe288a','Ian Torres','iantorres@outlook.com','2025-02-20 04:53:13','$2y$12$5TugeginzcTASbKSuFJX..syUDkrSPJoKkElnSfX4vkn0Amp5KQlG','NEj9ni9n7e','2025-02-20 04:53:13','2025-02-20 04:53:13');
+INSERT INTO `users` VALUES ('75a02add-cd16-4517-9c40-b57041eb2162','Ian Torres','iantorres@outlook.com','2025-02-20 04:53:13','$2y$12$5TugeginzcTASbKSuFJX..syUDkrSPJoKkElnSfX4vkn0Amp5KQlG','NEj9ni9n7e','2025-02-20 04:53:13','2025-02-20 04:53:13');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

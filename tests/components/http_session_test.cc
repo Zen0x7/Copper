@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/asio/co_spawn.hpp>
 #include <boost/json/parse.hpp>
 #include <boost/json/serialize.hpp>
@@ -167,6 +168,7 @@ TEST(Components_HTTP_Session, Implementation) {
     stream.connect(results);
 
     {
+      // Not found
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
       http_request request{http_method::get, "/", 11};
@@ -174,32 +176,116 @@ TEST(Components_HTTP_Session, Implementation) {
       request.set(http_fields::user_agent, "Copper");
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_EQ(response.body(), "{}");
+      ASSERT_EQ(response.result_int(), 404);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
 
     {
-      for (int i = 0; i <= 5; i++) {
+      // Options
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::response<boost::beast::http::string_body> response;
+      http_request request{http_method::options, "/api/up", 11};
+      request.set(http_fields::host, host);
+      request.set(http_fields::user_agent, "Copper");
+
+      boost::beast::http::write(stream, request);
+      boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_EQ(response.body(), "{}");
+      ASSERT_EQ(response.result_int(), 200);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_methods) >
+                  0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_methods), "GET");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
+      buffer.clear();
+      response.clear();
+    }
+
+    {
+      // Rate limiter
+      for (int i = 0; i < 5; i++) {
         boost::beast::flat_buffer buffer;
         boost::beast::http::response<boost::beast::http::string_body> response;
         http_request request{http_method::get, "/api/up", 11};
         request.set(http_fields::host, host);
         request.set(http_fields::user_agent, "Copper");
+
         boost::beast::http::write(stream, request);
         boost::beast::http::read(stream, buffer, response);
+
+        ASSERT_TRUE(boost::starts_with(response.body(), R"({"timestamp":)"));
+        ASSERT_EQ(response.result_int(), 200);
+
+        ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+        ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+        ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) >
+                    0);
+        ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+        ASSERT_TRUE(response.count("X-Server") > 0);
+        ASSERT_EQ(response.at("X-Server"), "Copper");
+
+        ASSERT_TRUE(response.count("X-Time") > 0);
+
         buffer.clear();
         response.clear();
       }
     }
 
     {
+      // Too many requests
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{http_method::options, "/api/up", 11};
+      http_request request{http_method::get, "/api/up", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::user_agent, "Copper");
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_EQ(response.body(), "{}");
+      ASSERT_EQ(response.result_int(), 429);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+      ASSERT_TRUE(response.count("X-Rate-Until") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -208,10 +294,27 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
       http_request request{http_method::get, "/api/exception", 11};
+
       request.set(http_fields::host, host);
       request.set(http_fields::user_agent, "Copper");
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_EQ(response.body(), "{}");
+      ASSERT_EQ(response.result_int(), 500);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -229,6 +332,21 @@ TEST(Components_HTTP_Session, Implementation) {
       request.body() = serialize(existing_user);
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_TRUE(boost::starts_with(response.body(), R"({"token":"Bearer)"));
+      ASSERT_EQ(response.result_int(), 200);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       auto json_response = boost::json::parse(response.body());
 
@@ -243,8 +361,29 @@ TEST(Components_HTTP_Session, Implementation) {
         user_request.set(http_fields::user_agent, "Copper");
         user_request.set(http_fields::authorization,
                          json_response.as_object().at("token").as_string());
+
         boost::beast::http::write(stream, user_request);
         boost::beast::http::read(stream, user_buffer, user_response);
+
+        ASSERT_TRUE(boost::starts_with(user_response.body(), R"({"id":")"));
+        ASSERT_TRUE(boost::contains(user_response.body(),
+                                    "75a02add-cd16-4517-9c40-b57041eb2162"));
+        ASSERT_EQ(user_response.result_int(), 200);
+
+        ASSERT_TRUE(user_response.count(http_fields::content_type) > 0);
+        ASSERT_EQ(user_response.at(http_fields::content_type),
+                  "application/json");
+
+        ASSERT_TRUE(
+            user_response.count(http_fields::access_control_allow_origin) > 0);
+        ASSERT_EQ(user_response.at(http_fields::access_control_allow_origin),
+                  "*");
+
+        ASSERT_TRUE(user_response.count("X-Server") > 0);
+        ASSERT_EQ(user_response.at("X-Server"), "Copper");
+
+        ASSERT_TRUE(user_response.count("X-Time") > 0);
+
         user_buffer.clear();
         user_response.clear();
       }
@@ -263,6 +402,23 @@ TEST(Components_HTTP_Session, Implementation) {
       request.body() = serialize(wrong_user);
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_TRUE(boost::starts_with(response.body(), R"({"message":")"));
+      ASSERT_TRUE(
+          boost::contains(response.body(), "Password provided doesn't match."));
+      ASSERT_EQ(response.result_int(), 401);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -278,8 +434,26 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::json::object non_registered_user = {{"email", "ian@zentrack.cl"},
                                                  {"password", "abcdef"}};
       request.body() = serialize(non_registered_user);
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_TRUE(boost::starts_with(response.body(), R"({"message":")"));
+      ASSERT_TRUE(
+          boost::contains(response.body(), "Email provided isn't registered."));
+      ASSERT_EQ(response.result_int(), 401);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -290,8 +464,27 @@ TEST(Components_HTTP_Session, Implementation) {
       http_request request{http_method::get, "/api/params/hello", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::user_agent, "Copper");
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_TRUE(boost::starts_with(response.body(), R"({"message":")"));
+      ASSERT_TRUE(
+          boost::contains(response.body(), "Request has been processed."));
+      ASSERT_TRUE(boost::contains(response.body(), "hello"));
+      ASSERT_EQ(response.result_int(), 200);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -303,8 +496,27 @@ TEST(Components_HTTP_Session, Implementation) {
                            "/api/params/hello?a=b&c=d&e[]=f&e[]=g", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::user_agent, "Copper");
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_TRUE(boost::starts_with(response.body(), R"({"message":")"));
+      ASSERT_TRUE(
+          boost::contains(response.body(), "Request has been processed."));
+      ASSERT_TRUE(boost::contains(response.body(), "hello"));
+      ASSERT_EQ(response.result_int(), 200);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -315,8 +527,24 @@ TEST(Components_HTTP_Session, Implementation) {
       http_request request{http_method::get, "/api/../bad_request", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::user_agent, "Copper");
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_EQ(response.body(), "{}");
+      ASSERT_EQ(response.result_int(), 400);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -325,22 +553,27 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
       http_request request{http_method::get, "/api/user", 11};
-      request.set(http_fields::host, host);
-      request.set(http_fields::user_agent, "Copper");
-      boost::beast::http::write(stream, request);
-      boost::beast::http::read(stream, buffer, response);
-      buffer.clear();
-      response.clear();
-    }
 
-    {
-      boost::beast::flat_buffer buffer;
-      boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{http_method::get, "/", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::user_agent, "Copper");
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_EQ(response.body(), "{}");
+      ASSERT_EQ(response.result_int(), 401);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "application/json");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -351,8 +584,24 @@ TEST(Components_HTTP_Session, Implementation) {
       http_request request{http_method::get, "/", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::accept, "text/html");
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_TRUE(boost::starts_with(response.body(), R"(<!doctype html>)"));
+      ASSERT_EQ(response.result_int(), 404);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "text/html");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }
@@ -363,8 +612,24 @@ TEST(Components_HTTP_Session, Implementation) {
       http_request request{http_method::get, "/api/templated", 11};
       request.set(http_fields::host, host);
       request.set(http_fields::accept, "text/html");
+
       boost::beast::http::write(stream, request);
       boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_TRUE(boost::starts_with(response.body(), R"(<!doctype html>)"));
+      ASSERT_EQ(response.result_int(), 200);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "text/html");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
       buffer.clear();
       response.clear();
     }

@@ -11,8 +11,7 @@ http_route_result http_route_find(const std::string_view &path,
       path_has_parameters ? path.substr(0, query_ask_symbol_position) : path};
 
   if (route.is_expression_) {
-    const std::string query{path};
-    const auto expression_result = route.expression_->query(query);
+    const auto expression_result = route.expression_->query(to_be_compared);
     return {
         .matches_ = expression_result->matches(),
         .bindings_ = expression_result->get_bindings(),

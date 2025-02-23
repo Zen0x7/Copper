@@ -43,7 +43,8 @@ http_response http_response_cors(
   response.version(request.version());
   response.keep_alive(request.keep_alive());
 
-  response.content_length(0);
+  response.body() = "{}";
+  response.prepare_payload();
 
   return response;
 }

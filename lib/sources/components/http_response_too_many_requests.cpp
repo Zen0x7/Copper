@@ -33,8 +33,7 @@ http_response http_response_too_many_requests(const http_request &request,
   response.version(request.version());
   response.keep_alive(request.keep_alive());
 
-  response.body() = std::string(R"({"message":"too_many_requests"})");
-
+  response.body() = "{}";
   response.prepare_payload();
 
   return response;

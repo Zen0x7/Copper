@@ -17,7 +17,7 @@ http_route_result http_route_match(http_method method,
     return {.matches_ = false, .bindings_ = {}};
   } else if (!expression_rejection) {
     const std::string query{path};
-    const auto expression_result_ = route.expression_->query(query);
+    const auto expression_result_ = route.expression_->query(to_compare);
 
     return {
         .matches_ = expression_result_->matches(),

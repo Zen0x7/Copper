@@ -1,5 +1,6 @@
 #include <copper/components/cache.hpp>
 #include <copper/components/configuration.hpp>
+#include <iostream>
 
 namespace copper::components {
 
@@ -73,15 +74,16 @@ containers::async_of<std::tuple<bool, int>> cache::can_invoke(
   auto connection = co_await this->get_connection();
 
   if (co_await has(key, connection) != 0) {
-    const auto requests = co_await counter_of(key, connection);
+    auto requests = co_await counter_of(key, connection);
 
     co_await increase(key, connection);
+    requests++;
 
-    if (requests >= max_requests) {
-      co_return std::tuple{false, co_await get_expiration_of(key, connection)};
+    if (requests <= max_requests) {
+      co_return std::tuple{true, 0};
     }
 
-    co_return std::tuple{true, 0};
+    co_return std::tuple{false, co_await get_expiration_of(key, connection)};
   }
 
   co_await set(key, connection);

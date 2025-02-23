@@ -43,9 +43,8 @@ http_response http_response_not_found(const http_request &request,
   if (requires_html) {
     response.body() = state->get_views()->render("404");
   } else {
-    response.body() = std::string(R"({"message":"not_found"})");
+    response.body() = "{}";
   }
-
   response.prepare_payload();
 
   return response;
