@@ -46,7 +46,7 @@ class auth_controller final : public components::http_controller {
       const components::json::object errors = {
           {"message", "Email provided isn't registered."}};
 
-      co_return make_response(request, components::http_status_code::not_found,
+      co_return make_response(request, components::http_status_code::unauthorized,
                               serialize(errors), "application/json");
     }
 

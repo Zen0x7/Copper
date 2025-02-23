@@ -32,7 +32,7 @@ http_response http_response_bad_request(const http_request &request,
   response.version(request.version());
   response.keep_alive(request.keep_alive());
 
-  response.body() = std::string(R"({"message":"bad_request"})");
+  response.body() = "{}";
 
   response.prepare_payload();
 
