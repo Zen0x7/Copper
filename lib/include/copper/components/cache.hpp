@@ -55,6 +55,16 @@ class cache : public shared_enabled<cache> {
       const http_request &request, const std::string &ip,
       const int &max_requests);
 
+  /**
+   * Publish
+   *
+   * @param channel
+   * @param data
+   * @return async_of<void>
+   */
+  containers::async_of<void> publish(const std::string &channel,
+                                     const std::string &data);
+
  private:
   /**
    * Determines if cache has key
@@ -110,16 +120,6 @@ class cache : public shared_enabled<cache> {
   static containers::async_of<void> set(
       const std::string &key,
       const shared<boost::redis::connection> &connection);
-
-  /**
-   * Publish
-   *
-   * @param channel
-   * @param data
-   * @return async_of<void>
-   */
-  containers::async_of<void> publish(const std::string &channel,
-                                     const std::string &data);
 
   /**
    * Generate request based key
