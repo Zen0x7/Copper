@@ -116,7 +116,6 @@ class cache : public shared_enabled<cache> {
    *
    * @param channel
    * @param data
-   * @param connection
    * @return async_of<void>
    */
   containers::async_of<void> publish(const std::string &channel,
