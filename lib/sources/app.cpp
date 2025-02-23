@@ -12,6 +12,7 @@
 #include <copper/components/shared.hpp>
 #include <copper/components/signal_handler.hpp>
 #include <copper/components/state.hpp>
+#include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/controllers/auth_controller.hpp>
 #include <copper/controllers/up_controller.hpp>
@@ -129,6 +130,19 @@ int run(int argc, const char *argv[]) {
             }
           }
         }));
+
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), subscriber(_state),
+                          _task_group->adapt([](std::exception_ptr e) {
+                            if (e) {
+                              try {
+                                std::rethrow_exception(e);
+                              } catch (std::exception &e) {
+                                //              std::cerr << "Error in listener:
+                                //              " << e.what() <<
+                                //              "\n";
+                              }
+                            }
+                          }));
 
     boost::asio::co_spawn(boost::asio::make_strand(ioc),
                           signal_handler(_task_group), boost::asio::detached);

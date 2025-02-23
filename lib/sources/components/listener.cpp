@@ -1,4 +1,5 @@
 #include <boost/asio/co_spawn.hpp>
+#include <copper/components/cache.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/state.hpp>
 
@@ -28,7 +29,19 @@ containers::async_of<void> listener(shared<state> state,
 
     if (ec) throw boost::system::system_error{ec};
 
-    auto session_id = boost::uuids::random_generator()();
+    auto uuid_generator = boost::uuids::random_generator();
+
+    auto session_id = uuid_generator();
+    auto server_id = uuid_generator();
+    auto transaction_id = uuid_generator();
+
+    json::object server_registered = {
+        {"transaction_id", to_string(transaction_id)},
+        {"event", "server_registered"},
+        {"data", {{"id", to_string(server_id)}}}};
+
+    co_await state->get_cache()->publish("events",
+                                         serialize(server_registered));
 
     boost::asio::co_spawn(
         executor,

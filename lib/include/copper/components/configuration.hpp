@@ -1,6 +1,8 @@
 #ifndef COPPER_COMPONENTS_CONFIGURATION_HPP
 #define COPPER_COMPONENTS_CONFIGURATION_HPP
 
+#pragma once
+
 #include <copper/components/dotenv.hpp>
 #include <copper/components/shared.hpp>
 
