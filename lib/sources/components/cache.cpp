@@ -117,4 +117,13 @@ containers::async_of<shared<boost::redis::connection>> cache::get_connection() {
                   boost::asio::consign(boost::asio::detached, conn));
   co_return conn;
 }
+
+containers::async_of<void> cache::publish(const std::string &channel,
+                                          const std::string &data) {
+  auto connection = co_await this->get_connection();
+  boost::redis::request request;
+  request.push("PUBLISH", channel, data);
+  co_await connection->async_exec(request, boost::redis::ignore,
+                                  boost::asio::deferred);
+}
 }  // namespace copper::components

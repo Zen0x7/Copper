@@ -29,19 +29,19 @@ class cache : public shared_enabled<cache> {
    */
   shared<boost::redis::config> redis_configuration_;
 
-  /**
-   * Retrieve connection
-   *
-   * @return shared<redis::connection>
-   */
-  containers::async_of<shared<boost::redis::connection>> get_connection();
-
  public:
   /**
    * Constructor
    * @param configuration
    */
   cache(const shared<configuration> &configuration);
+
+  /**
+   * Retrieve connection
+   *
+   * @return shared<redis::connection>
+   */
+  containers::async_of<shared<boost::redis::connection>> get_connection();
 
   /**
    * Determines if request can be invoked
@@ -110,6 +110,17 @@ class cache : public shared_enabled<cache> {
   static containers::async_of<void> set(
       const std::string &key,
       const shared<boost::redis::connection> &connection);
+
+  /**
+   * Publish
+   *
+   * @param channel
+   * @param data
+   * @param connection
+   * @return async_of<void>
+   */
+  containers::async_of<void> publish(const std::string &channel,
+                                     const std::string &data);
 
   /**
    * Generate request based key

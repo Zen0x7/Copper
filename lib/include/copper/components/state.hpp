@@ -51,7 +51,7 @@ class state : public shared_enabled<state> {
   /**
    * Cache
    */
-  shared<cache> redis_;
+  shared<cache> cache_;
 
   /**
    * Database
