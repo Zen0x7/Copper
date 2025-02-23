@@ -16,8 +16,8 @@
 #include <copper/components/shared.hpp>
 #include <copper/components/signal_handler.hpp>
 #include <copper/components/state.hpp>
-#include <copper/components/task_group.hpp>
 #include <copper/components/subscriber.hpp>
+#include <copper/components/task_group.hpp>
 #include <copper/controllers/auth_controller.hpp>
 #include <copper/controllers/up_controller.hpp>
 #include <copper/controllers/user_controller.hpp>
