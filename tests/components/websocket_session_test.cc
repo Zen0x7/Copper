@@ -11,6 +11,7 @@
 #include <copper/components/signal_handler.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/task_group.hpp>
+#include <copper/components/subscriber.hpp>
 
 copper::components::containers::async_of<void> cancel_websocket_session() {
   auto executor = co_await boost::asio::this_coro::executor;
@@ -71,6 +72,19 @@ TEST(Components_WebSocket_Session, Implementation) {
             }
           }
         }));
+
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), subscriber(state_),
+                          task_group_->adapt([](std::exception_ptr e) {
+                            if (e) {
+                              try {
+                                std::rethrow_exception(e);
+                              } catch (std::exception &e) {
+                                //              std::cerr << "Error in listener:
+                                //              " << e.what() <<
+                                //              "\n";
+                              }
+                            }
+                          }));
 
     boost::asio::co_spawn(boost::asio::make_strand(ioc),
                           signal_handler(task_group_), boost::asio::detached);
