@@ -195,7 +195,6 @@ TEST(Components_HTTP_Session, Implementation) {
       response.clear();
     }
 
-
     {
       // Options
       boost::beast::flat_buffer buffer;
@@ -216,7 +215,8 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
       ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
 
-      ASSERT_TRUE(response.count(http_fields::access_control_allow_methods) > 0);
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_methods) >
+                  0);
       ASSERT_EQ(response.at(http_fields::access_control_allow_methods), "GET");
 
       ASSERT_TRUE(response.count("X-Server") > 0);
@@ -259,7 +259,6 @@ TEST(Components_HTTP_Session, Implementation) {
         response.clear();
       }
     }
-
 
     {
       // Too many requests
@@ -348,7 +347,6 @@ TEST(Components_HTTP_Session, Implementation) {
 
       ASSERT_TRUE(response.count("X-Time") > 0);
 
-
       buffer.clear();
       auto json_response = boost::json::parse(response.body());
 
@@ -368,14 +366,18 @@ TEST(Components_HTTP_Session, Implementation) {
         boost::beast::http::read(stream, user_buffer, user_response);
 
         ASSERT_TRUE(boost::starts_with(user_response.body(), R"({"id":")"));
-        ASSERT_TRUE(boost::contains(user_response.body(), "75a02add-cd16-4517-9c40-b57041eb2162"));
+        ASSERT_TRUE(boost::contains(user_response.body(),
+                                    "75a02add-cd16-4517-9c40-b57041eb2162"));
         ASSERT_EQ(user_response.result_int(), 200);
 
         ASSERT_TRUE(user_response.count(http_fields::content_type) > 0);
-        ASSERT_EQ(user_response.at(http_fields::content_type), "application/json");
+        ASSERT_EQ(user_response.at(http_fields::content_type),
+                  "application/json");
 
-        ASSERT_TRUE(user_response.count(http_fields::access_control_allow_origin) > 0);
-        ASSERT_EQ(user_response.at(http_fields::access_control_allow_origin), "*");
+        ASSERT_TRUE(
+            user_response.count(http_fields::access_control_allow_origin) > 0);
+        ASSERT_EQ(user_response.at(http_fields::access_control_allow_origin),
+                  "*");
 
         ASSERT_TRUE(user_response.count("X-Server") > 0);
         ASSERT_EQ(user_response.at("X-Server"), "Copper");
@@ -402,7 +404,8 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::read(stream, buffer, response);
 
       ASSERT_TRUE(boost::starts_with(response.body(), R"({"message":")"));
-      ASSERT_TRUE(boost::contains(response.body(), "Password provided doesn't match."));
+      ASSERT_TRUE(
+          boost::contains(response.body(), "Password provided doesn't match."));
       ASSERT_EQ(response.result_int(), 401);
 
       ASSERT_TRUE(response.count(http_fields::content_type) > 0);
@@ -436,7 +439,8 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::read(stream, buffer, response);
 
       ASSERT_TRUE(boost::starts_with(response.body(), R"({"message":")"));
-      ASSERT_TRUE(boost::contains(response.body(), "Email provided isn't registered."));
+      ASSERT_TRUE(
+          boost::contains(response.body(), "Email provided isn't registered."));
       ASSERT_EQ(response.result_int(), 401);
 
       ASSERT_TRUE(response.count(http_fields::content_type) > 0);
@@ -465,7 +469,8 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::read(stream, buffer, response);
 
       ASSERT_TRUE(boost::starts_with(response.body(), R"({"message":")"));
-      ASSERT_TRUE(boost::contains(response.body(), "Request has been processed."));
+      ASSERT_TRUE(
+          boost::contains(response.body(), "Request has been processed."));
       ASSERT_TRUE(boost::contains(response.body(), "hello"));
       ASSERT_EQ(response.result_int(), 200);
 
@@ -496,7 +501,8 @@ TEST(Components_HTTP_Session, Implementation) {
       boost::beast::http::read(stream, buffer, response);
 
       ASSERT_TRUE(boost::starts_with(response.body(), R"({"message":")"));
-      ASSERT_TRUE(boost::contains(response.body(), "Request has been processed."));
+      ASSERT_TRUE(
+          boost::contains(response.body(), "Request has been processed."));
       ASSERT_TRUE(boost::contains(response.body(), "hello"));
       ASSERT_EQ(response.result_int(), 200);
 

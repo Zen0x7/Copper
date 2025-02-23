@@ -1,6 +1,5 @@
 #include <copper/components/cache.hpp>
 #include <copper/components/configuration.hpp>
-
 #include <iostream>
 
 namespace copper::components {
