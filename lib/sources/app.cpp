@@ -44,8 +44,26 @@ int run(int argc, const char *argv[]) {
       boost::program_options::value<std::string>()->default_value("none"),
       "The `command` name.");
 
+      boost::program_options::options_description _command_invoke_description(
+        "Command `invoke` options");
+
+      _command_invoke_description.add_options()(
+        "method",
+        boost::program_options::value<std::string>()->default_value("GET"),
+        "HTTP verb.")(
+        "signature",
+        boost::program_options::value<std::string>()->default_value("/"),
+        "HTTP `path`.")(
+        "headers",
+        boost::program_options::value<std::string>()->default_value("{}"),
+        "HTTP `headers`.")(
+        "body",
+        boost::program_options::value<std::string>()->default_value("{}"),
+        "HTTP `body`.");
+
   boost::program_options::options_description _commandline_description;
   _commandline_description.add(_program_description);
+  _commandline_description.add(_command_invoke_description);
 
   boost::program_options::variables_map _vm;
   store(parse_command_line(argc, argv, _commandline_description), _vm);
@@ -190,6 +208,46 @@ int run(int argc, const char *argv[]) {
 
       fmt::print("APP_KEY={}\n", base64_encode(_key.first));
       fmt::print("APP_KEY_IV={}\n", base64_encode(_key.second));
+    } else if (_command == "invoke") {
+      auto _method = _vm["method"].as<std::string>();
+      auto _signature = _vm["signature"].as<std::string>();
+      auto _headers = _vm["headers"].as<std::string>();
+      auto _body = _vm["body"].as<std::string>();
+
+      auto _verb = boost::beast::http::string_to_verb(_method);
+
+      boost::asio::io_context _client_ioc;
+      boost::asio::ip::tcp::resolver _resolver(_client_ioc);
+      boost::beast::tcp_stream _stream(_client_ioc);
+
+      auto const _results = _resolver.resolve(_configuration->get()->app_host_, std::to_string(_configuration->get()->app_port_));
+
+      _stream.connect(_results);
+
+      {
+        boost::beast::flat_buffer _buffer;
+        boost::beast::http::response<boost::beast::http::string_body> _response;
+        http_request _request{_verb, _signature, 11};
+        _request.set(http_fields::host, _configuration->get()->app_host_);
+        _request.set(http_fields::user_agent, "Copper");
+        _request.set(http_fields::content_type, "application/json");
+        _request.body() = _body;
+        _request.prepare_payload();
+        boost::beast::http::write(_stream, _request);
+        boost::beast::http::read(_stream, _buffer, _response);
+
+        std::cout << _response << std::endl;
+
+        _buffer.clear();
+        _response.clear();
+      }
+
+      boost::system::error_code ec;
+      _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+      if (ec && ec != boost::system::errc::not_connected) {
+      }
+      _stream.close();
+      _client_ioc.run();
     }
   }
 
