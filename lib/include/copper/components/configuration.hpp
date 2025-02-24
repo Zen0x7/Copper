@@ -126,6 +126,16 @@ class configurations : public shared_enabled<configurations> {
    * HTTP allowed origins
    */
   std::string http_allowed_origins_;
+
+  /**
+   * Logging max size
+   */
+  int logging_max_size_;
+
+  /**
+   * Logging max files
+   */
+  int logging_max_files_;
 };
 
 /**

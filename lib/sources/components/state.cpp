@@ -16,7 +16,7 @@ state::state(const shared<configuration>& configuration,
       cache_(boost::make_shared<cache>(configuration)),
       database_(boost::make_shared<database>(pool)),
       views_(boost::make_shared<views>()),
-      logger_(boost::make_shared<logger>()) {
+      logger_(boost::make_shared<logger>(configuration)) {
   this->get_views()->push("404", "404");
 }
 

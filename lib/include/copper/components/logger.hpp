@@ -12,6 +12,12 @@
 #include "spdlog/sinks/basic_file_sink.h"
 
 namespace copper::components {
+
+/**
+ * Forward configuration
+ */
+class configuration;
+
 /**
  * Logger
  */
@@ -20,22 +26,22 @@ class logger : public shared_enabled<logger> {
   /**
    * System
    */
-  shared<spdlog::logger> system_;
+  basic_shared<spdlog::logger> system_;
 
   /**
    * Sessions
    */
-  shared<spdlog::logger> sessions_;
+  basic_shared<spdlog::logger> sessions_;
 
   /**
    * Requests
    */
-  shared<spdlog::logger> requests_;
+  basic_shared<spdlog::logger> requests_;
 
   /**
    * Constructor
    */
-  logger();
+  logger(shared<configuration> configuration);
 };
 }  // namespace copper::components
 
