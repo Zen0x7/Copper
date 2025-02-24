@@ -2,6 +2,8 @@
 #include <copper/components/http_controller.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/views.hpp>
+#include <copper/components/gunzip.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace copper::components {
 
@@ -48,7 +50,14 @@ http_response http_controller::make_response(const http_request &request,
   response.version(request.version());
   response.keep_alive(request.keep_alive());
   response.result(status);
-  response.body() = data;
+
+  if (!request["Accept-Encoding"].empty() && boost::starts_with(request["Accept-Encoding"], "gzip")) {
+    response.body() = gunzip_compress(data);
+    response.set(http_fields::content_encoding, "gzip");
+  } else {
+    response.body() = data;
+  }
+
   response.prepare_payload();
   return response;
 }
@@ -78,7 +87,14 @@ http_response http_controller::make_view(const http_request &request,
   response.version(request.version());
   response.keep_alive(request.keep_alive());
   response.result(status);
-  response.body() = state_->get_views()->render(view, data);
+
+  if (!request["Accept-Encoding"].empty() && boost::starts_with(request["Accept-Encoding"], "gzip")) {
+    response.body() = gunzip_compress(state_->get_views()->render(view, data));
+    response.set(http_fields::content_encoding, "gzip");
+  } else {
+    response.body() = state_->get_views()->render(view, data);
+  }
+  
   response.prepare_payload();
   return response;
 }
