@@ -66,8 +66,12 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                 boost::asio::strand<boost::asio::io_context::executor_type>>::
                 other{std::move(socket)},
             ctx, doc_root),
+
+        // LCOV_EXCL_START
         task_group->adapt([server_id, session_id, executor,
                            &state](std::exception_ptr e) {
+          // LCOV_EXCL_STOP
+
           if (e) {
             // LCOV_EXCL_START
             try {
