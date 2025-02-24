@@ -477,7 +477,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
       response.clear();
 
-      {
+      { // User
         boost::beast::flat_buffer user_buffer;
         boost::beast::http::response<boost::beast::http::string_body>
             user_response;
@@ -513,7 +513,7 @@ TEST(Components_HTTP_Session, Implementation) {
         user_response.clear();
       }
 
-      {
+      { // User compressed
         boost::beast::flat_buffer user_buffer;
         boost::beast::http::response<boost::beast::http::string_body>
           user_response;
@@ -527,8 +527,8 @@ TEST(Components_HTTP_Session, Implementation) {
         boost::beast::http::write(stream, user_request);
         boost::beast::http::read(stream, user_buffer, user_response);
 
-        ASSERT_TRUE(boost::starts_with(user_response.body(), R"({"id":")"));
-        ASSERT_TRUE(boost::contains(user_response.body(),
+        ASSERT_TRUE(boost::starts_with(gunzip_decompress(user_response.body()), R"({"id":")"));
+        ASSERT_TRUE(boost::contains(gunzip_decompress(user_response.body()),
                                     "75a02add-cd16-4517-9c40-b57041eb2162"));
         ASSERT_EQ(user_response.result_int(), 200);
 
