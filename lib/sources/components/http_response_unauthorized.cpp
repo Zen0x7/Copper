@@ -34,7 +34,7 @@ http_response http_response_unauthorized(const http_request &request,
   response.keep_alive(request.keep_alive());
 
   if (!request["Accept-Encoding"].empty() &&
-      boost::starts_with(request["Accept-Encoding"], "gzip")) {
+      boost::contains(request["Accept-Encoding"], "gzip")) {
     response.body() = gunzip_compress("{}");
     response.set(http_fields::content_encoding, "gzip");
   } else {

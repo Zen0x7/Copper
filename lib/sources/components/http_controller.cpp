@@ -52,7 +52,7 @@ http_response http_controller::make_response(const http_request &request,
   response.result(status);
 
   if (!request["Accept-Encoding"].empty() &&
-      boost::starts_with(request["Accept-Encoding"], "gzip")) {
+      boost::contains(request["Accept-Encoding"], "gzip")) {
     response.body() = gunzip_compress(data);
     response.set(http_fields::content_encoding, "gzip");
   } else {
@@ -90,7 +90,7 @@ http_response http_controller::make_view(const http_request &request,
   response.result(status);
 
   if (!request["Accept-Encoding"].empty() &&
-      boost::starts_with(request["Accept-Encoding"], "gzip")) {
+      boost::contains(request["Accept-Encoding"], "gzip")) {
     response.body() = gunzip_compress(state_->get_views()->render(view, data));
     response.set(http_fields::content_encoding, "gzip");
   } else {
