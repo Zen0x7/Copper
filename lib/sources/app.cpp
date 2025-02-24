@@ -15,9 +15,9 @@
 #include <copper/components/state.hpp>
 #include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
-#include <copper/controllers/auth_controller.hpp>
-#include <copper/controllers/up_controller.hpp>
-#include <copper/controllers/user_controller.hpp>
+#include <copper/controllers/api/auth_controller.hpp>
+#include <copper/controllers/api/up_controller.hpp>
+#include <copper/controllers/api/user_controller.hpp>
 #include <iostream>
 #include <thread>
 
@@ -136,20 +136,20 @@ int run(int argc, const char *argv[]) {
 
   _state->get_router()
       ->push(method::get, "/api/user",
-             boost::make_shared<controllers::user_controller>(),
+             boost::make_shared<controllers::api::user_controller>(),
              {
                  .use_auth_ = true,
                  .use_throttler_ = true,
                  .rpm_ = 5,
              })
       ->push(method::get, "/api/up",
-             boost::make_shared<controllers::up_controller>(),
+             boost::make_shared<controllers::api::up_controller>(),
              {
                  .use_throttler_ = true,
                  .rpm_ = 5,
              })
       ->push(method::post, "/api/auth",
-             boost::make_shared<controllers::auth_controller>(),
+             boost::make_shared<controllers::api::auth_controller>(),
              {
                  .use_throttler_ = true,
                  .use_validator_ = true,

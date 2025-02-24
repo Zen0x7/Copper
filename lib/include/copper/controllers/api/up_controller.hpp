@@ -1,5 +1,5 @@
-#ifndef COPPER_CONTROLLERS_UP_CONTROLLER_HPP
-#define COPPER_CONTROLLERS_UP_CONTROLLER_HPP
+#ifndef COPPER_CONTROLLERS_API_UP_CONTROLLER_HPP
+#define COPPER_CONTROLLERS_API_UP_CONTROLLER_HPP
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include <copper/components/controller.hpp>
 #include <copper/components/json.hpp>
 
-namespace copper::controllers {
+namespace copper::controllers::api {
 
 /**
  * UP Controller
@@ -29,6 +29,6 @@ class up_controller final : public components::controller {
   }
 };
 
-}  // namespace copper::controllers
+}  // namespace copper::controllers::api
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef COPPER_CONTROLLERS_AUTH_CONTROLLER_HPP
-#define COPPER_CONTROLLERS_AUTH_CONTROLLER_HPP
+#ifndef COPPER_CONTROLLERS_API_AUTH_CONTROLLER_HPP
+#define COPPER_CONTROLLERS_API_AUTH_CONTROLLER_HPP
 
 #pragma once
 
@@ -9,7 +9,7 @@
 #include <copper/components/controller.hpp>
 #include <copper/components/json.hpp>
 
-namespace copper::controllers {
+namespace copper::controllers::api {
 
 /**
  * Auth controller
@@ -71,6 +71,6 @@ class auth_controller final : public components::controller {
   }
 };
 
-}  // namespace copper::controllers
+}  // namespace copper::controllers::api
 
 #endif

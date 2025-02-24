@@ -19,9 +19,9 @@
 #include <copper/components/state.hpp>
 #include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
-#include <copper/controllers/auth_controller.hpp>
-#include <copper/controllers/up_controller.hpp>
-#include <copper/controllers/user_controller.hpp>
+#include <copper/controllers/api/auth_controller.hpp>
+#include <copper/controllers/api/up_controller.hpp>
+#include <copper/controllers/api/user_controller.hpp>
 #include <nlohmann/json.hpp>
 
 using namespace copper::components;
@@ -111,7 +111,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     _state->get_router()
         ->push(method::get, "/api/up",
-               boost::make_shared<copper::controllers::up_controller>(),
+               boost::make_shared<copper::controllers::api::up_controller>(),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(method::get, "/api/templated",
                boost::make_shared<templated_controller>(),
@@ -123,7 +123,7 @@ TEST(Components_HTTP_Session, Implementation) {
                boost::make_shared<exception_controller>(),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(method::get, "/api/user",
-               boost::make_shared<copper::controllers::user_controller>(),
+               boost::make_shared<copper::controllers::api::user_controller>(),
                {
                    .use_auth_ = true,
                    .use_throttler_ = true,
@@ -131,7 +131,7 @@ TEST(Components_HTTP_Session, Implementation) {
                    .rpm_ = 5,
                })
         ->push(method::post, "/api/auth",
-               boost::make_shared<copper::controllers::auth_controller>(),
+               boost::make_shared<copper::controllers::api::auth_controller>(),
                {
                    .use_throttler_ = true,
                    .use_validator_ = true,
