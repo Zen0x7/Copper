@@ -959,7 +959,10 @@ TEST(Components_HTTP_Session, Implementation) {
     ASSERT_TRUE(true);
 
   } catch (std::runtime_error &e) {
+    std::cout << e.what() << std::endl;
   } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
   } catch (...) {
+    std::cout << "Something went wrong" << std::endl;
   }
 }

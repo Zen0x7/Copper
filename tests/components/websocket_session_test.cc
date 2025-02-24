@@ -12,6 +12,7 @@
 #include <copper/components/state.hpp>
 #include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
+#include <iostream>
 
 copper::components::containers::async_of<void> cancel_websocket_session() {
   auto executor = co_await boost::asio::this_coro::executor;
@@ -70,6 +71,7 @@ TEST(Components_WebSocket_Session, Implementation) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
+              std::cout << "Something went wrong... " << e.what() << std::endl;
             }
           }
         }));
@@ -80,9 +82,8 @@ TEST(Components_WebSocket_Session, Implementation) {
                               try {
                                 std::rethrow_exception(e);
                               } catch (std::exception &e) {
-                                //              std::cerr << "Error in listener:
-                                //              " << e.what() <<
-                                //              "\n";
+                                std::cout << "Something went wrong... "
+                                          << e.what() << std::endl;
                               }
                             }
                           }));
@@ -152,7 +153,10 @@ TEST(Components_WebSocket_Session, Implementation) {
     ASSERT_TRUE(true);
 
   } catch (std::runtime_error &e) {
+    std::cout << e.what() << std::endl;
   } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
   } catch (...) {
+    std::cout << "Something went wrong" << std::endl;
   }
 }

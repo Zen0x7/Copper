@@ -26,22 +26,22 @@ class logger : public shared_enabled<logger> {
   /**
    * System
    */
-  basic_shared<spdlog::logger> system_;
+  shared<spdlog::logger> system_;
 
   /**
    * Sessions
    */
-  basic_shared<spdlog::logger> sessions_;
+  shared<spdlog::logger> sessions_;
 
   /**
    * Requests
    */
-  basic_shared<spdlog::logger> requests_;
+  shared<spdlog::logger> requests_;
 
   /**
    * Constructor
    */
-  logger(shared<configuration> configuration);
+  explicit logger(const shared<configuration>& configuration);
 };
 }  // namespace copper::components
 
