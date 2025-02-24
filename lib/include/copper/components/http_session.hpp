@@ -65,7 +65,7 @@ containers::async_of<void> http_session_run(
       co_return;
     }
 
-    auto kernel = boost::make_shared<kernel>(state);
+    auto _kernel = boost::make_shared<kernel>(state);
 
     if (ec == boost::beast::error::timeout) {
       throw boost::system::system_error{ec};
@@ -79,7 +79,7 @@ containers::async_of<void> http_session_run(
                          .address()
                          .to_string();
 
-    auto [_request, _response, res] = co_await kernel->call(
+    auto [_request, _response, res] = co_await _kernel->call(
         session_id, doc_root, parser.release(), ip, request_id, start_at);
 
     _request->finished_at_ = chronos::now();
