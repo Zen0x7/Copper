@@ -1,6 +1,8 @@
+#include <boost/algorithm/string/predicate.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/dotenv.hpp>
+#include <copper/components/gunzip.hpp>
 #include <copper/components/http_fields.hpp>
 #include <copper/components/http_response_unauthorized.hpp>
 #include <copper/components/http_status_code.hpp>
@@ -31,7 +33,14 @@ http_response http_response_unauthorized(const http_request &request,
   response.version(request.version());
   response.keep_alive(request.keep_alive());
 
-  response.body() = "{}";
+  if (!request["Accept-Encoding"].empty() &&
+      boost::contains(request["Accept-Encoding"], "gzip")) {
+    response.body() = gunzip_compress("{}");
+    response.set(http_fields::content_encoding, "gzip");
+  } else {
+    response.body() = "{}";
+  }
+
   response.prepare_payload();
 
   return response;

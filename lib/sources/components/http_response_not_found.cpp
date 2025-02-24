@@ -2,6 +2,7 @@
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/dotenv.hpp>
+#include <copper/components/gunzip.hpp>
 #include <copper/components/http_fields.hpp>
 #include <copper/components/http_response_not_found.hpp>
 #include <copper/components/http_status_code.hpp>
@@ -40,11 +41,22 @@ http_response http_response_not_found(const http_request &request,
   response.version(request.version());
   response.keep_alive(request.keep_alive());
 
-  if (requires_html) {
-    response.body() = state->get_views()->render("404");
+  if (!request["Accept-Encoding"].empty() &&
+      boost::contains(request["Accept-Encoding"], "gzip")) {
+    response.set(http_fields::content_encoding, "gzip");
+    if (requires_html) {
+      response.body() = gunzip_compress(state->get_views()->render("404"));
+    } else {
+      response.body() = gunzip_compress("{}");
+    }
   } else {
-    response.body() = "{}";
+    if (requires_html) {
+      response.body() = state->get_views()->render("404");
+    } else {
+      response.body() = "{}";
+    }
   }
+
   response.prepare_payload();
 
   return response;
