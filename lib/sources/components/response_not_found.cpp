@@ -1,33 +1,30 @@
-#include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
-#include <copper/components/containers.hpp>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/http_response_cors.hpp>
-#include <copper/components/method.hpp>
+#include <copper/components/response_not_found.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/status_code.hpp>
+#include <copper/components/views.hpp>
 
 namespace copper::components {
 
-response http_response_cors(const request &request, long start_at,
-                            const containers::vector_of<method> methods,
+response response_not_found(const request &request,
+                            long start_at,
                             const shared<state> &state) {
   const auto now = chronos::now();
 
-  response response{
-      methods.empty() ? status_code::method_not_allowed : status_code::ok,
-      request.version()};
-  response.set(fields::content_type, "application/json");
+  response response{status_code::not_found, request.version()};
 
-  containers::vector_of<std::string> authorized_methods;
-  for (auto &verb : methods) authorized_methods.push_back(to_string(verb));
-  const auto methods_as_string = boost::join(authorized_methods, ",");
-  response.set(fields::access_control_allow_methods,
-               methods.empty() ? "" : methods_as_string);
+  bool requires_html = request.count(fields::accept) > 0 &&
+                       boost::contains(request.at(fields::accept), "html");
+  if (requires_html) {
+    response.set(fields::content_type, "text/html");
+  } else {
+    response.set(fields::content_type, "application/json");
+  }
 
   const std::string allowed_headers =
       "Accept,Authorization,Content-Type,X-Requested-With";
@@ -46,10 +43,18 @@ response http_response_cors(const request &request, long start_at,
 
   if (!request["Accept-Encoding"].empty() &&
       boost::contains(request["Accept-Encoding"], "gzip")) {
-    response.body() = gunzip_compress("{}");
     response.set(fields::content_encoding, "gzip");
+    if (requires_html) {
+      response.body() = gunzip_compress(state->get_views()->render("404"));
+    } else {
+      response.body() = gunzip_compress("{}");
+    }
   } else {
-    response.body() = "{}";
+    if (requires_html) {
+      response.body() = state->get_views()->render("404");
+    } else {
+      response.body() = "{}";
+    }
   }
 
   response.prepare_payload();

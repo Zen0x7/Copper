@@ -8,7 +8,7 @@
 #include <copper/components/containers.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/response.hpp>
-#include <copper/components/http_response_generic.hpp>
+#include <copper/components/response_generic.hpp>
 #include <copper/components/normalized_path.hpp>
 #include <copper/components/route.hpp>
 #include <copper/components/shared.hpp>
@@ -85,11 +85,11 @@ class kernel : public shared_enabled<kernel> {
    * @param request_id
    * @param now
    * @return async_of<tuple_of<shared<models::request>,
-   * shared<models::response>, http_response_generic>>
+   * shared<models::response>, response_generic>>
    */
   containers::async_of<containers::tuple_of<shared<copper::models::request>,
                                             shared<copper::models::response>,
-                                            http_response_generic>>
+                                            response_generic>>
   call(uuid session_id, boost::beast::string_view /* root */,
        const request &request, const std::string &ip,
        const uuid &request_id, long now) const;

@@ -6,12 +6,12 @@
 #include <copper/components/configuration.hpp>
 #include <copper/components/controller.hpp>
 #include <copper/components/header.hpp>
-#include <copper/components/http_response_bad_request.hpp>
-#include <copper/components/http_response_cors.hpp>
-#include <copper/components/http_response_exception.hpp>
-#include <copper/components/http_response_not_found.hpp>
-#include <copper/components/http_response_too_many_requests.hpp>
-#include <copper/components/http_response_unauthorized.hpp>
+#include <copper/components/response_bad_request.hpp>
+#include <copper/components/response_cors.hpp>
+#include <copper/components/response_exception.hpp>
+#include <copper/components/response_not_found.hpp>
+#include <copper/components/response_too_many_requests.hpp>
+#include <copper/components/response_unauthorized.hpp>
 #include <copper/components/kernel.hpp>
 #include <copper/components/mime_type.hpp>
 #include <copper/components/path.hpp>
@@ -53,7 +53,7 @@ containers::vector_of<method> kernel::get_available_methods(
 
 containers::async_of<
     std::tuple<shared<copper::models::request>,
-               shared<copper::models::response>, http_response_generic>>
+               shared<copper::models::response>, response_generic>>
 kernel::call(uuid session_id, boost::beast::string_view,
              const request &request, const std::string &ip,
              const uuid &request_id, long now) const {
@@ -70,7 +70,7 @@ kernel::call(uuid session_id, boost::beast::string_view,
               request, ip, route.value().controller_->configuration_.rpm_);
           !can) {
         auto _http_response =
-            http_response_too_many_requests(request, now, TTL, state_);
+          response_too_many_requests(request, now, TTL, state_);
 
         auto _response = copper::models::response_from_response(
           session_id, _request, _http_response);
@@ -90,7 +90,7 @@ kernel::call(uuid session_id, boost::beast::string_view,
           bearer, state_->get_configuration()->get()->app_key_);
 
       if (!user_id.has_value()) {
-        auto _http_response = http_response_unauthorized(request, now, state_);
+        auto _http_response = response_unauthorized(request, now, state_);
 
         auto _response = copper::models::response_from_response(
           session_id, _request, _http_response);
@@ -166,7 +166,7 @@ kernel::call(uuid session_id, boost::beast::string_view,
 
       co_return std::make_tuple(_request, _response, _http_response);
     } catch (std::exception &exception) {
-      auto _http_response = http_response_exception(request, now, state_);
+      auto _http_response = response_exception(request, now, state_);
 
       auto _response = copper::models::response_from_response(
         session_id, _request, _http_response);
@@ -182,7 +182,7 @@ kernel::call(uuid session_id, boost::beast::string_view,
     auto available_verbs = get_available_methods(request);
 
     auto _http_response =
-        http_response_cors(request, now, available_verbs, state_);
+      response_cors(request, now, available_verbs, state_);
 
     auto _response = copper::models::response_from_response(
       session_id, _request, _http_response);
@@ -191,7 +191,7 @@ kernel::call(uuid session_id, boost::beast::string_view,
   }
 
   if (request_is_illegal(request)) {
-    auto _http_response = http_response_bad_request(request, now, state_);
+    auto _http_response = response_bad_request(request, now, state_);
 
     auto _response = copper::models::response_from_response(
       session_id, _request, _http_response);
@@ -199,7 +199,7 @@ kernel::call(uuid session_id, boost::beast::string_view,
     co_return std::make_tuple(_request, _response, _http_response);
   }
 
-  auto _http_response = http_response_not_found(request, now, state_);
+  auto _http_response = response_not_found(request, now, state_);
 
   auto _response = copper::models::response_from_response(
     session_id, _request, _http_response);

@@ -5,15 +5,15 @@
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/http_response_exception.hpp>
+#include <copper/components/response_exception.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/status_code.hpp>
 
 namespace copper::components {
 
-response http_response_exception(const request &request,
-                                 long start_at,
-                                 const shared<state> &state) {
+response response_exception(const request &request,
+                            long start_at,
+                            const shared<state> &state) {
   const auto now = chronos::now();
 
   response response{status_code::internal_server_error, request.version()};

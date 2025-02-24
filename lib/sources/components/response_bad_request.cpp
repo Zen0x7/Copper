@@ -1,21 +1,22 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
+#include <copper/components/containers.hpp>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/http_response_too_many_requests.hpp>
+#include <copper/components/response_bad_request.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/status_code.hpp>
 
 namespace copper::components {
 
-response http_response_too_many_requests(const request &request,
-                                         long start_at, const int ttl,
-                                         const shared<state> &state) {
+response response_bad_request(const request &request,
+                              long start_at,
+                              const shared<state> &state) {
   const auto now = chronos::now();
 
-  response response{status_code::too_many_requests, request.version()};
+  response response{status_code::bad_request, request.version()};
   response.set(fields::content_type, "application/json");
 
   const std::string allowed_headers =
@@ -29,7 +30,6 @@ response http_response_too_many_requests(const request &request,
 
   response.set("X-Server", "Copper");
   response.set("X-Time", std::to_string(now - start_at));
-  response.set("X-Rate-Until", std::to_string(ttl));
 
   response.version(request.version());
   response.keep_alive(request.keep_alive());

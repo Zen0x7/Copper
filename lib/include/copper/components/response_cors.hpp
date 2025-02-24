@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_RESPONSE_CORS_HPP
-#define COPPER_COMPONENTS_HTTP_RESPONSE_CORS_HPP
+#ifndef COPPER_COMPONENTS_RESPONSE_CORS_HPP
+#define COPPER_COMPONENTS_RESPONSE_CORS_HPP
 
 #pragma once
 
@@ -16,7 +16,7 @@ namespace copper::components {
 class state;
 
 /**
- * Generates HTTP response on CORS
+ * Generates response on CORS
  *
  * @param request
  * @param start_at
@@ -24,9 +24,9 @@ class state;
  * @param state
  * @return response
  */
-response http_response_cors(const request& request, long start_at,
-                            containers::vector_of<method> methods,
-                            const shared<state>& state);
+response response_cors(const request& request, long start_at,
+                       containers::vector_of<method> methods,
+                       const shared<state>& state);
 
 }  // namespace copper::components
 

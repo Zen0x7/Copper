@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_RESPONSE_NOT_FOUND_HPP
-#define COPPER_COMPONENTS_HTTP_RESPONSE_NOT_FOUND_HPP
+#ifndef COPPER_COMPONENTS_RESPONSE_UNAUTHORIZED_HPP
+#define COPPER_COMPONENTS_RESPONSE_UNAUTHORIZED_HPP
 
 #pragma once
 
@@ -15,16 +15,16 @@ namespace copper::components {
 class state;
 
 /**
- * Generate HTTP response on not found
+ * Generate response on unauthorized
  *
  * @param request
  * @param start_at
  * @param state
  * @return response
  */
-response http_response_not_found(const request& request,
-                                 long start_at,
-                                 const shared<state>& state);
+response response_unauthorized(const request& request,
+                               long start_at,
+                               const shared<state>& state);
 
 }  // namespace copper::components
 

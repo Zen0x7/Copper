@@ -4,15 +4,15 @@
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/http_response_unauthorized.hpp>
+#include <copper/components/response_unauthorized.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/status_code.hpp>
 
 namespace copper::components {
 
-response http_response_unauthorized(const request &request,
-                                    long start_at,
-                                    const shared<state> &state) {
+response response_unauthorized(const request &request,
+                               long start_at,
+                               const shared<state> &state) {
   const auto now = chronos::now();
 
   response response{status_code::unauthorized, request.version()};

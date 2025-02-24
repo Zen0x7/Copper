@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_RESPONSE_EXCEPTION_HPP
-#define COPPER_COMPONENTS_HTTP_RESPONSE_EXCEPTION_HPP
+#ifndef COPPER_COMPONENTS_RESPONSE_BAD_REQUEST_HPP
+#define COPPER_COMPONENTS_RESPONSE_BAD_REQUEST_HPP
 
 #pragma once
 
@@ -14,16 +14,16 @@ namespace copper::components {
 class state;
 
 /**
- * Generates HTTP response on exception
+ * Generates response on bad requests
  *
  * @param request
  * @param start_at
  * @param state
  * @return response
  */
-response http_response_exception(const request& request,
-                                 long start_at,
-                                 const shared<state>& state);
+response response_bad_request(const request& request,
+                              long start_at,
+                              const shared<state>& state);
 
 }  // namespace copper::components
 

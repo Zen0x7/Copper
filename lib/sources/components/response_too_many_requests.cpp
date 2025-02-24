@@ -4,27 +4,19 @@
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/http_response_not_found.hpp>
+#include <copper/components/response_too_many_requests.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/status_code.hpp>
-#include <copper/components/views.hpp>
 
 namespace copper::components {
 
-response http_response_not_found(const request &request,
-                                 long start_at,
-                                 const shared<state> &state) {
+response response_too_many_requests(const request &request,
+                                    long start_at, int ttl,
+                                    const shared<state> &state) {
   const auto now = chronos::now();
 
-  response response{status_code::not_found, request.version()};
-
-  bool requires_html = request.count(fields::accept) > 0 &&
-                       boost::contains(request.at(fields::accept), "html");
-  if (requires_html) {
-    response.set(fields::content_type, "text/html");
-  } else {
-    response.set(fields::content_type, "application/json");
-  }
+  response response{status_code::too_many_requests, request.version()};
+  response.set(fields::content_type, "application/json");
 
   const std::string allowed_headers =
       "Accept,Authorization,Content-Type,X-Requested-With";
@@ -37,24 +29,17 @@ response http_response_not_found(const request &request,
 
   response.set("X-Server", "Copper");
   response.set("X-Time", std::to_string(now - start_at));
+  response.set("X-Rate-Until", std::to_string(ttl));
 
   response.version(request.version());
   response.keep_alive(request.keep_alive());
 
   if (!request["Accept-Encoding"].empty() &&
       boost::contains(request["Accept-Encoding"], "gzip")) {
+    response.body() = gunzip_compress("{}");
     response.set(fields::content_encoding, "gzip");
-    if (requires_html) {
-      response.body() = gunzip_compress(state->get_views()->render("404"));
-    } else {
-      response.body() = gunzip_compress("{}");
-    }
   } else {
-    if (requires_html) {
-      response.body() = state->get_views()->render("404");
-    } else {
-      response.body() = "{}";
-    }
+    response.body() = "{}";
   }
 
   response.prepare_payload();

@@ -1,3 +1,4 @@
+#include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
@@ -5,19 +6,28 @@
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/http_response_bad_request.hpp>
+#include <copper/components/response_cors.hpp>
+#include <copper/components/method.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/status_code.hpp>
 
 namespace copper::components {
 
-response http_response_bad_request(const request &request,
-                                   long start_at,
-                                   const shared<state> &state) {
+response response_cors(const request &request, long start_at,
+                       containers::vector_of<method> methods,
+                       const shared<state> &state) {
   const auto now = chronos::now();
 
-  response response{status_code::bad_request, request.version()};
+  response response{
+      methods.empty() ? status_code::method_not_allowed : status_code::ok,
+      request.version()};
   response.set(fields::content_type, "application/json");
+
+  containers::vector_of<std::string> authorized_methods;
+  for (auto &verb : methods) authorized_methods.push_back(to_string(verb));
+  const auto methods_as_string = boost::join(authorized_methods, ",");
+  response.set(fields::access_control_allow_methods,
+               methods.empty() ? "" : methods_as_string);
 
   const std::string allowed_headers =
       "Accept,Authorization,Content-Type,X-Requested-With";
