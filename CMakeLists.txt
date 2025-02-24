@@ -10,11 +10,20 @@ find_package(OpenSSL REQUIRED)
 link_directories(${OPENSSL_LIBRARIES})
 include_directories(${OPENSSL_INCLUDE_DIR})
 
-find_package(ZLIB)
+find_package(ZLIB REQUIRED)
+find_package(spdlog REQUIRED)
 
 find_package(
         Boost 1.87.0
-        COMPONENTS json thread program_options random coroutine charconv system iostreams
+        COMPONENTS
+        json
+        thread
+        program_options
+        random
+        coroutine
+        charconv
+        system
+        iostreams
         REQUIRED
 )
 
@@ -51,9 +60,25 @@ if (BUILD_TESTS)
     fetchcontent_makeavailable(googletest)
 
     enable_testing()
-    add_executable(tests deps/asio.cpp deps/beast.cpp deps/redis.cpp deps/mysql.cpp ${SOURCES} ${TESTS})
+    add_executable(tests
+            deps/asio.cpp
+            deps/beast.cpp
+            deps/redis.cpp
+            deps/mysql.cpp
+            ${SOURCES}
+            ${TESTS}
+    )
     target_include_directories(tests PRIVATE ${ZLIB_INCLUDE_DIRS})
-    target_link_libraries(tests ZLIB::ZLIB GTest::gtest_main ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt bcrypt nlohmann_json::nlohmann_json)
+    target_link_libraries(tests
+            spdlog::spdlog
+            ZLIB::ZLIB
+            GTest::gtest_main
+            ${OPENSSL_LIBRARIES}
+            ${Boost_LIBRARIES}
+            fmt::fmt
+            bcrypt
+            nlohmann_json::nlohmann_json
+    )
     target_compile_definitions(tests PRIVATE BOOST_ASIO_SEPARATE_COMPILATION)
     target_compile_definitions(tests PRIVATE BOOST_REDIS_SEPARATE_COMPILATION)
     target_compile_definitions(tests PRIVATE BOOST_BEAST_SEPARATE_COMPILATION)
@@ -62,9 +87,24 @@ if (BUILD_TESTS)
     gtest_discover_tests(tests)
 endif ()
 
-add_executable(copper deps/asio.cpp deps/beast.cpp deps/redis.cpp deps/mysql.cpp main.cpp ${SOURCES})
+add_executable(copper
+        deps/asio.cpp
+        deps/beast.cpp
+        deps/redis.cpp
+        deps/mysql.cpp
+        main.cpp
+        ${SOURCES}
+)
 target_include_directories(copper PRIVATE ${ZLIB_INCLUDE_DIRS})
-target_link_libraries(copper ZLIB::ZLIB ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} fmt::fmt bcrypt nlohmann_json::nlohmann_json)
+target_link_libraries(copper
+        spdlog::spdlog
+        ZLIB::ZLIB
+        ${OPENSSL_LIBRARIES}
+        ${Boost_LIBRARIES}
+        fmt::fmt
+        bcrypt
+        nlohmann_json::nlohmann_json
+)
 target_compile_definitions(copper PRIVATE BOOST_ASIO_SEPARATE_COMPILATION)
 target_compile_definitions(copper PRIVATE BOOST_REDIS_SEPARATE_COMPILATION)
 target_compile_definitions(copper PRIVATE BOOST_BEAST_SEPARATE_COMPILATION)

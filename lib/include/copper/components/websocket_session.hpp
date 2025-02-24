@@ -30,8 +30,8 @@ namespace copper::components {
  */
 template <typename Stream>
 containers::async_of<void> websocket_session_run(
-    shared<state> & /* state */, Stream &stream,
-    boost::beast::flat_buffer &buffer, http_request req,
+    shared<state> & /* state */, uuid server_id, uuid session_id,
+    Stream &stream, boost::beast::flat_buffer &buffer, http_request req,
     boost::beast::string_view) {
   auto cs = co_await boost::asio::this_coro::cancellation_state;
   auto ws = boost::beast::websocket::stream<Stream &>{stream};

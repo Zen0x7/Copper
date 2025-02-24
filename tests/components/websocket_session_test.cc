@@ -22,6 +22,7 @@ TEST(Components_WebSocket_Session, Implementation) {
   try {
     using namespace copper::components;
 
+    auto _server_id = boost::uuids::random_generator()();
     auto _configuration = boost::make_shared<configuration>();
 
     auto const address = boost::asio::ip::make_address("0.0.0.0");
@@ -57,13 +58,13 @@ TEST(Components_WebSocket_Session, Implementation) {
     auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
         ioc, std::move(database_params));
 
-    auto state_ = boost::make_shared<state>(_configuration, database_pool);
+    auto _state = boost::make_shared<state>(_configuration, database_pool);
 
-    state_->get_database()->start();
+    _state->get_database()->start();
 
     boost::asio::co_spawn(
         boost::asio::make_strand(ioc),
-        listener(state_, task_group_, ctx, endpoint, doc_root),
+        listener(_server_id, _state, task_group_, ctx, endpoint, doc_root),
         task_group_->adapt([](std::exception_ptr e) {
           if (e) {
             try {
@@ -73,7 +74,7 @@ TEST(Components_WebSocket_Session, Implementation) {
           }
         }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), subscriber(state_),
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), subscriber(_state),
                           task_group_->adapt([](std::exception_ptr e) {
                             if (e) {
                               try {
