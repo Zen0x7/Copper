@@ -52,8 +52,7 @@ containers::async_of<void> cache::set(
   co_await connection->async_exec(request, response, boost::asio::deferred);
 }
 
-std::string cache::get_key_for(const request &request,
-                               const std::string &ip) {
+std::string cache::get_key_for(const request &request, const std::string &ip) {
   const size_t query_ask_mark_position = request.target().find('?');
   const bool path_has_params = query_ask_mark_position != std::string::npos;
   const std::string path{
@@ -68,8 +67,7 @@ std::string cache::get_key_for(const request &request,
 }
 
 containers::async_of<std::tuple<bool, int>> cache::can_invoke(
-  const request &request, const std::string &ip,
-  const int &max_requests) {
+    const request &request, const std::string &ip, const int &max_requests) {
   const auto key = get_key_for(request, ip);
   auto connection = co_await this->get_connection();
 

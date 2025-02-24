@@ -11,8 +11,7 @@
 
 namespace copper::components {
 
-response response_not_found(const request &request,
-                            long start_at,
+response response_not_found(const request &request, long start_at,
                             const shared<state> &state) {
   const auto now = chronos::now();
 

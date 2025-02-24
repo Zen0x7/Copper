@@ -23,9 +23,8 @@ class state;
  * @param state
  * @return response
  */
-response response_too_many_requests(const request& request,
-                                    long start_at, int ttl,
-                                    const shared<state>& state);
+response response_too_many_requests(const request& request, long start_at,
+                                    int ttl, const shared<state>& state);
 
 }  // namespace copper::components
 

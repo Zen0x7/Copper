@@ -4,7 +4,7 @@
 #pragma once
 
 #include <copper/components/containers.hpp>
-#include <copper/components/detect_session.hpp>
+#include <copper/components/protocol_handler.hpp>
 #include <copper/components/task_group.hpp>
 
 namespace copper::components {

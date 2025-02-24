@@ -10,8 +10,7 @@ namespace copper::components {
 /**
  * Request
  */
-typedef boost::beast::http::request<boost::beast::http::string_body>
-    request;
+typedef boost::beast::http::request<boost::beast::http::string_body> request;
 
 /**
  * Request is illegal

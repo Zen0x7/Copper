@@ -4,8 +4,8 @@
 #pragma once
 
 #include <copper/components/containers.hpp>
-#include <copper/components/request.hpp>
 #include <copper/components/json.hpp>
+#include <copper/components/request.hpp>
 #include <istream>
 #include <map>
 #include <sstream>

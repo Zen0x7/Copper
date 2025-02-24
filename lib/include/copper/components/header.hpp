@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include <copper/components/json.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/response.hpp>
-#include <copper/components/json.hpp>
 #include <string>
 
 namespace copper::components {

@@ -24,8 +24,7 @@ void controller::set_configuration(controller_configuration configuration) {
   configuration_ = configuration;
 }
 
-response controller::make_response(const request &request,
-                                   status_code status,
+response controller::make_response(const request &request, status_code status,
                                    const std::string &data,
                                    const char *type) const {
   const auto resolved_at = chronos::now();
@@ -61,9 +60,8 @@ response controller::make_response(const request &request,
   return response;
 }
 
-response controller::make_view(const request &request,
-                               status_code status, const std::string view,
-                               const json::json &data,
+response controller::make_view(const request &request, status_code status,
+                               const std::string view, const json::json &data,
                                const char *type) const {
   const auto resolved_at = chronos::now();
 

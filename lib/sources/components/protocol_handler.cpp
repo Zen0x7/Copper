@@ -1,10 +1,10 @@
-#include <copper/components/detect_session.hpp>
 #include <copper/components/logger.hpp>
+#include <copper/components/protocol_handler.hpp>
 #include <copper/components/state.hpp>
 
 namespace copper::components {
 
-containers::async_of<void> detect_session(
+containers::async_of<void> protocol_handler(
     shared<state> state, uuid server_id, uuid session_id,
     typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type>>::other
@@ -36,8 +36,8 @@ containers::async_of<void> detect_session(
 
     buffer.consume(bytes_transferred);
 
-    co_await http_session_run(state, server_id, session_id, ssl_stream, buffer,
-                              doc_root);
+    co_await session_handler(state, server_id, session_id, ssl_stream, buffer,
+                             doc_root);
 
     boost::asio::co_spawn(executor,
                           state->get_database()->session_closed(
@@ -54,8 +54,8 @@ containers::async_of<void> detect_session(
     if (ec && ec != boost::asio::ssl::error::stream_truncated)
       throw boost::system::system_error{ec};
   } else {
-    co_await http_session_run(state, server_id, session_id, stream, buffer,
-                              doc_root);
+    co_await session_handler(state, server_id, session_id, stream, buffer,
+                             doc_root);
 
     boost::asio::co_spawn(executor,
                           state->get_database()->session_closed(

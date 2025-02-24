@@ -10,8 +10,7 @@
 
 namespace copper::components {
 
-response response_unauthorized(const request &request,
-                               long start_at,
+response response_unauthorized(const request &request, long start_at,
                                const shared<state> &state) {
   const auto now = chronos::now();
 

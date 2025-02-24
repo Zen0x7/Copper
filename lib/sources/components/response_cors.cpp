@@ -6,8 +6,8 @@
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/response_cors.hpp>
 #include <copper/components/method.hpp>
+#include <copper/components/response_cors.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/status_code.hpp>
 

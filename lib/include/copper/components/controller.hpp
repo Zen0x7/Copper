@@ -13,9 +13,9 @@
 #include <copper/components/controller_configuration.hpp>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
+#include <copper/components/json.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/response.hpp>
-#include <copper/components/json.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/status_code.hpp>
 #include <copper/components/uuid.hpp>
@@ -67,8 +67,7 @@ class controller : public shared_enabled<controller> {
    *
    * @return async_of<response>
    */
-  virtual containers::async_of<response> invoke(
-      const request & /*request*/) {
+  virtual containers::async_of<response> invoke(const request & /*request*/) {
     response response;
     co_return response;
   };

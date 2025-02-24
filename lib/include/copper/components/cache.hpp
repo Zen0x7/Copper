@@ -52,8 +52,7 @@ class cache : public shared_enabled<cache> {
    * @return async_of<tuple_of<bool, int>>
    */
   containers::async_of<containers::tuple_of<bool, int>> can_invoke(
-    const request &request, const std::string &ip,
-    const int &max_requests);
+      const request &request, const std::string &ip, const int &max_requests);
 
   /**
    * Publish
@@ -128,8 +127,7 @@ class cache : public shared_enabled<cache> {
    * @param ip
    * @return async_of<void>
    */
-  static std::string get_key_for(const request &request,
-                                 const std::string &ip);
+  static std::string get_key_for(const request &request, const std::string &ip);
 };
 }  // namespace copper::components
 

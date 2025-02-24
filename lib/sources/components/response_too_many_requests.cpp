@@ -10,9 +10,8 @@
 
 namespace copper::components {
 
-response response_too_many_requests(const request &request,
-                                    long start_at, int ttl,
-                                    const shared<state> &state) {
+response response_too_many_requests(const request &request, long start_at,
+                                    int ttl, const shared<state> &state) {
   const auto now = chronos::now();
 
   response response{status_code::too_many_requests, request.version()};

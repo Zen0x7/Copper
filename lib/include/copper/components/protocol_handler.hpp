@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <copper/components/http_session.hpp>
+#include <copper/components/session_handler.hpp>
 #include <copper/models/session.hpp>
 
 namespace copper::components {
@@ -16,7 +16,7 @@ namespace copper::components {
  * @param doc_root
  * @return async_of<void>
  */
-containers::async_of<void> detect_session(
+containers::async_of<void> protocol_handler(
     shared<state> state, uuid server_id, uuid session_id,
     typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type> >::other

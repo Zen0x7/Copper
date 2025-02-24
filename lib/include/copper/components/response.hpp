@@ -10,8 +10,7 @@ namespace copper::components {
 /**
  * Response
  */
-typedef boost::beast::http::response<boost::beast::http::string_body>
-    response;
+typedef boost::beast::http::response<boost::beast::http::string_body> response;
 
 }  // namespace copper::components
 

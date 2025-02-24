@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_WEBSOCKET_SESSION_HPP
-#define COPPER_COMPONENTS_WEBSOCKET_SESSION_HPP
+#ifndef COPPER_COMPONENTS_WEBSOCKET_HANDLER_HPP
+#define COPPER_COMPONENTS_WEBSOCKET_HANDLER_HPP
 
 #pragma once
 
@@ -29,10 +29,10 @@ namespace copper::components {
  * @return
  */
 template <typename Stream>
-containers::async_of<void> websocket_session_run(
-  shared<state> & /* state */, uuid /* server_id */, uuid /* session_id */,
-  Stream &stream, boost::beast::flat_buffer &buffer, request req,
-  boost::beast::string_view) {
+containers::async_of<void> websocket_handler(
+    shared<state> & /* state */, uuid /* server_id */, uuid /* session_id */,
+    Stream &stream, boost::beast::flat_buffer &buffer, request req,
+    boost::beast::string_view) {
   auto cs = co_await boost::asio::this_coro::cancellation_state;
   auto ws = boost::beast::websocket::stream<Stream &>{stream};
 

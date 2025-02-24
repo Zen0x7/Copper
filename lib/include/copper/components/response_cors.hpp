@@ -4,9 +4,9 @@
 #pragma once
 
 #include <copper/components/containers.hpp>
+#include <copper/components/method.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/response.hpp>
-#include <copper/components/method.hpp>
 #include <copper/components/shared.hpp>
 
 namespace copper::components {

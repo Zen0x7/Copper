@@ -6,10 +6,10 @@
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/strand.hpp>
 #include <copper/components/containers.hpp>
+#include <copper/components/normalized_path.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/response.hpp>
 #include <copper/components/response_generic.hpp>
-#include <copper/components/normalized_path.hpp>
 #include <copper/components/route.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
@@ -87,12 +87,12 @@ class kernel : public shared_enabled<kernel> {
    * @return async_of<tuple_of<shared<models::request>,
    * shared<models::response>, response_generic>>
    */
-  containers::async_of<containers::tuple_of<shared<copper::models::request>,
-                                            shared<copper::models::response>,
-                                            response_generic>>
+  containers::async_of<
+      containers::tuple_of<shared<copper::models::request>,
+                           shared<copper::models::response>, response_generic>>
   call(uuid session_id, boost::beast::string_view /* root */,
-       const request &request, const std::string &ip,
-       const uuid &request_id, long now) const;
+       const request &request, const std::string &ip, const uuid &request_id,
+       long now) const;
 };
 
 }  // namespace copper::components

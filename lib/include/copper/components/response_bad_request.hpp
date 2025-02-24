@@ -21,8 +21,7 @@ class state;
  * @param state
  * @return response
  */
-response response_bad_request(const request& request,
-                              long start_at,
+response response_bad_request(const request& request, long start_at,
                               const shared<state>& state);
 
 }  // namespace copper::components
