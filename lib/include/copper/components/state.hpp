@@ -15,9 +15,9 @@ namespace copper::components {
 class cache;
 
 /**
- * Forward HTTP router
+ * Forward Router
  */
-class http_router;
+class router;
 
 /**
  * Forward configuration
@@ -44,14 +44,14 @@ class logger;
  */
 class state : public shared_enabled<state> {
   /**
-   *
+   * Configuration
    */
   shared<configuration> configuration_;
 
   /**
-   * HTTP router
+   * Router
    */
-  shared<http_router> http_router_;
+  shared<router> router_;
 
   /**
    * Cache
@@ -90,11 +90,11 @@ class state : public shared_enabled<state> {
   shared<configuration> get_configuration();
 
   /**
-   * Get HTTP router
+   * Get Router
    *
-   * @return shared<http_router>
+   * @return shared<router>
    */
-  shared<http_router> get_http_router();
+  shared<router> get_router();
 
   /**
    * Get cache

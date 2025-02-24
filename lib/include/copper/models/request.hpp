@@ -7,9 +7,9 @@
 #include <boost/describe/class.hpp>
 #include <boost/mysql/datetime.hpp>
 #include <boost/optional.hpp>
-#include <copper/components/http_header.hpp>
-#include <copper/components/http_path.hpp>
-#include <copper/components/http_query.hpp>
+#include <copper/components/header.hpp>
+#include <copper/components/path.hpp>
+#include <copper/components/query.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
 #include <cstdint>
@@ -118,9 +118,9 @@ class request : public components::shared_enabled<request> {
  * @param request
  * @return
  */
-components::shared<request> request_from_http_request(
+components::shared<request> request_from_request(
     components::uuid session_id, components::uuid request_id, long now,
-    const components::http_request &request);
+    const components::request &request);
 
 }  // namespace copper::models
 

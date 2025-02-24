@@ -60,7 +60,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
 
     boost::asio::co_spawn(
         std::move(socket_executor),
-        detect_session(
+        protocol_handler(
             state, server_id, session_id,
             typename boost::beast::tcp_stream::rebind_executor<
                 boost::asio::strand<boost::asio::io_context::executor_type>>::
