@@ -247,6 +247,42 @@ TEST(Components_HTTP_Session, Implementation) {
     }
 
     {
+      // Not found HTML
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::response<boost::beast::http::string_body> response;
+      http_request request{http_method::get, "/", 11};
+
+      request.set(http_fields::host, host);
+      request.set(http_fields::user_agent, "Copper");
+      request.set(http_fields::accept, "text/html");
+      request.set(http_fields::accept_encoding, "gzip");
+
+      boost::beast::http::write(stream, request);
+      boost::beast::http::read(stream, buffer, response);
+
+      ASSERT_TRUE(boost::starts_with(gunzip_decompress(response.body()),
+                                     R"(<!doctype html>)"));
+      ASSERT_EQ(response.result_int(), 404);
+
+      ASSERT_TRUE(response.count(http_fields::content_type) > 0);
+      ASSERT_EQ(response.at(http_fields::content_type), "text/html");
+
+      ASSERT_TRUE(response.count(http_fields::content_encoding) > 0);
+      ASSERT_EQ(response.at(http_fields::content_encoding), "gzip");
+
+      ASSERT_TRUE(response.count(http_fields::access_control_allow_origin) > 0);
+      ASSERT_EQ(response.at(http_fields::access_control_allow_origin), "*");
+
+      ASSERT_TRUE(response.count("X-Server") > 0);
+      ASSERT_EQ(response.at("X-Server"), "Copper");
+
+      ASSERT_TRUE(response.count("X-Time") > 0);
+
+      buffer.clear();
+      response.clear();
+    }
+
+    {
       // Options
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
