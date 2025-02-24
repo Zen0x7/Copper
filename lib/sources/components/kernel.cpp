@@ -68,13 +68,13 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
       if (auto [can, TTL] = co_await state_->get_cache()->can_invoke(
               request, ip, route.value().controller_->configuration_.rpm_);
           !can) {
-        auto _http_response =
+        auto _service_response =
             response_too_many_requests(request, now, TTL, state_);
 
         auto _response = copper::models::response_from_response(
-            session_id, _request, _http_response);
+            session_id, _request, _service_response);
 
-        co_return std::make_tuple(_request, _response, _http_response);
+        co_return std::make_tuple(_request, _response, _service_response);
       }
     }
 
@@ -89,15 +89,15 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
           bearer, state_->get_configuration()->get()->app_key_);
 
       if (!user_id.has_value()) {
-        auto _http_response = response_unauthorized(request, now, state_);
+        auto _service_response = response_unauthorized(request, now, state_);
 
         auto _response = copper::models::response_from_response(
-            session_id, _request, _http_response);
+            session_id, _request, _service_response);
 
         _response->protected_ =
             route.value().controller_->configuration_.use_protector_ == true;
 
-        co_return std::make_tuple(_request, _response, _http_response);
+        co_return std::make_tuple(_request, _response, _service_response);
       };
 
       route.value().controller_->set_user(user_id.get().id_);
@@ -123,85 +123,87 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
               json::object({{"message", "The given data was invalid."},
                             {"errors", validator->errors_}});
 
-          auto _http_response = route.value().controller_->make_response(
+          auto _service_response = route.value().controller_->make_response(
               request, status_code::unprocessable_entity,
               serialize(error_response), "application/json");
 
           auto _response = copper::models::response_from_response(
-              session_id, _request, _http_response);
+              session_id, _request, _service_response);
 
           _response->protected_ =
               route.value().controller_->configuration_.use_protector_ == true;
 
-          co_return std::make_tuple(_request, _response, _http_response);
+          co_return std::make_tuple(_request, _response, _service_response);
         }
       } else {
         auto error_response = json::object(
             {{"message", "The given data was invalid."},
              {"errors", {{"*", "The body must be a valid JSON."}}}});
 
-        auto _http_response = route.value().controller_->make_response(
+        auto _service_response = route.value().controller_->make_response(
             request, status_code::unprocessable_entity,
             serialize(error_response), "application/json");
 
         auto _response = copper::models::response_from_response(
-            session_id, _request, _http_response);
+            session_id, _request, _service_response);
 
         _response->protected_ =
             route.value().controller_->configuration_.use_protector_ == true;
 
-        co_return std::make_tuple(_request, _response, _http_response);
+        co_return std::make_tuple(_request, _response, _service_response);
       }
     }
 
     try {
-      auto _http_response = co_await route.value().controller_->invoke(request);
+      auto _service_response =
+          co_await route.value().controller_->invoke(request);
 
       auto _response = copper::models::response_from_response(
-          session_id, _request, _http_response);
+          session_id, _request, _service_response);
 
       _response->protected_ =
           route.value().controller_->configuration_.use_protector_ == true;
 
-      co_return std::make_tuple(_request, _response, _http_response);
+      co_return std::make_tuple(_request, _response, _service_response);
     } catch (std::exception &exception) {
-      auto _http_response = response_exception(request, now, state_);
+      auto _service_response = response_exception(request, now, state_);
 
       auto _response = copper::models::response_from_response(
-          session_id, _request, _http_response);
+          session_id, _request, _service_response);
 
       _response->protected_ =
           route.value().controller_->configuration_.use_protector_ == true;
 
-      co_return std::make_tuple(_request, _response, _http_response);
+      co_return std::make_tuple(_request, _response, _service_response);
     }
   }
 
   if (request.method() == method::options) {
     auto available_verbs = get_available_methods(request);
 
-    auto _http_response = response_cors(request, now, available_verbs, state_);
+    auto _service_response =
+        response_cors(request, now, available_verbs, state_);
 
     auto _response = copper::models::response_from_response(
-        session_id, _request, _http_response);
+        session_id, _request, _service_response);
 
-    co_return std::make_tuple(_request, _response, _http_response);
+    co_return std::make_tuple(_request, _response, _service_response);
   }
 
   if (request_is_illegal(request)) {
-    auto _http_response = response_bad_request(request, now, state_);
+    auto _service_response = response_bad_request(request, now, state_);
 
     auto _response = copper::models::response_from_response(
-        session_id, _request, _http_response);
+        session_id, _request, _service_response);
 
-    co_return std::make_tuple(_request, _response, _http_response);
+    co_return std::make_tuple(_request, _response, _service_response);
   }
 
-  auto _http_response = response_not_found(request, now, state_);
+  auto _service_response = response_not_found(request, now, state_);
 
   auto _response = copper::models::response_from_response(session_id, _request,
-                                                          _http_response);
+                                                          _service_response);
 
-  co_return std::make_tuple(_request, _response, _http_response);
+  co_return std::make_tuple(_request, _response, _service_response);
 }
 }  // namespace copper::components

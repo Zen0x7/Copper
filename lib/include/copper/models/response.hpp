@@ -87,12 +87,12 @@ class response : public components::shared_enabled<response> {
  *
  * @param session
  * @param request
- * @param http_response
+ * @param service_response
  * @return
  */
 components::shared<response> response_from_response(
     components::uuid session, const components::shared<request> &request,
-    const components::response &http_response);
+    const components::response &service_response);
 
 }  // namespace copper::models
 
