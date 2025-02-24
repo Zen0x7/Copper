@@ -70,74 +70,76 @@ int run(int argc, const char *argv[]) {
 
   const auto _as = _vm["as"].as<std::string>();
 
+  auto const _address =
+      boost::asio::ip::make_address(_configuration->get()->app_host_);
+  auto const _port = (unsigned short)_configuration->get()->app_port_;
+  auto const _endpoint = boost::asio::ip::tcp::endpoint{_address, _port};
+  auto const _doc_root = std::string_view{"."};
+  auto const _threads = std::max<int>(1, _configuration->get()->app_threads_);
+
+  boost::asio::io_context _ioc{_threads};
+
+  boost::asio::ssl::context _ctx{boost::asio::ssl::context::tlsv12};
+
+  _ctx.set_options(boost::asio::ssl::context::default_workarounds |
+                   boost::asio::ssl::context::single_dh_use);
+  _ctx.use_certificate_chain_file(_configuration->get()->app_public_key_);
+  _ctx.use_private_key_file(_configuration->get()->app_private_key_,
+                            boost::asio::ssl::context::pem);
+  _ctx.use_tmp_dh_file(_configuration->get()->app_dh_params_);
+
+  auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
+
+  boost::mysql::pool_params _database_params;
+  _database_params.server_address.emplace_host_and_port(
+      _configuration->get()->database_host_,
+      _configuration->get()->database_port_);
+
+  _database_params.username = _configuration->get()->database_user_;
+  _database_params.password = _configuration->get()->database_password_;
+  _database_params.database = _configuration->get()->database_name_;
+  _database_params.thread_safe =
+      _configuration->get()->database_pool_thread_safe_;
+  _database_params.initial_size =
+      _configuration->get()->database_pool_initial_size_;
+  _database_params.max_size = _configuration->get()->database_pool_max_size_;
+
+  auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
+      _ioc, std::move(_database_params));
+
+  auto _state = boost::make_shared<state>(_configuration, database_pool);
+
   if (_as == "service") {
-    auto const _address =
-        boost::asio::ip::make_address(_configuration->get()->app_host_);
-    auto const _port = (unsigned short)_configuration->get()->app_port_;
-    auto const _endpoint = boost::asio::ip::tcp::endpoint{_address, _port};
-    auto const _doc_root = std::string_view{"."};
-    auto const _threads = std::max<int>(1, _configuration->get()->app_threads_);
-
-    boost::asio::io_context _ioc{_threads};
-
-    boost::asio::ssl::context _ctx{boost::asio::ssl::context::tlsv12};
-
-    _ctx.set_options(boost::asio::ssl::context::default_workarounds |
-                     boost::asio::ssl::context::single_dh_use);
-    _ctx.use_certificate_chain_file(_configuration->get()->app_public_key_);
-    _ctx.use_private_key_file(_configuration->get()->app_private_key_,
-                              boost::asio::ssl::context::pem);
-    _ctx.use_tmp_dh_file(_configuration->get()->app_dh_params_);
-
-    auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
-
-    boost::mysql::pool_params _database_params;
-    _database_params.server_address.emplace_host_and_port(
-        _configuration->get()->database_host_,
-        _configuration->get()->database_port_);
-
-    _database_params.username = _configuration->get()->database_user_;
-    _database_params.password = _configuration->get()->database_password_;
-    _database_params.database = _configuration->get()->database_name_;
-    _database_params.thread_safe =
-        _configuration->get()->database_pool_thread_safe_;
-    _database_params.initial_size =
-        _configuration->get()->database_pool_initial_size_;
-    _database_params.max_size = _configuration->get()->database_pool_max_size_;
-
-    auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
-        _ioc, std::move(_database_params));
-
-    auto _state = boost::make_shared<state>(_configuration, database_pool);
-
     _state->get_logger()->system_->info(
         "[{}] Server is running on [{}:{}]", to_string(_server_id),
         _configuration->get()->app_host_, _configuration->get()->app_port_);
 
     _state->get_database()->start();
+  }
 
-    _state->get_http_router()
-        ->push(http_method::get, "/api/user",
-               boost::make_shared<controllers::user_controller>(),
-               {
-                   .use_auth_ = true,
-                   .use_throttler_ = true,
-                   .rpm_ = 5,
-               })
-        ->push(http_method::get, "/api/up",
-               boost::make_shared<controllers::up_controller>(),
-               {
-                   .use_throttler_ = true,
-                   .rpm_ = 5,
-               })
-        ->push(http_method::post, "/api/auth",
-               boost::make_shared<controllers::auth_controller>(),
-               {
-                   .use_throttler_ = true,
-                   .use_validator_ = true,
-                   .rpm_ = 5,
-               });
+  _state->get_http_router()
+      ->push(http_method::get, "/api/user",
+             boost::make_shared<controllers::user_controller>(),
+             {
+                 .use_auth_ = true,
+                 .use_throttler_ = true,
+                 .rpm_ = 5,
+             })
+      ->push(http_method::get, "/api/up",
+             boost::make_shared<controllers::up_controller>(),
+             {
+                 .use_throttler_ = true,
+                 .rpm_ = 5,
+             })
+      ->push(http_method::post, "/api/auth",
+             boost::make_shared<controllers::auth_controller>(),
+             {
+                 .use_throttler_ = true,
+                 .use_validator_ = true,
+                 .rpm_ = 5,
+             });
 
+  if (_as == "service") {
     boost::asio::co_spawn(
         boost::asio::make_strand(_ioc),
         listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
@@ -180,9 +182,6 @@ int run(int argc, const char *argv[]) {
 
     _state->get_logger()->system_->info("[{}] Server has been shutdown",
                                         to_string(_server_id));
-
-    sentry_close();
-    return EXIT_SUCCESS;
   } else {
     const auto _command = _vm["command"].as<std::string>();
 
@@ -192,10 +191,10 @@ int run(int argc, const char *argv[]) {
       fmt::print("APP_KEY={}\n", base64_encode(_key.first));
       fmt::print("APP_KEY_IV={}\n", base64_encode(_key.second));
     }
-
-    sentry_close();
-    return EXIT_SUCCESS;
   }
+
+  sentry_close();
+  return EXIT_SUCCESS;
 }
 // LCOV_EXCL_STOP
 }  // namespace copper
