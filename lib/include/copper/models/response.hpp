@@ -9,7 +9,7 @@
 #include <boost/optional.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#include <copper/components/http_header.hpp>
+#include <copper/components/header.hpp>
 #include <copper/components/http_request.hpp>
 #include <copper/components/http_response.hpp>
 #include <copper/components/shared.hpp>

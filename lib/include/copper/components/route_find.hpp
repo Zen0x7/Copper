@@ -14,8 +14,7 @@ namespace copper::components {
  * @param route
  * @return route_result
  */
-route_result route_find(const std::string_view &path,
-                        const route &route);
+route_result route_find(const std::string_view &path, const route &route);
 
 }  // namespace copper::components
 

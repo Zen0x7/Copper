@@ -2,8 +2,7 @@
 
 namespace copper::components {
 
-route_result route_match(http_method method,
-                         const std::string_view &path,
+route_result route_match(method method, const std::string_view &path,
                          const route &route) {
   const size_t query_ask_mark_position = path.find('?');
   const bool path_has_params = query_ask_mark_position != std::string::npos;

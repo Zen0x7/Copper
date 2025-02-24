@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_HEADER_HPP
-#define COPPER_COMPONENTS_HTTP_HEADER_HPP
+#ifndef COPPER_COMPONENTS_HEADER_HPP
+#define COPPER_COMPONENTS_HEADER_HPP
 
 #pragma once
 
@@ -14,17 +14,17 @@ namespace copper::components {
  * Retrieves headers from request
  *
  * @param request
- * @return
+ * @return string
  */
-std::string http_header_from_request(const http_request& request);
+std::string header_from_request(const http_request& request);
 
 /**
  * Retrieves headers from response
  *
  * @param response
- * @return
+ * @return string
  */
-std::string http_header_from_response(const http_response& response);
+std::string header_from_response(const http_response& response);
 
 }  // namespace copper::components
 

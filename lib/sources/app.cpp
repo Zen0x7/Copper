@@ -6,9 +6,9 @@
 #include <copper/components/base64.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/configuration.hpp>
-#include <copper/components/router.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/logger.hpp>
+#include <copper/components/router.hpp>
 #include <copper/components/server_certificates.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/signal_handler.hpp>
@@ -44,22 +44,21 @@ int run(int argc, const char *argv[]) {
       boost::program_options::value<std::string>()->default_value("none"),
       "The `command` name.");
 
-      boost::program_options::options_description _command_invoke_description(
-        "Command `invoke` options");
+  boost::program_options::options_description _command_invoke_description(
+      "Command `invoke` options");
 
-      _command_invoke_description.add_options()(
-        "method",
-        boost::program_options::value<std::string>()->default_value("GET"),
-        "HTTP verb.")(
-        "signature",
-        boost::program_options::value<std::string>()->default_value("/"),
-        "HTTP `path`.")(
-        "headers",
-        boost::program_options::value<std::string>()->default_value("{}"),
-        "HTTP `headers`.")(
-        "body",
-        boost::program_options::value<std::string>()->default_value("{}"),
-        "HTTP `body`.");
+  _command_invoke_description.add_options()(
+      "method",
+      boost::program_options::value<std::string>()->default_value("GET"),
+      "HTTP verb.")(
+      "signature",
+      boost::program_options::value<std::string>()->default_value("/"),
+      "HTTP `path`.")(
+      "headers",
+      boost::program_options::value<std::string>()->default_value("{}"),
+      "HTTP `headers`.")(
+      "body", boost::program_options::value<std::string>()->default_value("{}"),
+      "HTTP `body`.");
 
   boost::program_options::options_description _commandline_description;
   _commandline_description.add(_program_description);
@@ -135,21 +134,21 @@ int run(int argc, const char *argv[]) {
     _state->get_database()->start();
   }
 
-      _state->get_router()
-      ->push(http_method::get, "/api/user",
+  _state->get_router()
+      ->push(method::get, "/api/user",
              boost::make_shared<controllers::user_controller>(),
              {
                  .use_auth_ = true,
                  .use_throttler_ = true,
                  .rpm_ = 5,
              })
-      ->push(http_method::get, "/api/up",
+      ->push(method::get, "/api/up",
              boost::make_shared<controllers::up_controller>(),
              {
                  .use_throttler_ = true,
                  .rpm_ = 5,
              })
-      ->push(http_method::post, "/api/auth",
+      ->push(method::post, "/api/auth",
              boost::make_shared<controllers::auth_controller>(),
              {
                  .use_throttler_ = true,
@@ -220,7 +219,9 @@ int run(int argc, const char *argv[]) {
       boost::asio::ip::tcp::resolver _resolver(_client_ioc);
       boost::beast::tcp_stream _stream(_client_ioc);
 
-      auto const _results = _resolver.resolve(_configuration->get()->app_host_, std::to_string(_configuration->get()->app_port_));
+      auto const _results =
+          _resolver.resolve(_configuration->get()->app_host_,
+                            std::to_string(_configuration->get()->app_port_));
 
       _stream.connect(_results);
 
@@ -228,9 +229,9 @@ int run(int argc, const char *argv[]) {
         boost::beast::flat_buffer _buffer;
         boost::beast::http::response<boost::beast::http::string_body> _response;
         http_request _request{_verb, _signature, 11};
-        _request.set(http_fields::host, _configuration->get()->app_host_);
-        _request.set(http_fields::user_agent, "Copper");
-        _request.set(http_fields::content_type, "application/json");
+        _request.set(fields::host, _configuration->get()->app_host_);
+        _request.set(fields::user_agent, "Copper");
+        _request.set(fields::content_type, "application/json");
         _request.body() = _body;
         _request.prepare_payload();
         boost::beast::http::write(_stream, _request);
@@ -243,7 +244,8 @@ int run(int argc, const char *argv[]) {
       }
 
       boost::system::error_code ec;
-      _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+      _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both,
+                                ec);
       if (ec && ec != boost::system::errc::not_connected) {
       }
       _stream.close();

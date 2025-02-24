@@ -1,8 +1,8 @@
-#include <copper/components/http_query.hpp>
+#include <copper/components/query.hpp>
 
 namespace copper::components {
 
-std::string http_query_from_request(const http_request &request) {
+std::string query_from_request(const http_request &request) {
   json::object object;
 
   containers::map_of<std::string, containers::vector_of<std::string>> map;

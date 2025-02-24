@@ -4,7 +4,7 @@
 #pragma once
 
 #include <copper/components/cipher.hpp>
-#include <copper/components/http_controller.hpp>
+#include <copper/components/controller.hpp>
 #include <copper/components/json.hpp>
 
 namespace copper::controllers {
@@ -12,7 +12,7 @@ namespace copper::controllers {
 /**
  * UP Controller
  */
-class up_controller final : public components::http_controller {
+class up_controller final : public components::controller {
  public:
   /**
    * Invoke
@@ -24,7 +24,7 @@ class up_controller final : public components::http_controller {
       const components::http_request &request) override {
     auto now = components::chronos::now();
     const components::json::object data = {{"timestamp", now}};
-    co_return make_response(request, components::http_status_code::ok,
+    co_return make_response(request, components::status_code::ok,
                             serialize(data), "application/json");
   }
 };

@@ -5,7 +5,7 @@
 
 #include <copper/components/chronos.hpp>
 #include <copper/components/cipher.hpp>
-#include <copper/components/http_controller.hpp>
+#include <copper/components/controller.hpp>
 #include <copper/components/json.hpp>
 
 namespace copper::controllers {
@@ -13,7 +13,7 @@ namespace copper::controllers {
 /**
  * User controller
  */
-class user_controller final : public components::http_controller {
+class user_controller final : public components::controller {
  public:
   /**
    * Invoke
@@ -34,7 +34,7 @@ class user_controller final : public components::http_controller {
         {"updated_at", _user->updated_at_},
     };
 
-    co_return make_response(request, components::http_status_code::ok,
+    co_return make_response(request, components::status_code::ok,
                             serialize(data), "application/json");
   }
 };

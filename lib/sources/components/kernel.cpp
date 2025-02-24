@@ -4,20 +4,20 @@
 #include <copper/components/authentication.hpp>
 #include <copper/components/cache.hpp>
 #include <copper/components/configuration.hpp>
-#include <copper/components/http_controller.hpp>
-#include <copper/components/http_header.hpp>
-#include <copper/components/http_kernel.hpp>
-#include <copper/components/http_path.hpp>
-#include <copper/components/http_query.hpp>
+#include <copper/components/controller.hpp>
+#include <copper/components/header.hpp>
 #include <copper/components/http_response_bad_request.hpp>
 #include <copper/components/http_response_cors.hpp>
 #include <copper/components/http_response_exception.hpp>
 #include <copper/components/http_response_not_found.hpp>
 #include <copper/components/http_response_too_many_requests.hpp>
 #include <copper/components/http_response_unauthorized.hpp>
+#include <copper/components/kernel.hpp>
+#include <copper/components/mime_type.hpp>
+#include <copper/components/path.hpp>
+#include <copper/components/query.hpp>
 #include <copper/components/route_find.hpp>
 #include <copper/components/route_match.hpp>
-#include <copper/components/mime_type.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/validator.hpp>
 #include <copper/models/request.hpp>
@@ -25,14 +25,13 @@
 
 namespace copper::components {
 
-containers::optional_of<http_kernel_result> http_kernel::find_on_routes(
+containers::optional_of<kernel_result> kernel::find_on_routes(
     const http_request &request) const {
-  for (const auto &[route, controller] :
-       *state_->get_router()->get_routes()) {
+  for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
     if (auto [matches, bindings] =
             route_match(request.method(), request.target(), route);
         matches) {
-      return http_kernel_result{
+      return kernel_result{
           .route_ = route, .controller_ = controller, .bindings_ = bindings};
     }
   }
@@ -40,13 +39,11 @@ containers::optional_of<http_kernel_result> http_kernel::find_on_routes(
   return boost::none;
 }
 
-containers::vector_of<http_method> http_kernel::get_available_methods(
+containers::vector_of<method> kernel::get_available_methods(
     const http_request &request) const {
-  containers::vector_of<http_method> methods;
-  for (const auto &[route, controller] :
-       *state_->get_router()->get_routes()) {
-    if (auto [matches, bindings] = route_find(request.target(), route);
-        matches)
+  containers::vector_of<method> methods;
+  for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
+    if (auto [matches, bindings] = route_find(request.target(), route); matches)
       methods.push_back(route.method_);
   }
   return methods;
@@ -57,9 +54,9 @@ containers::vector_of<http_method> http_kernel::get_available_methods(
 containers::async_of<
     std::tuple<shared<copper::models::request>,
                shared<copper::models::response>, http_response_generic>>
-http_kernel::call(uuid session_id, boost::beast::string_view,
-                  const http_request &request, const std::string &ip,
-                  const uuid &request_id, long now) const {
+kernel::call(uuid session_id, boost::beast::string_view,
+             const http_request &request, const std::string &ip,
+             const uuid &request_id, long now) const {
   auto _request =
       models::request_from_http_request(session_id, request_id, now, request);
 
@@ -128,7 +125,7 @@ http_kernel::call(uuid session_id, boost::beast::string_view,
                             {"errors", validator->errors_}});
 
           auto _http_response = route.value().controller_->make_response(
-              request, http_status_code::unprocessable_entity,
+              request, status_code::unprocessable_entity,
               serialize(error_response), "application/json");
 
           auto _response = copper::models::response_from_http_response(
@@ -145,7 +142,7 @@ http_kernel::call(uuid session_id, boost::beast::string_view,
              {"errors", {{"*", "The body must be a valid JSON."}}}});
 
         auto _http_response = route.value().controller_->make_response(
-            request, http_status_code::unprocessable_entity,
+            request, status_code::unprocessable_entity,
             serialize(error_response), "application/json");
 
         auto _response = copper::models::response_from_http_response(
@@ -181,7 +178,7 @@ http_kernel::call(uuid session_id, boost::beast::string_view,
     }
   }
 
-  if (request.method() == http_method::options) {
+  if (request.method() == method::options) {
     auto available_verbs = get_available_methods(request);
 
     auto _http_response =

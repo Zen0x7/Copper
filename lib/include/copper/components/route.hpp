@@ -5,7 +5,7 @@
 
 #include <copper/components/containers.hpp>
 #include <copper/components/expression.hpp>
-#include <copper/components/http_method.hpp>
+#include <copper/components/method.hpp>
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
@@ -32,7 +32,7 @@ struct route {
   /**
    * Method
    */
-  http_method method_;
+  method method_;
 
   /**
    * URL

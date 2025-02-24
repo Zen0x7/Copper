@@ -2,8 +2,7 @@
 
 namespace copper::components {
 
-route_result route_find(const std::string_view &path,
-                        const route &route) {
+route_result route_find(const std::string_view &path, const route &route) {
   const size_t query_ask_symbol_position = path.find('?');
   const bool path_has_parameters =
       query_ask_symbol_position != std::string::npos;

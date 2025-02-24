@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_CONTROLLER_HPP
-#define COPPER_COMPONENTS_HTTP_CONTROLLER_HPP
+#ifndef COPPER_COMPONENTS_CONTROLLER_HPP
+#define COPPER_COMPONENTS_CONTROLLER_HPP
 
 #pragma once
 
@@ -10,21 +10,21 @@
 #include <boost/smart_ptr.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/containers.hpp>
+#include <copper/components/controller_configuration.hpp>
 #include <copper/components/dotenv.hpp>
-#include <copper/components/http_controller_configuration.hpp>
-#include <copper/components/http_fields.hpp>
+#include <copper/components/fields.hpp>
 #include <copper/components/http_request.hpp>
 #include <copper/components/http_response.hpp>
-#include <copper/components/http_status_code.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/shared.hpp>
+#include <copper/components/status_code.hpp>
 #include <copper/components/uuid.hpp>
 
 namespace copper::components {
 
 class state;
 
-class http_controller : public shared_enabled<http_controller> {
+class controller : public shared_enabled<controller> {
  public:
   /**
    * Bindings
@@ -54,13 +54,13 @@ class http_controller : public shared_enabled<http_controller> {
   /**
    * Configuration
    */
-  http_controller_configuration configuration_;
+  controller_configuration configuration_;
 
   // LCOV_EXCL_START
   /**
    * Constructor
    */
-  virtual ~http_controller() = default;
+  virtual ~controller() = default;
 
   /**
    * Invoke
@@ -94,7 +94,7 @@ class http_controller : public shared_enabled<http_controller> {
    *
    * @param configuration
    */
-  void set_configuration(http_controller_configuration configuration);
+  void set_configuration(controller_configuration configuration);
 
   /**
    * Set start at
@@ -133,8 +133,8 @@ class http_controller : public shared_enabled<http_controller> {
    * @param type
    * @return http_response
    */
-  http_response make_response(const http_request &request,
-                              http_status_code status, const std::string &data,
+  http_response make_response(const http_request &request, status_code status,
+                              const std::string &data,
                               const char *type = "text/html") const;
 
   /**
@@ -146,7 +146,7 @@ class http_controller : public shared_enabled<http_controller> {
    * @param type
    * @return http_response
    */
-  http_response make_view(const http_request &request, http_status_code status,
+  http_response make_view(const http_request &request, status_code status,
                           const std::string view, const json::json &data,
                           const char *type = "text/html") const;
 };

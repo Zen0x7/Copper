@@ -1,8 +1,8 @@
 #include <copper/components/cache.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/database.hpp>
-#include <copper/components/router.hpp>
 #include <copper/components/logger.hpp>
+#include <copper/components/router.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/views.hpp>

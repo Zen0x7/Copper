@@ -5,8 +5,8 @@
 #include <copper/components/client_certificates.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/router.hpp>
 #include <copper/components/listener.hpp>
+#include <copper/components/router.hpp>
 #include <copper/components/server_certificates.hpp>
 #include <copper/components/signal_handler.hpp>
 #include <copper/components/state.hpp>

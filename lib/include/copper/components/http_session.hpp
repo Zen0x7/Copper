@@ -11,8 +11,8 @@
 #include <copper/components/configuration.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/database.hpp>
-#include <copper/components/http_header.hpp>
-#include <copper/components/http_kernel.hpp>
+#include <copper/components/header.hpp>
+#include <copper/components/kernel.hpp>
 #include <copper/components/logger.hpp>
 #include <copper/components/report.hpp>
 #include <copper/components/state.hpp>
@@ -65,7 +65,7 @@ containers::async_of<void> http_session_run(
       co_return;
     }
 
-    auto kernel = boost::make_shared<http_kernel>(state);
+    auto kernel = boost::make_shared<kernel>(state);
 
     if (ec == boost::beast::error::timeout) {
       throw boost::system::system_error{ec};

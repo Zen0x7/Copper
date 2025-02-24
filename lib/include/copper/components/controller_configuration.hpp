@@ -1,14 +1,14 @@
-#ifndef COPPER_COMPONENTS_HTTP_CONTROLLER_CONFIG_HPP
-#define COPPER_COMPONENTS_HTTP_CONTROLLER_CONFIG_HPP
+#ifndef COPPER_COMPONENTS_CONTROLLER_CONFIGURATION_HPP
+#define COPPER_COMPONENTS_CONTROLLER_CONFIGURATION_HPP
 
 #pragma once
 
 namespace copper::components {
 
 /**
- * HTTP controller configuration
+ * Controller configuration
  */
-struct http_controller_configuration {
+struct controller_configuration {
   /**
    * Use auth
    */

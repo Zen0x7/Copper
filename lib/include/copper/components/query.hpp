@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_PATH_HPP
-#define COPPER_COMPONENTS_HTTP_PATH_HPP
+#ifndef COPPER_COMPONENTS_QUERY_HPP
+#define COPPER_COMPONENTS_QUERY_HPP
 
 #pragma once
 
@@ -15,12 +15,12 @@
 namespace copper::components {
 
 /**
- * HTTP path from request
+ * Query from request
  *
  * @param request
  * @return string
  */
-std::string http_path_from_request(const http_request &request);
+std::string query_from_request(const http_request &request);
 
 }  // namespace copper::components
 

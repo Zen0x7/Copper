@@ -6,7 +6,7 @@
 #include <boost/lexical_cast.hpp>
 #include <copper/components/authentication.hpp>
 #include <copper/components/cipher.hpp>
-#include <copper/components/http_controller.hpp>
+#include <copper/components/controller.hpp>
 #include <copper/components/json.hpp>
 
 namespace copper::controllers {
@@ -14,7 +14,7 @@ namespace copper::controllers {
 /**
  * Auth controller
  */
-class auth_controller final : public components::http_controller {
+class auth_controller final : public components::controller {
  public:
   /**
    * Rules
@@ -46,8 +46,7 @@ class auth_controller final : public components::http_controller {
       const components::json::object errors = {
           {"message", "Email provided isn't registered."}};
 
-      co_return make_response(request,
-                              components::http_status_code::unauthorized,
+      co_return make_response(request, components::status_code::unauthorized,
                               serialize(errors), "application/json");
     }
 
@@ -60,14 +59,14 @@ class auth_controller final : public components::http_controller {
       const components::json::object data = {{"token", token}};
 
       auto shared_token = std::make_shared<std::string>(token.data());
-      co_return make_response(request, components::http_status_code::ok,
+      co_return make_response(request, components::status_code::ok,
                               serialize(data), "application/json");
     }
 
     const components::json::object errors = {
         {"message", "Password provided doesn't match."}};
 
-    co_return make_response(request, components::http_status_code::unauthorized,
+    co_return make_response(request, components::status_code::unauthorized,
                             serialize(errors), "application/json");
   }
 };

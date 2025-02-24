@@ -4,9 +4,9 @@
 #pragma once
 
 #include <copper/components/containers.hpp>
-#include <copper/components/http_controller.hpp>
-#include <copper/components/http_controller_configuration.hpp>
-#include <copper/components/http_method.hpp>
+#include <copper/components/controller.hpp>
+#include <copper/components/controller_configuration.hpp>
+#include <copper/components/method.hpp>
 #include <copper/components/route.hpp>
 #include <copper/components/routes.hpp>
 #include <copper/components/shared.hpp>
@@ -44,9 +44,9 @@ class router : public shared_enabled<router> {
    * @param config
    * @return shared<router>
    */
-  shared<router> push(http_method method, const char path[],
-                      const shared<http_controller>& controller,
-                      http_controller_configuration config);
+  shared<router> push(method method, const char path[],
+                      const shared<controller>& controller,
+                      controller_configuration config);
 
   /**
    * Router factory
@@ -55,7 +55,7 @@ class router : public shared_enabled<router> {
    * @param path
    * @return route
    */
-  static route factory(http_method method, const char* path);
+  static route factory(method method, const char* path);
 };
 
 }  // namespace copper::components
