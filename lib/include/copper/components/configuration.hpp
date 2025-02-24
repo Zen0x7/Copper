@@ -18,6 +18,11 @@ class configurations : public shared_enabled<configurations> {
   std::string app_host_;
 
   /**
+   * App debug
+   */
+  bool app_debug_;
+
+  /**
    * App key
    */
   std::string app_key_;
@@ -136,6 +141,16 @@ class configurations : public shared_enabled<configurations> {
    * Logging max files
    */
   int logging_max_files_;
+
+  /**
+   * Sentry DSN
+   */
+  std::string sentry_dsn_;
+
+  /**
+   * Sentry crashpad handler
+   */
+  std::string sentry_crashpad_handler_;
 };
 
 /**

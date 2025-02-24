@@ -75,6 +75,7 @@ jobs:
           REDIS_CONNECTION_TIMEOUT: 60
           REDIS_RECONNECTION_WAIT_INTERVAL: 5
           REDIS_CLIENT_NAME: Copper
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

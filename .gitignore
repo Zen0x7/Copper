@@ -5,6 +5,7 @@ bin/certificates/params.pem
 bin/logs/*.log
 bin/copper
 bin/tests
+bin/.sentry-native
 bin/.env
 cmake-build-debug
 cmake-build-debug-coverage

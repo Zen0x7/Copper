@@ -6,6 +6,8 @@ configuration::configuration() {
   dotenv::init();
   values_ = boost::make_shared<configurations>();
 
+  values_->app_debug_ = dotenv::getenv("APP_DEBUG", "ON") == "ON";
+
   values_->app_host_ = dotenv::getenv("APP_HOST", "0.0.0.0");
   values_->app_key_ = dotenv::getenv("APP_KEY", "secret");
   values_->app_port_ = std::stoi(dotenv::getenv("APP_PORT", "9000"));
@@ -49,6 +51,11 @@ configuration::configuration() {
       std::stoi(dotenv::getenv("LOGGING_MAX_SIZE", "5242880"));
   values_->logging_max_files_ =
       std::stoi(dotenv::getenv("LOGGING_MAX_FILES", "3"));
+
+  values_->sentry_dsn_ =
+      dotenv::getenv("SENTRY_DSN", "https://{a}@{b}.ingest.us.sentry.io/{c}");
+  values_->sentry_crashpad_handler_ = dotenv::getenv(
+      "SENTRY_CRASHPAD_HANDLER", "/usr/local/bin/crashpad_handler");
 }
 
 shared<configurations> configuration::get() { return values_; }

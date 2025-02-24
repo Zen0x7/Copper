@@ -1,3 +1,7 @@
+#ifndef BOOST_BIND_GLOBAL_PLACEHOLDERS
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
+
 #include <boost/bind.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/smart_ptr.hpp>
