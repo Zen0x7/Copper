@@ -12,6 +12,7 @@ include_directories(${OPENSSL_INCLUDE_DIR})
 
 find_package(ZLIB REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(sentry REQUIRED)
 
 find_package(
         Boost 1.87.0
@@ -78,6 +79,7 @@ if (BUILD_TESTS)
             fmt::fmt
             bcrypt
             nlohmann_json::nlohmann_json
+            sentry::sentry
     )
     target_compile_definitions(tests PRIVATE BOOST_ASIO_SEPARATE_COMPILATION)
     target_compile_definitions(tests PRIVATE BOOST_REDIS_SEPARATE_COMPILATION)
@@ -104,6 +106,7 @@ target_link_libraries(copper
         fmt::fmt
         bcrypt
         nlohmann_json::nlohmann_json
+        sentry::sentry
 )
 target_compile_definitions(copper PRIVATE BOOST_ASIO_SEPARATE_COMPILATION)
 target_compile_definitions(copper PRIVATE BOOST_REDIS_SEPARATE_COMPILATION)

@@ -1,3 +1,5 @@
+#include <sentry.h>
+
 #include <boost/asio/co_spawn.hpp>
 #include <boost/program_options.hpp>
 #include <copper/app.hpp>
@@ -54,6 +56,17 @@ int run(int argc, const char *argv[]) {
   }
 
   auto _configuration = boost::make_shared<configuration>();
+
+  sentry_options_t *options = sentry_options_new();
+  sentry_options_set_dsn(options, _configuration->get()->sentry_dsn_.c_str());
+  sentry_options_set_database_path(options, ".sentry-native");
+  sentry_options_set_handler_path(
+      options, _configuration->get()->sentry_crashpad_handler_.c_str());
+  std::string release = "copper@" + get_version();
+  sentry_options_set_release(options, release.c_str());
+  sentry_options_set_debug(options,
+                           _configuration->get()->app_debug_ == true ? 1 : 0);
+  sentry_init(options);
 
   const auto _as = _vm["as"].as<std::string>();
 
@@ -168,6 +181,7 @@ int run(int argc, const char *argv[]) {
     _state->get_logger()->system_->info("[{}] Server has been shutdown",
                                         to_string(_server_id));
 
+    sentry_close();
     return EXIT_SUCCESS;
   } else {
     const auto _command = _vm["command"].as<std::string>();
@@ -179,6 +193,7 @@ int run(int argc, const char *argv[]) {
       fmt::print("APP_KEY_IV={}\n", base64_encode(_key.second));
     }
 
+    sentry_close();
     return EXIT_SUCCESS;
   }
 }
