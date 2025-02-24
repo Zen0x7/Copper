@@ -10,6 +10,7 @@
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
 #include <cstdint>
+#include <utility>
 
 namespace copper::models {
 
@@ -54,8 +55,8 @@ class session : public components::shared_enabled<session> {
    */
   session(std::string id, std::string ip, uint_least16_t port, long started_at,
           long finished_at)
-      : id_(id),
-        ip_(ip),
+      : id_(std::move(id)),
+        ip_(std::move(ip)),
         port_(port),
         started_at_(started_at),
         finished_at_(finished_at) {}

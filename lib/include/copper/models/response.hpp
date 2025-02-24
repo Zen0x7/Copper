@@ -17,6 +17,7 @@
 #include <copper/models/request.hpp>
 #include <copper/models/session.hpp>
 #include <cstdint>
+#include <utility>
 
 namespace copper::models {
 
@@ -72,12 +73,12 @@ class response : public components::shared_enabled<response> {
    */
   response(std::string id, std::string session_id, std::string request_id,
            int status_code, std::string headers, std::string body)
-      : id_(id),
-        session_id_(session_id),
-        request_id_(request_id),
+      : id_(std::move(id)),
+        session_id_(std::move(session_id)),
+        request_id_(std::move(request_id)),
         status_code_(status_code),
-        headers_(headers),
-        body_(body),
+        headers_(std::move(headers)),
+        body_(std::move(body)),
         protected_(false) {}
 };
 
