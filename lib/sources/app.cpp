@@ -6,7 +6,7 @@
 #include <copper/components/base64.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/configuration.hpp>
-#include <copper/components/http_router.hpp>
+#include <copper/components/router.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/logger.hpp>
 #include <copper/components/server_certificates.hpp>
@@ -135,7 +135,7 @@ int run(int argc, const char *argv[]) {
     _state->get_database()->start();
   }
 
-  _state->get_http_router()
+      _state->get_router()
       ->push(http_method::get, "/api/user",
              boost::make_shared<controllers::user_controller>(),
              {

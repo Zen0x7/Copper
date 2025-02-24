@@ -14,9 +14,9 @@
 namespace copper::components {
 
 /**
- * HTTP router
+ * Router
  */
-class http_router : public shared_enabled<http_router> {
+class router : public shared_enabled<router> {
   /**
    * Routes
    */
@@ -26,7 +26,7 @@ class http_router : public shared_enabled<http_router> {
   /**
    * Constructor
    */
-  explicit http_router();
+  explicit router();
 
   /**
    * Retrieves routes
@@ -42,14 +42,14 @@ class http_router : public shared_enabled<http_router> {
    * @param path
    * @param controller
    * @param config
-   * @return shared<http_router>
+   * @return shared<router>
    */
-  shared<http_router> push(http_method method, const char path[],
-                           const shared<http_controller>& controller,
-                           http_controller_configuration config);
+  shared<router> push(http_method method, const char path[],
+                      const shared<http_controller>& controller,
+                      http_controller_configuration config);
 
   /**
-   * HTTP router factory
+   * Router factory
    *
    * @param method
    * @param path

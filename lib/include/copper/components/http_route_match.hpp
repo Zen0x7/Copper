@@ -4,7 +4,7 @@
 #pragma once
 
 #include <copper/components/http_method.hpp>
-#include <copper/components/http_router.hpp>
+#include <copper/components/router.hpp>
 
 namespace copper::components {
 

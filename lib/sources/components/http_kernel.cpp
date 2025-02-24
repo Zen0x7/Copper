@@ -28,7 +28,7 @@ namespace copper::components {
 containers::optional_of<http_kernel_result> http_kernel::find_on_routes(
     const http_request &request) const {
   for (const auto &[route, controller] :
-       *state_->get_http_router()->get_routes()) {
+       *state_->get_router()->get_routes()) {
     if (auto [matches, bindings] =
             http_route_match(request.method(), request.target(), route);
         matches) {
@@ -44,7 +44,7 @@ containers::vector_of<http_method> http_kernel::get_available_methods(
     const http_request &request) const {
   containers::vector_of<http_method> methods;
   for (const auto &[route, controller] :
-       *state_->get_http_router()->get_routes()) {
+       *state_->get_router()->get_routes()) {
     if (auto [matches, bindings] = http_route_find(request.target(), route);
         matches)
       methods.push_back(route.method_);

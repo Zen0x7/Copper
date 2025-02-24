@@ -10,7 +10,7 @@
 #include <copper/components/http_controller.hpp>
 #include <copper/components/http_fields.hpp>
 #include <copper/components/http_response.hpp>
-#include <copper/components/http_router.hpp>
+#include <copper/components/router.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/server_certificates.hpp>
@@ -109,7 +109,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     _state->get_database()->start();
 
-    _state->get_http_router()
+    _state->get_router()
         ->push(http_method::get, "/api/up",
                boost::make_shared<copper::controllers::up_controller>(),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
