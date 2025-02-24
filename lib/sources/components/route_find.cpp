@@ -1,9 +1,9 @@
-#include <copper/components/http_route_find.hpp>
+#include <copper/components/route_find.hpp>
 
 namespace copper::components {
 
-http_route_result http_route_find(const std::string_view &path,
-                                  const http_route &route) {
+route_result route_find(const std::string_view &path,
+                        const route &route) {
   const size_t query_ask_symbol_position = path.find('?');
   const bool path_has_parameters =
       query_ask_symbol_position != std::string::npos;

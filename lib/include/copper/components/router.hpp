@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_ROUTER_HPP
-#define COPPER_COMPONENTS_HTTP_ROUTER_HPP
+#ifndef COPPER_COMPONENTS_ROUTER_HPP
+#define COPPER_COMPONENTS_ROUTER_HPP
 
 #pragma once
 
@@ -7,8 +7,8 @@
 #include <copper/components/http_controller.hpp>
 #include <copper/components/http_controller_configuration.hpp>
 #include <copper/components/http_method.hpp>
-#include <copper/components/http_route.hpp>
-#include <copper/components/http_routes.hpp>
+#include <copper/components/route.hpp>
+#include <copper/components/routes.hpp>
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
@@ -20,7 +20,7 @@ class router : public shared_enabled<router> {
   /**
    * Routes
    */
-  shared<http_routes> routes_;
+  shared<routes> routes_;
 
  public:
   /**
@@ -31,9 +31,9 @@ class router : public shared_enabled<router> {
   /**
    * Retrieves routes
    *
-   * @return shared<http_routes>
+   * @return shared<routes>
    */
-  shared<http_routes> get_routes();
+  shared<routes> get_routes();
 
   /**
    * Push
@@ -53,9 +53,9 @@ class router : public shared_enabled<router> {
    *
    * @param method
    * @param path
-   * @return http_route
+   * @return route
    */
-  static http_route factory(http_method method, const char* path);
+  static route factory(http_method method, const char* path);
 };
 
 }  // namespace copper::components

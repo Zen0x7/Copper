@@ -2,7 +2,7 @@
 
 namespace copper::components {
 
-http_route router::factory(http_method method, const char *path) {
+route router::factory(http_method method, const char *path) {
   std::string route(path);
 
   const auto expression = expression_make(route);
@@ -27,7 +27,7 @@ shared<router> router::push(http_method method, const char *path,
   return shared_from_this();
 }
 
-shared<http_routes> router::get_routes() { return routes_; }
+shared<routes> router::get_routes() { return routes_; }
 
-router::router() : routes_(boost::make_shared<http_routes>()) {}
+router::router() : routes_(boost::make_shared<routes>()) {}
 }  // namespace copper::components

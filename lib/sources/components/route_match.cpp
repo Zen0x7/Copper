@@ -1,10 +1,10 @@
-#include <copper/components/http_route_match.hpp>
+#include <copper/components/route_match.hpp>
 
 namespace copper::components {
 
-http_route_result http_route_match(http_method method,
-                                   const std::string_view &path,
-                                   const http_route &route) {
+route_result route_match(http_method method,
+                         const std::string_view &path,
+                         const route &route) {
   const size_t query_ask_mark_position = path.find('?');
   const bool path_has_params = query_ask_mark_position != std::string::npos;
   const std::string to_compare{

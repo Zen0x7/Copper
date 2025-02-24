@@ -15,8 +15,8 @@
 #include <copper/components/http_response_not_found.hpp>
 #include <copper/components/http_response_too_many_requests.hpp>
 #include <copper/components/http_response_unauthorized.hpp>
-#include <copper/components/http_route_find.hpp>
-#include <copper/components/http_route_match.hpp>
+#include <copper/components/route_find.hpp>
+#include <copper/components/route_match.hpp>
 #include <copper/components/mime_type.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/validator.hpp>
@@ -30,7 +30,7 @@ containers::optional_of<http_kernel_result> http_kernel::find_on_routes(
   for (const auto &[route, controller] :
        *state_->get_router()->get_routes()) {
     if (auto [matches, bindings] =
-            http_route_match(request.method(), request.target(), route);
+            route_match(request.method(), request.target(), route);
         matches) {
       return http_kernel_result{
           .route_ = route, .controller_ = controller, .bindings_ = bindings};
@@ -45,7 +45,7 @@ containers::vector_of<http_method> http_kernel::get_available_methods(
   containers::vector_of<http_method> methods;
   for (const auto &[route, controller] :
        *state_->get_router()->get_routes()) {
-    if (auto [matches, bindings] = http_route_find(request.target(), route);
+    if (auto [matches, bindings] = route_find(request.target(), route);
         matches)
       methods.push_back(route.method_);
   }

@@ -9,7 +9,7 @@
 #include <copper/components/http_request.hpp>
 #include <copper/components/http_response.hpp>
 #include <copper/components/http_response_generic.hpp>
-#include <copper/components/http_route.hpp>
+#include <copper/components/route.hpp>
 #include <copper/components/normalized_path.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
@@ -37,7 +37,7 @@ class http_controller;
  * HTTP kernel result
  */
 struct http_kernel_result {
-  http_route route_;
+  route route_;
   shared<http_controller> controller_;
   containers::unordered_map_of_strings bindings_;
 };

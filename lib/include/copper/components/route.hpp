@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_ROUTE_HPP
-#define COPPER_COMPONENTS_HTTP_ROUTE_HPP
+#ifndef COPPER_COMPONENTS_ROUTE_HPP
+#define COPPER_COMPONENTS_ROUTE_HPP
 
 #pragma once
 
@@ -11,9 +11,9 @@
 namespace copper::components {
 
 /**
- * HTTP route result
+ * Route result
  */
-struct http_route_result {
+struct route_result {
   /**
    * Matches
    */
@@ -26,9 +26,9 @@ struct http_route_result {
 };
 
 /**
- * HTTP route
+ * Route
  */
-struct http_route {
+struct route {
   /**
    * Method
    */
