@@ -18,12 +18,12 @@ namespace copper::components {
 class logger : public shared_enabled<logger> {
  public:
   /**
-   * Requests
+   * System
    */
   shared<spdlog::logger> system_;
 
   /**
-   * Requests
+   * Sessions
    */
   shared<spdlog::logger> sessions_;
 
