@@ -24,13 +24,13 @@ void controller::set_configuration(controller_configuration configuration) {
   configuration_ = configuration;
 }
 
-http_response controller::make_response(const http_request &request,
-                                        status_code status,
-                                        const std::string &data,
-                                        const char *type) const {
+response controller::make_response(const request &request,
+                                   status_code status,
+                                   const std::string &data,
+                                   const char *type) const {
   const auto resolved_at = chronos::now();
 
-  http_response response{};
+  response response{};
 
   response.set(fields::content_type, type);
   response.set(fields::allow, request.method_string());
@@ -61,13 +61,13 @@ http_response controller::make_response(const http_request &request,
   return response;
 }
 
-http_response controller::make_view(const http_request &request,
-                                    status_code status, const std::string view,
-                                    const json::json &data,
-                                    const char *type) const {
+response controller::make_view(const request &request,
+                               status_code status, const std::string view,
+                               const json::json &data,
+                               const char *type) const {
   const auto resolved_at = chronos::now();
 
-  http_response response{};
+  response response{};
 
   response.set(fields::content_type, type);
   response.set(fields::allow, request.method_string());

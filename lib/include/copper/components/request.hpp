@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_REQUEST_HPP
-#define COPPER_COMPONENTS_HTTP_REQUEST_HPP
+#ifndef COPPER_COMPONENTS_REQUEST_HPP
+#define COPPER_COMPONENTS_REQUEST_HPP
 
 #pragma once
 
@@ -8,18 +8,18 @@
 namespace copper::components {
 
 /**
- * HTTP request
+ * Request
  */
 typedef boost::beast::http::request<boost::beast::http::string_body>
-    http_request;
+    request;
 
 /**
- * HTTP request is illegal
+ * Request is illegal
  *
  * @param request
  * @return bool
  */
-bool http_request_is_illegal(const http_request& request);
+bool request_is_illegal(const request& request);
 
 }  // namespace copper::components
 

@@ -18,10 +18,10 @@ class up_controller final : public components::controller {
    * Invoke
    *
    * @param request
-   * @return async_of<http_response>
+   * @return async_of<response>
    */
-  components::containers::async_of<components::http_response> invoke(
-      const components::http_request &request) override {
+  components::containers::async_of<components::response> invoke(
+      const components::request &request) override {
     auto now = components::chronos::now();
     const components::json::object data = {{"timestamp", now}};
     co_return make_response(request, components::status_code::ok,

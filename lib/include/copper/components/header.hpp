@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <copper/components/http_request.hpp>
-#include <copper/components/http_response.hpp>
+#include <copper/components/request.hpp>
+#include <copper/components/response.hpp>
 #include <copper/components/json.hpp>
 #include <string>
 
@@ -16,7 +16,7 @@ namespace copper::components {
  * @param request
  * @return string
  */
-std::string header_from_request(const http_request& request);
+std::string header_from_request(const request& request);
 
 /**
  * Retrieves headers from response
@@ -24,7 +24,7 @@ std::string header_from_request(const http_request& request);
  * @param response
  * @return string
  */
-std::string header_from_response(const http_response& response);
+std::string header_from_response(const response& response);
 
 }  // namespace copper::components
 

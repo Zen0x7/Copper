@@ -2,9 +2,9 @@
 
 namespace copper::models {
 
-components::shared<request> request_from_http_request(
+components::shared<request> request_from_request(
     components::uuid session_id, components::uuid request_id, long now,
-    const components::http_request &request) {
+    const components::request &request) {
   return boost::make_shared<copper::models::request>(
       to_string(request_id), to_string(session_id),
       std::to_string(request.version()), std::string(request.method_string()),

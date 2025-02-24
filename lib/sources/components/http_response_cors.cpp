@@ -13,12 +13,12 @@
 
 namespace copper::components {
 
-http_response http_response_cors(const http_request &request, long start_at,
-                                 const containers::vector_of<method> methods,
-                                 const shared<state> &state) {
+response http_response_cors(const request &request, long start_at,
+                            const containers::vector_of<method> methods,
+                            const shared<state> &state) {
   const auto now = chronos::now();
 
-  http_response response{
+  response response{
       methods.empty() ? status_code::method_not_allowed : status_code::ok,
       request.version()};
   response.set(fields::content_type, "application/json");

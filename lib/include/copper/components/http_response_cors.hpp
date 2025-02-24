@@ -4,8 +4,8 @@
 #pragma once
 
 #include <copper/components/containers.hpp>
-#include <copper/components/http_request.hpp>
-#include <copper/components/http_response.hpp>
+#include <copper/components/request.hpp>
+#include <copper/components/response.hpp>
 #include <copper/components/method.hpp>
 #include <copper/components/shared.hpp>
 
@@ -22,11 +22,11 @@ class state;
  * @param start_at
  * @param methods
  * @param state
- * @return http_response
+ * @return response
  */
-http_response http_response_cors(const http_request& request, long start_at,
-                                 containers::vector_of<method> methods,
-                                 const shared<state>& state);
+response http_response_cors(const request& request, long start_at,
+                            containers::vector_of<method> methods,
+                            const shared<state>& state);
 
 }  // namespace copper::components
 

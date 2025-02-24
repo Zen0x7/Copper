@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <copper/components/http_request.hpp>
-#include <copper/components/http_response.hpp>
+#include <copper/components/request.hpp>
+#include <copper/components/response.hpp>
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
@@ -21,11 +21,11 @@ class state;
  * @param start_at
  * @param ttl
  * @param state
- * @return http_response
+ * @return response
  */
-http_response http_response_too_many_requests(const http_request& request,
-                                              long start_at, int ttl,
-                                              const shared<state>& state);
+response http_response_too_many_requests(const request& request,
+                                         long start_at, int ttl,
+                                         const shared<state>& state);
 
 }  // namespace copper::components
 

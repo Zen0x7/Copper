@@ -11,12 +11,12 @@
 
 namespace copper::components {
 
-http_response http_response_not_found(const http_request &request,
-                                      long start_at,
-                                      const shared<state> &state) {
+response http_response_not_found(const request &request,
+                                 long start_at,
+                                 const shared<state> &state) {
   const auto now = chronos::now();
 
-  http_response response{status_code::not_found, request.version()};
+  response response{status_code::not_found, request.version()};
 
   bool requires_html = request.count(fields::accept) > 0 &&
                        boost::contains(request.at(fields::accept), "html");

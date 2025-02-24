@@ -19,10 +19,10 @@ class user_controller final : public components::controller {
    * Invoke
    *
    * @param request
-   * @return async_of<http_response>
+   * @return async_of<response>
    */
-  components::containers::async_of<components::http_response> invoke(
-      const components::http_request &request) override {
+  components::containers::async_of<components::response> invoke(
+      const components::request &request) override {
     auto _user = co_await state_->get_database()->get_user_by_id(auth_id_);
 
     const components::json::object data = {

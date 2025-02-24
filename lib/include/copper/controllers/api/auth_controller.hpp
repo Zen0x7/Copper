@@ -33,10 +33,10 @@ class auth_controller final : public components::controller {
    * Invoke
    *
    * @param request
-   * @return async_of<http_response>
+   * @return async_of<response>
    */
-  components::containers::async_of<components::http_response> invoke(
-      const components::http_request &request) override {
+  components::containers::async_of<components::response> invoke(
+      const components::request &request) override {
     std::string email{body_.as_object().at("email").as_string()};
     std::string password{body_.as_object().at("password").as_string()};
 

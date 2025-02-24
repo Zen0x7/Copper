@@ -118,9 +118,9 @@ class request : public components::shared_enabled<request> {
  * @param request
  * @return
  */
-components::shared<request> request_from_http_request(
+components::shared<request> request_from_request(
     components::uuid session_id, components::uuid request_id, long now,
-    const components::http_request &request);
+    const components::request &request);
 
 }  // namespace copper::models
 

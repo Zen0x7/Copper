@@ -9,7 +9,7 @@
 #include <copper/components/controller.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/http_response.hpp>
+#include <copper/components/response.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/router.hpp>
@@ -33,8 +33,8 @@ containers::async_of<void> cancel_http_sessions() {
 
 class templated_controller final : public controller {
  public:
-  containers::async_of<copper::components::http_response> invoke(
-      const http_request &request) override {
+  containers::async_of<copper::components::response> invoke(
+      const request &request) override {
     json::json data;
     co_return make_view(request, status_code::ok, "template", data);
   }
@@ -42,8 +42,8 @@ class templated_controller final : public controller {
 
 class exception_controller final : public controller {
  public:
-  containers::async_of<copper::components::http_response> invoke(
-      const http_request &request) override {
+  containers::async_of<copper::components::response> invoke(
+      const request &request) override {
     throw std::runtime_error("Something went wrong");
     auto now = chronos::now();
     const json::object data = {{"message", "Request has been processed."},
@@ -57,8 +57,8 @@ class exception_controller final : public controller {
 
 class params_controller final : public controller {
  public:
-  containers::async_of<copper::components::http_response> invoke(
-      const http_request &request) override {
+  containers::async_of<copper::components::response> invoke(
+      const request &request) override {
     auto now = chronos::now();
     const json::object data = {{"message", "Request has been processed."},
                                {"data", this->bindings_.at("name")},
@@ -187,7 +187,7 @@ TEST(Components_HTTP_Session, Implementation) {
       // Not found
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/", 11};
+      request request{method::get, "/", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -217,7 +217,7 @@ TEST(Components_HTTP_Session, Implementation) {
       // Not found compressed
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/", 11};
+      request request{method::get, "/", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -251,7 +251,7 @@ TEST(Components_HTTP_Session, Implementation) {
       // Not found HTML
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/", 11};
+      request request{method::get, "/", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -287,7 +287,7 @@ TEST(Components_HTTP_Session, Implementation) {
       // Options
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::options, "/api/up", 11};
+      request request{method::options, "/api/up", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -320,7 +320,7 @@ TEST(Components_HTTP_Session, Implementation) {
       // Options compressed
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::options, "/api/up", 11};
+      request request{method::options, "/api/up", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -358,7 +358,7 @@ TEST(Components_HTTP_Session, Implementation) {
       for (int i = 0; i < 5; i++) {
         boost::beast::flat_buffer buffer;
         boost::beast::http::response<boost::beast::http::string_body> response;
-        http_request request{method::get, "/api/up", 11};
+        request request{method::get, "/api/up", 11};
         request.set(fields::host, host);
         request.set(fields::user_agent, "Copper");
 
@@ -388,7 +388,7 @@ TEST(Components_HTTP_Session, Implementation) {
       // Too many requests
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/up", 11};
+      request request{method::get, "/api/up", 11};
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
 
@@ -418,7 +418,7 @@ TEST(Components_HTTP_Session, Implementation) {
       // Too many requests compressed
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/up", 11};
+      request request{method::get, "/api/up", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -452,7 +452,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {  // Exception
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/exception", 11};
+      request request{method::get, "/api/exception", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -481,7 +481,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {  // Exception compressed
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/exception", 11};
+      request request{method::get, "/api/exception", 11};
       request.set(fields::accept_encoding, "gzip");
 
       request.set(fields::host, host);
@@ -514,7 +514,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::post, "/api/auth", 11};
+      request request{method::post, "/api/auth", 11};
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
       request.set(fields::content_type, "application/json");
@@ -548,7 +548,7 @@ TEST(Components_HTTP_Session, Implementation) {
         boost::beast::flat_buffer user_buffer;
         boost::beast::http::response<boost::beast::http::string_body>
             user_response;
-        http_request user_request{method::get, "/api/user", 11};
+        request user_request{method::get, "/api/user", 11};
         user_request.set(fields::host, host);
         user_request.set(fields::user_agent, "Copper");
         user_request.set(fields::authorization,
@@ -582,7 +582,7 @@ TEST(Components_HTTP_Session, Implementation) {
         boost::beast::flat_buffer user_buffer;
         boost::beast::http::response<boost::beast::http::string_body>
             user_response;
-        http_request user_request{method::get, "/api/user", 11};
+        request user_request{method::get, "/api/user", 11};
         user_request.set(fields::host, host);
         user_request.set(fields::user_agent, "Copper");
         user_request.set(fields::accept_encoding, "gzip");
@@ -621,7 +621,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::post, "/api/auth", 11};
+      request request{method::post, "/api/auth", 11};
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
       request.set(fields::content_type, "application/json");
@@ -655,7 +655,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::post, "/api/auth", 11};
+      request request{method::post, "/api/auth", 11};
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
       request.set(fields::content_type, "application/json");
@@ -690,7 +690,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/params/hello", 11};
+      request request{method::get, "/api/params/hello", 11};
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
 
@@ -721,8 +721,8 @@ TEST(Components_HTTP_Session, Implementation) {
     {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/params/hello?a=b&c=d&e[]=f&e[]=g",
-                           11};
+      request request{method::get, "/api/params/hello?a=b&c=d&e[]=f&e[]=g",
+                      11};
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
 
@@ -753,7 +753,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {  // Bad request
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/../bad_request", 11};
+      request request{method::get, "/api/../bad_request", 11};
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
 
@@ -781,7 +781,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {  // Bad request compressed
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/../bad_request", 11};
+      request request{method::get, "/api/../bad_request", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -814,7 +814,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {  // Unauthorized
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/user", 11};
+      request request{method::get, "/api/user", 11};
 
       request.set(fields::host, host);
       request.set(fields::user_agent, "Copper");
@@ -843,7 +843,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {  // Unauthorized compressed
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/user", 11};
+      request request{method::get, "/api/user", 11};
       request.set(fields::accept_encoding, "gzip");
 
       request.set(fields::host, host);
@@ -876,7 +876,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/", 11};
+      request request{method::get, "/", 11};
       request.set(fields::host, host);
       request.set(fields::accept, "text/html");
 
@@ -904,7 +904,7 @@ TEST(Components_HTTP_Session, Implementation) {
     {
       boost::beast::flat_buffer buffer;
       boost::beast::http::response<boost::beast::http::string_body> response;
-      http_request request{method::get, "/api/templated", 11};
+      request request{method::get, "/api/templated", 11};
       request.set(fields::host, host);
       request.set(fields::accept, "text/html");
 

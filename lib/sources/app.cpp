@@ -23,7 +23,7 @@
 
 namespace copper {
 
-std::string get_version() { return "3.0.0"; }
+std::string get_version() { return "5.0.0"; }
 
 // LCOV_EXCL_START
 int run(int argc, const char *argv[]) {
@@ -228,7 +228,7 @@ int run(int argc, const char *argv[]) {
       {
         boost::beast::flat_buffer _buffer;
         boost::beast::http::response<boost::beast::http::string_body> _response;
-        http_request _request{_verb, _signature, 11};
+        request _request{_verb, _signature, 11};
         _request.set(fields::host, _configuration->get()->app_host_);
         _request.set(fields::user_agent, "Copper");
         _request.set(fields::content_type, "application/json");

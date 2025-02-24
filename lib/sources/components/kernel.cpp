@@ -26,7 +26,7 @@
 namespace copper::components {
 
 containers::optional_of<kernel_result> kernel::find_on_routes(
-    const http_request &request) const {
+    const request &request) const {
   for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
     if (auto [matches, bindings] =
             route_match(request.method(), request.target(), route);
@@ -40,7 +40,7 @@ containers::optional_of<kernel_result> kernel::find_on_routes(
 }
 
 containers::vector_of<method> kernel::get_available_methods(
-    const http_request &request) const {
+    const request &request) const {
   containers::vector_of<method> methods;
   for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
     if (auto [matches, bindings] = route_find(request.target(), route); matches)
@@ -55,10 +55,10 @@ containers::async_of<
     std::tuple<shared<copper::models::request>,
                shared<copper::models::response>, http_response_generic>>
 kernel::call(uuid session_id, boost::beast::string_view,
-             const http_request &request, const std::string &ip,
+             const request &request, const std::string &ip,
              const uuid &request_id, long now) const {
   auto _request =
-      models::request_from_http_request(session_id, request_id, now, request);
+    models::request_from_request(session_id, request_id, now, request);
 
   if (const auto route = find_on_routes(request); route.has_value()) {
     containers::unordered_map_of_strings bindings = route.value().bindings_;
@@ -72,8 +72,8 @@ kernel::call(uuid session_id, boost::beast::string_view,
         auto _http_response =
             http_response_too_many_requests(request, now, TTL, state_);
 
-        auto _response = copper::models::response_from_http_response(
-            session_id, _request, _http_response);
+        auto _response = copper::models::response_from_response(
+          session_id, _request, _http_response);
 
         co_return std::make_tuple(_request, _response, _http_response);
       }
@@ -92,8 +92,8 @@ kernel::call(uuid session_id, boost::beast::string_view,
       if (!user_id.has_value()) {
         auto _http_response = http_response_unauthorized(request, now, state_);
 
-        auto _response = copper::models::response_from_http_response(
-            session_id, _request, _http_response);
+        auto _response = copper::models::response_from_response(
+          session_id, _request, _http_response);
 
         _response->protected_ =
             route.value().controller_->configuration_.use_protector_ == true;
@@ -128,8 +128,8 @@ kernel::call(uuid session_id, boost::beast::string_view,
               request, status_code::unprocessable_entity,
               serialize(error_response), "application/json");
 
-          auto _response = copper::models::response_from_http_response(
-              session_id, _request, _http_response);
+          auto _response = copper::models::response_from_response(
+            session_id, _request, _http_response);
 
           _response->protected_ =
               route.value().controller_->configuration_.use_protector_ == true;
@@ -145,8 +145,8 @@ kernel::call(uuid session_id, boost::beast::string_view,
             request, status_code::unprocessable_entity,
             serialize(error_response), "application/json");
 
-        auto _response = copper::models::response_from_http_response(
-            session_id, _request, _http_response);
+        auto _response = copper::models::response_from_response(
+          session_id, _request, _http_response);
 
         _response->protected_ =
             route.value().controller_->configuration_.use_protector_ == true;
@@ -158,8 +158,8 @@ kernel::call(uuid session_id, boost::beast::string_view,
     try {
       auto _http_response = co_await route.value().controller_->invoke(request);
 
-      auto _response = copper::models::response_from_http_response(
-          session_id, _request, _http_response);
+      auto _response = copper::models::response_from_response(
+        session_id, _request, _http_response);
 
       _response->protected_ =
           route.value().controller_->configuration_.use_protector_ == true;
@@ -168,8 +168,8 @@ kernel::call(uuid session_id, boost::beast::string_view,
     } catch (std::exception &exception) {
       auto _http_response = http_response_exception(request, now, state_);
 
-      auto _response = copper::models::response_from_http_response(
-          session_id, _request, _http_response);
+      auto _response = copper::models::response_from_response(
+        session_id, _request, _http_response);
 
       _response->protected_ =
           route.value().controller_->configuration_.use_protector_ == true;
@@ -184,25 +184,25 @@ kernel::call(uuid session_id, boost::beast::string_view,
     auto _http_response =
         http_response_cors(request, now, available_verbs, state_);
 
-    auto _response = copper::models::response_from_http_response(
-        session_id, _request, _http_response);
+    auto _response = copper::models::response_from_response(
+      session_id, _request, _http_response);
 
     co_return std::make_tuple(_request, _response, _http_response);
   }
 
-  if (http_request_is_illegal(request)) {
+  if (request_is_illegal(request)) {
     auto _http_response = http_response_bad_request(request, now, state_);
 
-    auto _response = copper::models::response_from_http_response(
-        session_id, _request, _http_response);
+    auto _response = copper::models::response_from_response(
+      session_id, _request, _http_response);
 
     co_return std::make_tuple(_request, _response, _http_response);
   }
 
   auto _http_response = http_response_not_found(request, now, state_);
 
-  auto _response = copper::models::response_from_http_response(
-      session_id, _request, _http_response);
+  auto _response = copper::models::response_from_response(
+    session_id, _request, _http_response);
 
   co_return std::make_tuple(_request, _response, _http_response);
 }

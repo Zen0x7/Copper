@@ -6,8 +6,8 @@
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/strand.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/http_request.hpp>
-#include <copper/components/http_response.hpp>
+#include <copper/components/request.hpp>
+#include <copper/components/response.hpp>
 #include <copper/components/http_response_generic.hpp>
 #include <copper/components/normalized_path.hpp>
 #include <copper/components/route.hpp>
@@ -65,7 +65,7 @@ class kernel : public shared_enabled<kernel> {
    * @return optional_of<kernel_result>
    */
   containers::optional_of<kernel_result> find_on_routes(
-      const http_request &request) const;
+      const request &request) const;
 
   /**
    * Get available methods
@@ -74,7 +74,7 @@ class kernel : public shared_enabled<kernel> {
    * @return vector_of<method>
    */
   containers::vector_of<method> get_available_methods(
-      const http_request &request) const;
+      const request &request) const;
 
   /**
    * Call
@@ -91,7 +91,7 @@ class kernel : public shared_enabled<kernel> {
                                             shared<copper::models::response>,
                                             http_response_generic>>
   call(uuid session_id, boost::beast::string_view /* root */,
-       const http_request &request, const std::string &ip,
+       const request &request, const std::string &ip,
        const uuid &request_id, long now) const;
 };
 

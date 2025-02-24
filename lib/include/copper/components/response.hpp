@@ -1,5 +1,5 @@
-#ifndef COPPER_COMPONENTS_HTTP_RESPONSE_HPP
-#define COPPER_COMPONENTS_HTTP_RESPONSE_HPP
+#ifndef COPPER_COMPONENTS_RESPONSE_HPP
+#define COPPER_COMPONENTS_RESPONSE_HPP
 
 #pragma once
 
@@ -8,10 +8,10 @@
 namespace copper::components {
 
 /**
- * HTTP response
+ * Response
  */
 typedef boost::beast::http::response<boost::beast::http::string_body>
-    http_response;
+    response;
 
 }  // namespace copper::components
 

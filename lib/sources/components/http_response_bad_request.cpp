@@ -11,12 +11,12 @@
 
 namespace copper::components {
 
-http_response http_response_bad_request(const http_request &request,
-                                        long start_at,
-                                        const shared<state> &state) {
+response http_response_bad_request(const request &request,
+                                   long start_at,
+                                   const shared<state> &state) {
   const auto now = chronos::now();
 
-  http_response response{status_code::bad_request, request.version()};
+  response response{status_code::bad_request, request.version()};
   response.set(fields::content_type, "application/json");
 
   const std::string allowed_headers =

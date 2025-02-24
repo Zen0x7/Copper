@@ -10,12 +10,12 @@
 
 namespace copper::components {
 
-http_response http_response_too_many_requests(const http_request &request,
-                                              long start_at, const int ttl,
-                                              const shared<state> &state) {
+response http_response_too_many_requests(const request &request,
+                                         long start_at, const int ttl,
+                                         const shared<state> &state) {
   const auto now = chronos::now();
 
-  http_response response{status_code::too_many_requests, request.version()};
+  response response{status_code::too_many_requests, request.version()};
   response.set(fields::content_type, "application/json");
 
   const std::string allowed_headers =

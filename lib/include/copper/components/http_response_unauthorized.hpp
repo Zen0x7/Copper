@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <copper/components/http_request.hpp>
-#include <copper/components/http_response.hpp>
+#include <copper/components/request.hpp>
+#include <copper/components/response.hpp>
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
@@ -20,11 +20,11 @@ class state;
  * @param request
  * @param start_at
  * @param state
- * @return http_response
+ * @return response
  */
-http_response http_response_unauthorized(const http_request& request,
-                                         long start_at,
-                                         const shared<state>& state);
+response http_response_unauthorized(const request& request,
+                                    long start_at,
+                                    const shared<state>& state);
 
 }  // namespace copper::components
 

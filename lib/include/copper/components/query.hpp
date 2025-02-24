@@ -4,7 +4,7 @@
 #pragma once
 
 #include <copper/components/containers.hpp>
-#include <copper/components/http_request.hpp>
+#include <copper/components/request.hpp>
 #include <copper/components/json.hpp>
 #include <istream>
 #include <map>
@@ -20,7 +20,7 @@ namespace copper::components {
  * @param request
  * @return string
  */
-std::string query_from_request(const http_request &request);
+std::string query_from_request(const request &request);
 
 }  // namespace copper::components
 

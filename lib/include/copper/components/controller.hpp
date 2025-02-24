@@ -13,8 +13,8 @@
 #include <copper/components/controller_configuration.hpp>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
-#include <copper/components/http_request.hpp>
-#include <copper/components/http_response.hpp>
+#include <copper/components/request.hpp>
+#include <copper/components/response.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/status_code.hpp>
@@ -65,11 +65,11 @@ class controller : public shared_enabled<controller> {
   /**
    * Invoke
    *
-   * @return async_of<http_response>
+   * @return async_of<response>
    */
-  virtual containers::async_of<http_response> invoke(
-      const http_request & /*request*/) {
-    http_response response;
+  virtual containers::async_of<response> invoke(
+      const request & /*request*/) {
+    response response;
     co_return response;
   };
 
@@ -131,11 +131,11 @@ class controller : public shared_enabled<controller> {
    * @param status
    * @param data
    * @param type
-   * @return http_response
+   * @return response
    */
-  http_response make_response(const http_request &request, status_code status,
-                              const std::string &data,
-                              const char *type = "text/html") const;
+  response make_response(const request &request, status_code status,
+                         const std::string &data,
+                         const char *type = "text/html") const;
 
   /**
    * Make view
@@ -144,11 +144,11 @@ class controller : public shared_enabled<controller> {
    * @param status
    * @param data
    * @param type
-   * @return http_response
+   * @return response
    */
-  http_response make_view(const http_request &request, status_code status,
-                          const std::string view, const json::json &data,
-                          const char *type = "text/html") const;
+  response make_view(const request &request, status_code status,
+                     const std::string view, const json::json &data,
+                     const char *type = "text/html") const;
 };
 
 }  // namespace copper::components

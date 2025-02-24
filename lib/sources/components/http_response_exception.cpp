@@ -11,12 +11,12 @@
 
 namespace copper::components {
 
-http_response http_response_exception(const http_request &request,
-                                      long start_at,
-                                      const shared<state> &state) {
+response http_response_exception(const request &request,
+                                 long start_at,
+                                 const shared<state> &state) {
   const auto now = chronos::now();
 
-  http_response response{status_code::internal_server_error, request.version()};
+  response response{status_code::internal_server_error, request.version()};
   response.set(fields::content_type, "application/json");
 
   const std::string allowed_headers =
