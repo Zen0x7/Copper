@@ -13,6 +13,7 @@
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
 #include <cstdint>
+#include <utility>
 
 namespace copper::models {
 
@@ -95,14 +96,14 @@ class request : public components::shared_enabled<request> {
           std::string method, std::string path, std::string query,
           std::string headers, std::string body, long started_at,
           long finished_at, long duration)
-      : id_(id),
-        session_id_(session_id),
-        version_(version),
-        method_(method),
-        path_(path),
-        query_(query),
-        headers_(headers),
-        body_(body),
+      : id_(std::move(id)),
+        session_id_(std::move(session_id)),
+        version_(std::move(version)),
+        method_(std::move(method)),
+        path_(std::move(path)),
+        query_(std::move(query)),
+        headers_(std::move(headers)),
+        body_(std::move(body)),
         started_at_(started_at),
         finished_at_(finished_at),
         duration_(duration) {}
