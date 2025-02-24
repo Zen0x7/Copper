@@ -1,11 +1,13 @@
 #include <boost/asio/co_spawn.hpp>
 #include <copper/components/cache.hpp>
 #include <copper/components/listener.hpp>
+#include <copper/components/logger.hpp>
 #include <copper/components/state.hpp>
 
 namespace copper::components {
 
-containers::async_of<void> listener(shared<state> state,
+containers::async_of<void> listener(boost::uuids::uuid server_id,
+                                    shared<state> state,
                                     shared<task_group> task_group,
                                     boost::asio::ssl::context &ctx,
                                     boost::asio::ip::tcp::endpoint endpoint,
@@ -19,6 +21,19 @@ containers::async_of<void> listener(shared<state> state,
   co_await boost::asio::this_coro::reset_cancellation_state(
       boost::asio::enable_total_cancellation());
 
+  auto uuid_generator = boost::uuids::random_generator();
+  auto transaction_id = uuid_generator();
+
+  json::object server_registered = {
+      {"transaction_id", to_string(transaction_id)},
+      {"event", "server_registered"},
+      {"data", {{"id", to_string(server_id)}}}};
+
+  co_await state->get_cache()->publish("events", serialize(server_registered));
+
+  state->get_logger()->system_->info("[{}] Server is open",
+                                     to_string(server_id));
+
   while (!cs.cancelled()) {
     auto socket_executor =
         boost::asio::make_strand(executor.get_inner_executor());
@@ -29,19 +44,12 @@ containers::async_of<void> listener(shared<state> state,
 
     if (ec) throw boost::system::system_error{ec};
 
-    auto uuid_generator = boost::uuids::random_generator();
-
     auto session_id = uuid_generator();
-    auto server_id = uuid_generator();
-    auto transaction_id = uuid_generator();
 
-    json::object server_registered = {
-        {"transaction_id", to_string(transaction_id)},
-        {"event", "server_registered"},
-        {"data", {{"id", to_string(server_id)}}}};
-
-    co_await state->get_cache()->publish("events",
-                                         serialize(server_registered));
+    state->get_logger()->sessions_->info(
+        "[{}] Connection [{}] from [{}:{}] accepted", to_string(server_id),
+        to_string(session_id), socket.remote_endpoint().address().to_string(),
+        socket.remote_endpoint().port());
 
     boost::asio::co_spawn(
         executor,
@@ -53,23 +61,30 @@ containers::async_of<void> listener(shared<state> state,
     boost::asio::co_spawn(
         std::move(socket_executor),
         detect_session(
-            state, session_id,
+            state, server_id, session_id,
             typename boost::beast::tcp_stream::rebind_executor<
                 boost::asio::strand<boost::asio::io_context::executor_type>>::
                 other{std::move(socket)},
             ctx, doc_root),
-        task_group->adapt([session_id, executor, &state](std::exception_ptr e) {
+
+        // LCOV_EXCL_START
+        task_group->adapt([server_id, session_id, executor,
+                           &state](std::exception_ptr e) {
+          // LCOV_EXCL_STOP
+
           if (e) {
             // LCOV_EXCL_START
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
-              //              std::cout << "Error in session: " << e.what() <<
-              //              std::endl;
               boost::asio::co_spawn(
                   executor,
                   state->get_database()->session_closed(session_id, e.what()),
                   boost::asio::detached);
+
+              state->get_logger()->sessions_->info(
+                  "[{}] Connection [{}] error [{}]", to_string(server_id),
+                  to_string(session_id), e.what());
             }
             // LCOV_EXCL_STOP
           }

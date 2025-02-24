@@ -1,5 +1,3 @@
-#include <fmt/core.h>
-
 #include <boost/asio/co_spawn.hpp>
 #include <boost/program_options.hpp>
 #include <copper/app.hpp>
@@ -8,6 +6,7 @@
 #include <copper/components/configuration.hpp>
 #include <copper/components/http_router.hpp>
 #include <copper/components/listener.hpp>
+#include <copper/components/logger.hpp>
 #include <copper/components/server_certificates.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/signal_handler.hpp>
@@ -17,6 +16,7 @@
 #include <copper/controllers/auth_controller.hpp>
 #include <copper/controllers/up_controller.hpp>
 #include <copper/controllers/user_controller.hpp>
+#include <iostream>
 #include <thread>
 
 namespace copper {
@@ -27,10 +27,14 @@ std::string get_version() { return "3.0.0"; }
 int run(int argc, const char *argv[]) {
   using namespace components;
 
-  boost::program_options::options_description program_description(
+  auto _server_id = boost::uuids::random_generator()();
+
+  spdlog::flush_on(spdlog::level::info);
+
+  boost::program_options::options_description _program_description(
       "Allowed options");
 
-  program_description.add_options()("help", "Get more details about options")(
+  _program_description.add_options()("help", "Get more details about options")(
       "as",
       boost::program_options::value<std::string>()->default_value("service"),
       "Run as `service` or `command`.")(
@@ -38,60 +42,64 @@ int run(int argc, const char *argv[]) {
       boost::program_options::value<std::string>()->default_value("none"),
       "The `command` name.");
 
-  boost::program_options::options_description commandline_description;
-  commandline_description.add(program_description);
+  boost::program_options::options_description _commandline_description;
+  _commandline_description.add(_program_description);
 
-  boost::program_options::variables_map vm;
-  store(parse_command_line(argc, argv, commandline_description), vm);
+  boost::program_options::variables_map _vm;
+  store(parse_command_line(argc, argv, _commandline_description), _vm);
 
-  if (vm.contains("help")) {
-    //    std::cout << commandline_description << std::endl;
-    return EXIT_FAILURE;
+  if (_vm.contains("help")) {
+    std::cout << _commandline_description << std::endl;
+    return EXIT_SUCCESS;
   }
 
   auto _configuration = boost::make_shared<configuration>();
 
-  const auto as = vm["as"].as<std::string>();
+  const auto _as = _vm["as"].as<std::string>();
 
-  if (as == "service") {
-    auto const address =
+  if (_as == "service") {
+    auto const _address =
         boost::asio::ip::make_address(_configuration->get()->app_host_);
-    auto const port = (unsigned short)_configuration->get()->app_port_;
-    auto const endpoint = boost::asio::ip::tcp::endpoint{address, port};
-    auto const doc_root = std::string_view{"."};
-    auto const threads = std::max<int>(1, _configuration->get()->app_threads_);
+    auto const _port = (unsigned short)_configuration->get()->app_port_;
+    auto const _endpoint = boost::asio::ip::tcp::endpoint{_address, _port};
+    auto const _doc_root = std::string_view{"."};
+    auto const _threads = std::max<int>(1, _configuration->get()->app_threads_);
 
-    boost::asio::io_context ioc{threads};
+    boost::asio::io_context _ioc{_threads};
 
-    boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12};
+    boost::asio::ssl::context _ctx{boost::asio::ssl::context::tlsv12};
 
-    ctx.set_options(boost::asio::ssl::context::default_workarounds |
-                    boost::asio::ssl::context::single_dh_use);
-    ctx.use_certificate_chain_file(_configuration->get()->app_public_key_);
-    ctx.use_private_key_file(_configuration->get()->app_private_key_,
-                             boost::asio::ssl::context::pem);
-    ctx.use_tmp_dh_file(_configuration->get()->app_dh_params_);
+    _ctx.set_options(boost::asio::ssl::context::default_workarounds |
+                     boost::asio::ssl::context::single_dh_use);
+    _ctx.use_certificate_chain_file(_configuration->get()->app_public_key_);
+    _ctx.use_private_key_file(_configuration->get()->app_private_key_,
+                              boost::asio::ssl::context::pem);
+    _ctx.use_tmp_dh_file(_configuration->get()->app_dh_params_);
 
-    auto _task_group = boost::make_shared<task_group>(ioc.get_executor());
+    auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
 
-    boost::mysql::pool_params database_params;
-    database_params.server_address.emplace_host_and_port(
+    boost::mysql::pool_params _database_params;
+    _database_params.server_address.emplace_host_and_port(
         _configuration->get()->database_host_,
         _configuration->get()->database_port_);
 
-    database_params.username = _configuration->get()->database_user_;
-    database_params.password = _configuration->get()->database_password_;
-    database_params.database = _configuration->get()->database_name_;
-    database_params.thread_safe =
+    _database_params.username = _configuration->get()->database_user_;
+    _database_params.password = _configuration->get()->database_password_;
+    _database_params.database = _configuration->get()->database_name_;
+    _database_params.thread_safe =
         _configuration->get()->database_pool_thread_safe_;
-    database_params.initial_size =
+    _database_params.initial_size =
         _configuration->get()->database_pool_initial_size_;
-    database_params.max_size = _configuration->get()->database_pool_max_size_;
+    _database_params.max_size = _configuration->get()->database_pool_max_size_;
 
     auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
-        ioc, std::move(database_params));
+        _ioc, std::move(_database_params));
 
     auto _state = boost::make_shared<state>(_configuration, database_pool);
+
+    _state->get_logger()->system_->info(
+        "[{}] Server is running on [{}:{}]", to_string(_server_id),
+        _configuration->get()->app_host_, _configuration->get()->app_port_);
 
     _state->get_database()->start();
 
@@ -118,52 +126,57 @@ int run(int argc, const char *argv[]) {
                });
 
     boost::asio::co_spawn(
-        boost::asio::make_strand(ioc),
-        listener(_state, _task_group, ctx, endpoint, doc_root),
-        _task_group->adapt([](std::exception_ptr e) {
+        boost::asio::make_strand(_ioc),
+        listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
+        _task_group->adapt([_state, _server_id](std::exception_ptr e) {
           if (e) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
-              //              std::cerr << "Error in listener: " << e.what() <<
-              //              "\n";
+              _state->get_logger()->system_->info(
+                  "[{}] Something went wrong: [{}] on [{}]",
+                  to_string(_server_id), e.what(), "listener");
             }
           }
         }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), subscriber(_state),
-                          _task_group->adapt([](std::exception_ptr e) {
-                            if (e) {
-                              try {
-                                std::rethrow_exception(e);
-                              } catch (std::exception &e) {
-                                //              std::cerr << "Error in listener:
-                                //              " << e.what() <<
-                                //              "\n";
-                              }
-                            }
-                          }));
+    boost::asio::co_spawn(
+        boost::asio::make_strand(_ioc), subscriber(_state),
+        _task_group->adapt([_state, _server_id](std::exception_ptr e) {
+          if (e) {
+            try {
+              std::rethrow_exception(e);
+            } catch (std::exception &e) {
+              _state->get_logger()->system_->info(
+                  "[{}] Something went wrong: [{}] on [{}]",
+                  to_string(_server_id), e.what(), "subscriber");
+            }
+          }
+        }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc),
+    boost::asio::co_spawn(boost::asio::make_strand(_ioc),
                           signal_handler(_task_group), boost::asio::detached);
 
-    containers::vector_of<std::thread> v;
-    v.reserve(threads - 1);
-    for (auto i = threads - 1; i > 0; --i)
-      v.emplace_back([&ioc] { ioc.run(); });
-    ioc.run();
+    containers::vector_of<std::thread> _threads_container;
+    _threads_container.reserve(_threads - 1);
+    for (auto i = _threads - 1; i > 0; --i)
+      _threads_container.emplace_back([&_ioc] { _ioc.run(); });
+    _ioc.run();
 
-    for (auto &t : v) t.join();
+    for (auto &t : _threads_container) t.join();
+
+    _state->get_logger()->system_->info("[{}] Server has been shutdown",
+                                        to_string(_server_id));
 
     return EXIT_SUCCESS;
   } else {
-    const auto command = vm["command"].as<std::string>();
+    const auto _command = _vm["command"].as<std::string>();
 
-    if (command == "keygen") {
-      auto key = cipher_generate_aes_key_iv();
+    if (_command == "keygen") {
+      auto _key = cipher_generate_aes_key_iv();
 
-      fmt::print("APP_KEY={}\n", base64_encode(key.first));
-      fmt::print("APP_KEY_IV={}\n", base64_encode(key.second));
+      fmt::print("APP_KEY={}\n", base64_encode(_key.first));
+      fmt::print("APP_KEY_IV={}\n", base64_encode(_key.second));
     }
 
     return EXIT_SUCCESS;

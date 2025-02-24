@@ -1,10 +1,11 @@
 #include <copper/components/detect_session.hpp>
+#include <copper/components/logger.hpp>
 #include <copper/components/state.hpp>
 
 namespace copper::components {
 
 containers::async_of<void> detect_session(
-    shared<state> state, uuid session_id,
+    shared<state> state, uuid server_id, uuid session_id,
     typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type>>::other
         stream,
@@ -35,12 +36,17 @@ containers::async_of<void> detect_session(
 
     buffer.consume(bytes_transferred);
 
-    co_await http_session_run(state, session_id, ssl_stream, buffer, doc_root);
+    co_await http_session_run(state, server_id, session_id, ssl_stream, buffer,
+                              doc_root);
 
     boost::asio::co_spawn(executor,
                           state->get_database()->session_closed(
                               session_id, "The socket was closed"),
                           boost::asio::detached);
+
+    state->get_logger()->sessions_->info("[{}] Connection [{}] closed",
+                                         to_string(server_id),
+                                         to_string(session_id));
 
     if (!ssl_stream.lowest_layer().is_open()) co_return;
 
@@ -48,12 +54,17 @@ containers::async_of<void> detect_session(
     if (ec && ec != boost::asio::ssl::error::stream_truncated)
       throw boost::system::system_error{ec};
   } else {
-    co_await http_session_run(state, session_id, stream, buffer, doc_root);
+    co_await http_session_run(state, server_id, session_id, stream, buffer,
+                              doc_root);
 
     boost::asio::co_spawn(executor,
                           state->get_database()->session_closed(
                               session_id, "The socket was closed"),
                           boost::asio::detached);
+
+    state->get_logger()->sessions_->info("[{}] Connection [{}] closed",
+                                         to_string(server_id),
+                                         to_string(session_id));
 
     if (!stream.socket().is_open()) co_return;
 

@@ -35,6 +35,11 @@ class database;
 class views;
 
 /**
+ * Forward logger
+ */
+class logger;
+
+/**
  * State
  */
 class state : public shared_enabled<state> {
@@ -62,6 +67,11 @@ class state : public shared_enabled<state> {
    * Views
    */
   shared<views> views_;
+
+  /**
+   * Views
+   */
+  shared<logger> logger_;
 
  public:
   /**
@@ -103,9 +113,16 @@ class state : public shared_enabled<state> {
   /**
    * Get views
    *
-   * @return shared<database>
+   * @return shared<views>
    */
   shared<views> get_views();
+
+  /**
+   * Get logger
+   *
+   * @return shared<logger>
+   */
+  shared<logger> get_logger();
 };
 
 }  // namespace copper::components

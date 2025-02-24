@@ -31,7 +31,7 @@ class view : public shared_enabled<view> {
    */
   view(std::string path, shared<inja::Environment> environment) {
     path_ = path;
-    template_ = environment->parse_template("./views/" + path_ + ".html");
+    template_ = environment->parse_template("views/" + path_ + ".html");
   }
 };
 }  // namespace copper::components

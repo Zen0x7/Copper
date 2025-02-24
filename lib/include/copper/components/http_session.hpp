@@ -13,6 +13,7 @@
 #include <copper/components/database.hpp>
 #include <copper/components/http_header.hpp>
 #include <copper/components/http_kernel.hpp>
+#include <copper/components/logger.hpp>
 #include <copper/components/report.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/websocket_session.hpp>
@@ -33,7 +34,7 @@ namespace copper::components {
  */
 template <typename Stream>
 containers::async_of<void> http_session_run(
-    shared<state> state, uuid session_id, Stream &stream,
+    shared<state> state, uuid server_id, uuid session_id, Stream &stream,
     boost::beast::flat_buffer &buffer, boost::beast::string_view doc_root) {
   auto cs = co_await boost::asio::this_coro::cancellation_state;
   auto executor = co_await boost::asio::this_coro::executor;
@@ -58,8 +59,8 @@ containers::async_of<void> http_session_run(
 
       boost::beast::get_lowest_layer(stream).expires_never();
 
-      co_await websocket_session_run(state, stream, buffer, parser.release(),
-                                     doc_root);
+      co_await websocket_session_run(state, server_id, session_id, stream,
+                                     buffer, parser.release(), doc_root);
 
       co_return;
     }
@@ -91,6 +92,12 @@ containers::async_of<void> http_session_run(
           executor,
           state->get_database()->create_invocation(_request, _response),
           boost::asio::detached);
+
+      state->get_logger()->requests_->info(
+          "[{}] [{}] [{}] {} {} {} {}", to_string(server_id),
+          to_string(session_id), to_string(request_id), _request->version_,
+          _request->method_, _request->path_, _response->status_code_);
+
       co_return;
     }
 
@@ -98,6 +105,11 @@ containers::async_of<void> http_session_run(
     boost::asio::co_spawn(
         executor, state->get_database()->create_invocation(_request, _response),
         boost::asio::detached);
+
+    state->get_logger()->requests_->info(
+        "[{}] [{}] [{}] {} {} {} {}", to_string(server_id),
+        to_string(session_id), to_string(request_id), _request->version_,
+        _request->method_, _request->path_, _response->status_code_);
   }
 }
 

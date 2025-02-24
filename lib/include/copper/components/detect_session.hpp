@@ -17,7 +17,7 @@ namespace copper::components {
  * @return async_of<void>
  */
 containers::async_of<void> detect_session(
-    shared<state> state, uuid session_id,
+    shared<state> state, uuid server_id, uuid session_id,
     typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type> >::other
         stream,

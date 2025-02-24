@@ -24,7 +24,8 @@ class state;
  * @param doc_root
  * @return async_of<void>
  */
-containers::async_of<void> listener(shared<state> state,
+containers::async_of<void> listener(boost::uuids::uuid server_id,
+                                    shared<state> state,
                                     shared<task_group> task_group,
                                     boost::asio::ssl::context &ctx,
                                     boost::asio::ip::tcp::endpoint endpoint,

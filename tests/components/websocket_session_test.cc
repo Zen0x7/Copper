@@ -12,6 +12,7 @@
 #include <copper/components/state.hpp>
 #include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
+#include <iostream>
 
 copper::components::containers::async_of<void> cancel_websocket_session() {
   auto executor = co_await boost::asio::this_coro::executor;
@@ -22,6 +23,7 @@ TEST(Components_WebSocket_Session, Implementation) {
   try {
     using namespace copper::components;
 
+    auto _server_id = boost::uuids::random_generator()();
     auto _configuration = boost::make_shared<configuration>();
 
     auto const address = boost::asio::ip::make_address("0.0.0.0");
@@ -57,31 +59,31 @@ TEST(Components_WebSocket_Session, Implementation) {
     auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
         ioc, std::move(database_params));
 
-    auto state_ = boost::make_shared<state>(_configuration, database_pool);
+    auto _state = boost::make_shared<state>(_configuration, database_pool);
 
-    state_->get_database()->start();
+    _state->get_database()->start();
 
     boost::asio::co_spawn(
         boost::asio::make_strand(ioc),
-        listener(state_, task_group_, ctx, endpoint, doc_root),
+        listener(_server_id, _state, task_group_, ctx, endpoint, doc_root),
         task_group_->adapt([](std::exception_ptr e) {
           if (e) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
+              std::cout << "Something went wrong... " << e.what() << std::endl;
             }
           }
         }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(ioc), subscriber(state_),
+    boost::asio::co_spawn(boost::asio::make_strand(ioc), subscriber(_state),
                           task_group_->adapt([](std::exception_ptr e) {
                             if (e) {
                               try {
                                 std::rethrow_exception(e);
                               } catch (std::exception &e) {
-                                //              std::cerr << "Error in listener:
-                                //              " << e.what() <<
-                                //              "\n";
+                                std::cout << "Something went wrong... "
+                                          << e.what() << std::endl;
                               }
                             }
                           }));
@@ -151,7 +153,10 @@ TEST(Components_WebSocket_Session, Implementation) {
     ASSERT_TRUE(true);
 
   } catch (std::runtime_error &e) {
+    std::cout << e.what() << std::endl;
   } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
   } catch (...) {
+    std::cout << "Something went wrong" << std::endl;
   }
 }
