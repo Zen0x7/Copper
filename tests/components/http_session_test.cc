@@ -96,7 +96,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     load_server_certificate(_ctx);
 
-    auto task_group_ = boost::make_shared<task_group>(_ioc.get_executor());
+    auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
 
     boost::mysql::pool_params _database_params;
     _database_params.server_address.emplace_host_and_port(
@@ -151,8 +151,8 @@ TEST(Components_HTTP_Session, Implementation) {
 
     co_spawn(
         make_strand(_ioc),
-        listener(_server_id, _state, task_group_, _ctx, _endpoint, _doc_root),
-        task_group_->adapt([](std::exception_ptr e) {
+        listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
+        _task_group->adapt([](std::exception_ptr e) {
           if (e) {
             try {
               std::rethrow_exception(e);
@@ -162,7 +162,7 @@ TEST(Components_HTTP_Session, Implementation) {
         }));
 
     co_spawn(make_strand(_ioc), subscriber(_state),
-             task_group_->adapt([](std::exception_ptr e) {
+             _task_group->adapt([](std::exception_ptr e) {
                if (e) {
                  try {
                    std::rethrow_exception(e);
@@ -174,15 +174,15 @@ TEST(Components_HTTP_Session, Implementation) {
                }
              }));
 
-    co_spawn(make_strand(_ioc), signal_handler(task_group_),
+    co_spawn(make_strand(_ioc), signal_handler(_task_group),
              boost::asio::detached);
 
     boost::asio::io_context _client_ioc;
 
     std::vector<std::thread> _v;
     _v.reserve(_threads);
-    for (auto i = _threads; i > 0; --i)
-      _v.emplace_back([&_ioc, i] { _ioc.run(); });
+    for (auto _i = _threads; _i > 0; --_i)
+      _v.emplace_back([&_ioc, _i] { _ioc.run(); });
 
     sleep(1);
 
@@ -369,7 +369,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     {
       // Rate limiter
-      for (int i = 0; i < 5; i++) {
+      for (int _i = 0; _i < 5; _i++) {
         boost::beast::flat_buffer _buffer;
         response _response;
         request _request{method::get, "/api/up", 11};
@@ -567,7 +567,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
       _buffer.clear();
 
-      auto json_response = boost::json::parse(_response.body());
+      auto _json_response = boost::json::parse(_response.body());
 
       _response.clear();
 
@@ -579,7 +579,7 @@ TEST(Components_HTTP_Session, Implementation) {
         _user_request.set(fields::host, _host);
         _user_request.set(fields::user_agent, "Copper");
         _user_request.set(fields::authorization,
-                          json_response.as_object().at("token").as_string());
+                          _json_response.as_object().at("token").as_string());
 
         boost::beast::http::write(_stream, _user_request);
         boost::beast::http::read(_stream, _user_buffer, _user_response);
@@ -615,7 +615,7 @@ TEST(Components_HTTP_Session, Implementation) {
         _user_request.set(fields::user_agent, "Copper");
         _user_request.set(fields::accept_encoding, "gzip");
         _user_request.set(fields::authorization,
-                          json_response.as_object().at("token").as_string());
+                          _json_response.as_object().at("token").as_string());
 
         boost::beast::http::write(_stream, _user_request);
         boost::beast::http::read(_stream, _user_buffer, _user_response);

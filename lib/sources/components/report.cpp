@@ -13,12 +13,12 @@ void report(boost::beast::error_code /* ec */, const char* /* what */) {
 
 // LCOV_EXCL_START
 void report_for_openssl() {
-  unsigned long error_code = ERR_get_error();
-  char error_message[256];
-  ERR_error_string_n(error_code, error_message, sizeof(error_message));
-  std::string error_output = "OpenSSL error: ";
-  error_output.append(error_message);
-  throw std::runtime_error(error_output.c_str());
+  const unsigned long _error_code = ERR_get_error();
+  char _error_message[256];
+  ERR_error_string_n(_error_code, _error_message, sizeof(_error_message));
+  std::string _error_output = "OpenSSL error: ";
+  _error_output.append(_error_message);
+  throw std::runtime_error(_error_output.c_str());
 }
 // LCOV_EXCL_STOP
 

@@ -32,26 +32,26 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
             "Attribute " + _rule.first + " is required.";
         _response->insert_or_push(_rule.first, _error_message);
       } else {
-        containers::vector_of<std::string> scoped_rules;
+        containers::vector_of<std::string> _scoped_rules;
 
-        size_t start = 0;
-        size_t end = _rule.second.find(",");
+        size_t _start = 0;
+        size_t _end = _rule.second.find(",");
 
-        while (end != std::string::npos) {
-          scoped_rules.push_back(_rule.second.substr(start, end - start));
-          start = end + 1;
-          end = _rule.second.find(",", start);
+        while (_end != std::string::npos) {
+          _scoped_rules.push_back(_rule.second.substr(_start, _end - _start));
+          _start = _end + 1;
+          _end = _rule.second.find(",", _start);
         }
-        scoped_rules.push_back(_rule.second.substr(start));
+        _scoped_rules.push_back(_rule.second.substr(_start));
 
-        for (auto &scoped_rule : scoped_rules) {
-          if (scoped_rule == "is_string") {
+        for (auto &_scoped_rule : _scoped_rules) {
+          if (_scoped_rule == "is_string") {
             if (!value.as_object().at(_rule.first).is_string()) {
               std::string _error_message =
                   "Attribute " + _rule.first + " must be string.";
               _response->insert_or_push(_rule.first, _error_message);
             }
-          } else if (scoped_rule == "is_uuid") {
+          } else if (_scoped_rule == "is_uuid") {
             if (!value.as_object().at(_rule.first).is_string()) {
               std::string _error_message =
                   "Attribute " + _rule.first + " must be string.";
@@ -66,7 +66,7 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
                 _response->insert_or_push(_rule.first, _error_message);
               }
             }
-          } else if (scoped_rule == "confirmed") {
+          } else if (_scoped_rule == "confirmed") {
             if (!value.as_object().contains(_rule.first + "_confirmation")) {
               std::string _error_message = "Attribute " + _rule.first +
                                            "_confirmation" +
@@ -95,39 +95,39 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
                 }
               }
             }
-          } else if (scoped_rule == "is_object") {
+          } else if (_scoped_rule == "is_object") {
             if (!value.as_object().at(_rule.first).is_object()) {
               std::string _error_message =
                   "Attribute " + _rule.first + " must be an object.";
               _response->insert_or_push(_rule.first, _error_message);
             }
-          } else if (scoped_rule == "is_number") {
+          } else if (_scoped_rule == "is_number") {
             if (!value.as_object().at(_rule.first).is_int64()) {
               std::string _error_message =
                   "Attribute " + _rule.first + " must be a number.";
               _response->insert_or_push(_rule.first, _error_message);
             }
-          } else if (scoped_rule == "is_array_of_strings") {
+          } else if (_scoped_rule == "is_array_of_strings") {
             if (!value.as_object().at(_rule.first).is_array()) {
               std::string _error_message =
                   "Attribute " + _rule.first + " must be an array.";
               _response->insert_or_push(_rule.first, _error_message);
             } else {
-              if (auto elements = value.as_object().at(_rule.first).as_array();
-                  elements.empty()) {
+              if (auto _elements = value.as_object().at(_rule.first).as_array();
+                  _elements.empty()) {
                 std::string _error_message =
                     "Attribute " + _rule.first + " cannot be empty.";
                 _response->insert_or_push(_rule.first, _error_message);
               } else {
-                size_t i = 0;
-                for (const auto &element : elements) {
-                  if (!element.is_string()) {
+                size_t _i = 0;
+                for (const auto &_element : _elements) {
+                  if (!_element.is_string()) {
                     std::string _error_message =
                         "Attribute " + _rule.first + " at position " +
-                        std::to_string(i) + " must be string.";
+                        std::to_string(_i) + " must be string.";
                     _response->insert_or_push(_rule.first, _error_message);
                   }
-                  i++;
+                  _i++;
                 }
               }
             }

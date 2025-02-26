@@ -41,7 +41,7 @@ class cache : public shared_enabled<cache> {
    *
    * @return shared<redis::connection>
    */
-  containers::async_of<shared<boost::redis::connection>> get_connection();
+  containers::async_of<shared<boost::redis::connection>> get_connection() const;
 
   /**
    * Determines if request can be invoked
@@ -62,7 +62,7 @@ class cache : public shared_enabled<cache> {
    * @return async_of<void>
    */
   containers::async_of<void> publish(const std::string &channel,
-                                     const std::string &data);
+                                     const std::string &data) const;
 
  private:
   /**

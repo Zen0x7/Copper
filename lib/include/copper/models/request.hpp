@@ -8,9 +8,9 @@
 #include <boost/mysql/datetime.hpp>
 #include <boost/optional.hpp>
 #include <copper/components/header.hpp>
-#include <copper/components/path.hpp>
 #include <copper/components/query.hpp>
 #include <copper/components/shared.hpp>
+#include <copper/components/url.hpp>
 #include <copper/components/uuid.hpp>
 #include <cstdint>
 #include <utility>

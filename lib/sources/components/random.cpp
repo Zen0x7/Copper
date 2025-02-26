@@ -5,18 +5,18 @@
 
 namespace copper::components {
 
-std::string random_string(int size) {
-  std::string output;
-  output.reserve(size);
+std::string random_string(const int size) {
+  std::string _output;
+  _output.reserve(size);
 
-  boost::random::random_device device;
-  boost::random::uniform_int_distribution<> distribution(
+  boost::random::random_device _device;
+  const boost::random::uniform_int_distribution<> _distribution(
       0, base64url_charset_.size() - 1);
 
   for (int i = 0; i < size; i++)
-    output.push_back(base64url_charset_[distribution(device)]);
+    _output.push_back(base64url_charset_[_distribution(_device)]);
 
-  return output;
+  return _output;
 }
 
 }  // namespace copper::components

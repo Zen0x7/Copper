@@ -61,22 +61,22 @@ class task_group : public shared_enabled<task_group> {
    */
   template <typename CompletionToken>
   auto adapt(CompletionToken &&completion_token) {
-    auto guard = std::lock_guard{mutex_};
-    auto signal = signals_.emplace(signals_.end());
+    auto _guard = std::lock_guard{mutex_};
+    auto _signal = signals_.emplace(signals_.end());
 
-    boost::weak_ptr<task_group> weak_self = shared_from_this();
+    boost::weak_ptr<task_group> _weak_self = shared_from_this();
 
     return boost::asio::bind_cancellation_slot(
-        signal->slot(),
+        _signal->slot(),
         boost::asio::consign(
             std::forward<CompletionToken>(completion_token),
-            boost::scope::make_scope_exit([weak_self, signal]() {
-              if (auto self = weak_self.lock()) {
-                auto guard = std::lock_guard{self->mutex_};
+            boost::scope::make_scope_exit([_weak_self, _signal]() {
+              if (const auto _self = _weak_self.lock()) {
+                auto _local_guard = std::lock_guard{_self->mutex_};
 
-                self->signals_.erase(signal);
+                _self->signals_.erase(_signal);
 
-                if (self->signals_.empty()) self->timer_.cancel();
+                if (_self->signals_.empty()) _self->timer_.cancel();
               }
             })));
   }

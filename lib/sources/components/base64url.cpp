@@ -2,44 +2,44 @@
 
 namespace copper::components {
 std::string base64url_encode(const std::string &input, bool padding) {
-  std::string output;
-  int value = 0;
-  int value_b = -6;
+  std::string _output;
+  int _value = 0;
+  int _value_b = -6;
 
-  for (const unsigned char character : input) {
-    value = (value << 8) + character;
-    value_b += 8;
-    while (value_b >= 0) {
-      output.push_back(base64url_charset_[(value >> value_b) & 0x3F]);
-      value_b -= 6;
+  for (const unsigned char _character : input) {
+    _value = (_value << 8) + _character;
+    _value_b += 8;
+    while (_value_b >= 0) {
+      _output.push_back(base64url_charset_[(_value >> _value_b) & 0x3F]);
+      _value_b -= 6;
     }
   }
-  if (value_b > -6)
-    output.push_back(
-        base64url_charset_[((value << 8) >> (value_b + 8)) & 0x3F]);
+  if (_value_b > -6)
+    _output.push_back(
+        base64url_charset_[((_value << 8) >> (_value_b + 8)) & 0x3F]);
 
   if (padding)
-    while (output.size() % 4 != 0) output.push_back('=');
+    while (_output.size() % 4 != 0) _output.push_back('=');
 
-  return output;
+  return _output;
   // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP
 
 std::string base64url_decode(const std::string &input) {
-  std::string output;
-  int value = 0;
-  int value_b = -8;
-  for (const char character : input) {
-    if (character == '=') break;
-    value = (value << 6) + base64url_map_charset_[character];
-    value_b += 6;
-    if (value_b >= 0) {
-      output.push_back(static_cast<char>((value >> value_b) & 0xFF));
-      value_b -= 8;
+  std::string _output;
+  int _value = 0;
+  int _value_b = -8;
+  for (const char _character : input) {
+    if (_character == '=') break;
+    _value = (_value << 6) + base64url_map_charset_[_character];
+    _value_b += 6;
+    if (_value_b >= 0) {
+      _output.push_back(static_cast<char>((_value >> _value_b) & 0xFF));
+      _value_b -= 8;
     }
   }
-  return output;
+  return _output;
   // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP

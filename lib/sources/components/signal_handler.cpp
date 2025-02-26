@@ -4,19 +4,19 @@
 namespace copper::components {
 
 containers::async_of<void> signal_handler(shared<task_group> task_group) {
-  auto executor = co_await boost::asio::this_coro::executor;
-  auto signal_set = boost::asio::signal_set{executor, SIGINT, SIGTERM};
+  const auto _executor = co_await boost::asio::this_coro::executor;
+  auto _signal_set = boost::asio::signal_set{_executor, SIGINT, SIGTERM};
 
-  auto sig = co_await signal_set.async_wait();
+  auto _sig = co_await _signal_set.async_wait();
 
-  if (sig == SIGINT) {
+  if (_sig == SIGINT) {
     //    std::cout << "Gracefully cancelling child tasks...\n";
     task_group->emit(boost::asio::cancellation_type::total);
 
-    auto [ec] = co_await task_group->async_wait(boost::asio::as_tuple(
+    auto [_ec] = co_await task_group->async_wait(boost::asio::as_tuple(
         boost::asio::cancel_after(std::chrono::seconds{10})));
 
-    if (ec == boost::asio::error::operation_aborted) {
+    if (_ec == boost::asio::error::operation_aborted) {
       //      std::cout << "Sending a terminal cancellation signal...\n";
       task_group->emit(boost::asio::cancellation_type::terminal);
       co_await task_group->async_wait();
@@ -25,7 +25,7 @@ containers::async_of<void> signal_handler(shared<task_group> task_group) {
     //    std::cout << "Child tasks completed.\n";
   } else  // SIGTERM
   {
-    executor.get_inner_executor().context().stop();
+    _executor.get_inner_executor().context().stop();
   }
 }
 

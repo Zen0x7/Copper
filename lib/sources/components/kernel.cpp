@@ -8,7 +8,6 @@
 #include <copper/components/header.hpp>
 #include <copper/components/kernel.hpp>
 #include <copper/components/mime_type.hpp>
-#include <copper/components/path.hpp>
 #include <copper/components/query.hpp>
 #include <copper/components/response_bad_request.hpp>
 #include <copper/components/response_cors.hpp>
@@ -28,10 +27,12 @@ namespace copper::components {
 
 containers::optional_of<kernel_result> kernel::find_on_routes(
     method method, const std::string &url) const {
-  for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
-    if (auto [matches, bindings] = route_match(method, url, route); matches) {
+  for (const auto &[_route, _controller] :
+       *state_->get_router()->get_routes()) {
+    if (auto [_matches, _bindings] = route_match(method, url, _route);
+        _matches) {
       return kernel_result{
-          .route_ = route, .controller_ = controller, .bindings_ = bindings};
+          .route_ = _route, .controller_ = _controller, .bindings_ = _bindings};
     }
   }
 
@@ -40,12 +41,13 @@ containers::optional_of<kernel_result> kernel::find_on_routes(
 
 containers::vector_of<method> kernel::get_available_methods(
     const std::string &url) const {
-  containers::vector_of<method> methods;
-  for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
-    if (auto [matches, bindings] = route_find(url, route); matches)
-      methods.push_back(route.method_);
+  containers::vector_of<method> _methods;
+  for (const auto &[_route, _controller] :
+       *state_->get_router()->get_routes()) {
+    if (auto [_matches, _bindings] = route_find(url, _route); _matches)
+      _methods.push_back(_route.method_);
   }
-  return methods;
+  return _methods;
   // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP
@@ -89,13 +91,13 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
     }
 
     if (_route.value().controller_->configuration_.use_auth_) {
-      std::string bearer{request["Authorization"]};
+      std::string _bearer{request["Authorization"]};
 
-      std::string token =
-          boost::starts_with(bearer, "Bearer ") ? bearer.substr(7) : bearer;
+      std::string _token =
+          boost::starts_with(_bearer, "Bearer ") ? _bearer.substr(7) : _bearer;
 
       _user = authentication_from_bearer(
-          bearer, state_->get_configuration()->get()->app_key_);
+          _bearer, state_->get_configuration()->get()->app_key_);
 
       if (!_user.has_value()) {
         auto _service_response =
@@ -112,11 +114,11 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
     }
 
     if (_route.value().controller_->configuration_.use_validator_) {
-      boost::system::error_code _json_parse_error_code;
+      boost::system::error_code _json_error_code;
 
-      _body = boost::json::parse(request.body(), _json_parse_error_code);
+      _body = boost::json::parse(request.body(), _json_error_code);
 
-      if (!_json_parse_error_code) {
+      if (!_json_error_code) {
         if (auto _validator =
                 validator_make(_route.value().controller_->rules(), _body);
             !_validator->success_) {

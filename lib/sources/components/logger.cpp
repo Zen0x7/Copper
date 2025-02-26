@@ -24,17 +24,17 @@ typename boost::shared_ptr<T> logger_to_shared(
 }
 
 logger::logger(const shared<configuration>& configuration) {
-  auto max_size = configuration->get()->logging_max_size_;
-  auto max_files = configuration->get()->logging_max_files_;
-  auto uuid_generator = boost::uuids::random_generator();
+  const auto _max_size = configuration->get()->logging_max_size_;
+  const auto _max_files = configuration->get()->logging_max_files_;
+  auto _generator = boost::uuids::random_generator();
 
   system_ = logger_to_shared(spdlog::rotating_logger_mt(
-      to_string(uuid_generator()), "./logs/instance.log", max_size, max_files));
+      to_string(_generator()), "./logs/instance.log", _max_size, _max_files));
 
   sessions_ = logger_to_shared(spdlog::rotating_logger_mt(
-      to_string(uuid_generator()), "./logs/sessions.log", max_size, max_files));
+      to_string(_generator()), "./logs/sessions.log", _max_size, _max_files));
 
   requests_ = logger_to_shared(spdlog::rotating_logger_mt(
-      to_string(uuid_generator()), "./logs/requests.log", max_size, max_files));
+      to_string(_generator()), "./logs/requests.log", _max_size, _max_files));
 }
 }  // namespace copper::components

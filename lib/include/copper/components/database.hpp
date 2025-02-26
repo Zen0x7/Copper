@@ -47,7 +47,7 @@ class database : public shared_enabled<database> {
    * @param email
    * @return optional_of<shared<models::user>>
    */
-  containers::async_of<containers::optional_of<shared<copper::models::user>>>
+  containers::async_of<containers::optional_of<shared<models::user>>>
   get_user_by_email(const std::string &email);
 
   /**
@@ -56,7 +56,7 @@ class database : public shared_enabled<database> {
    * @param id
    * @return shared<models::user>
    */
-  containers::async_of<shared<copper::models::user>> get_user_by_id(uuid id);
+  containers::async_of<shared<models::user>> get_user_by_id(uuid id);
 
   /**
    * Creates a session
@@ -104,8 +104,7 @@ class database : public shared_enabled<database> {
    * @return async_of<void>
    */
   containers::async_of<void> create_invocation(
-      shared<copper::models::request> request,
-      shared<copper::models::response> response);
+      shared<models::request> request, shared<models::response> response);
 };
 
 }  // namespace copper::components
