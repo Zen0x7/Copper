@@ -3,16 +3,16 @@
 namespace copper::components {
 
 route router::factory(const method method, const char *path) {
-  const std::string route(path);
+  const std::string _route(path);
 
-  const auto expression = expression_make(route);
+  const auto _expression = expression_make(_route);
 
   return {
       .method_ = method,
-      .url_ = route,
+      .url_ = _route,
       .signature_ = path,
-      .is_expression_ = !expression->get_arguments().empty(),
-      .expression_ = expression,
+      .is_expression_ = !_expression->get_arguments().empty(),
+      .expression_ = _expression,
   };
 }
 

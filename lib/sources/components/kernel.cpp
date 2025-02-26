@@ -41,8 +41,7 @@ containers::optional_of<kernel_result> kernel::find_on_routes(
 containers::vector_of<method> kernel::get_available_methods(
     const std::string &url) const {
   containers::vector_of<method> methods;
-  for (const auto &route :
-       *state_->get_router()->get_routes() | std::views::keys) {
+  for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
     if (auto [matches, bindings] = route_find(url, route); matches)
       methods.push_back(route.method_);
   }

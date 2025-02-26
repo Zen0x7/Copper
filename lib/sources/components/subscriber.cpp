@@ -2,33 +2,34 @@
 
 namespace copper::components {
 containers::async_of<void> subscriber(shared<state> state) {
-  boost::redis::request req;
+  boost::redis::request _request;
 
-  req.push("SUBSCRIBE", "Copper_Events");
+  _request.push("SUBSCRIBE", "Copper_Events");
 
-  auto connection = co_await state->get_cache()->get_connection();
+  const auto _connection = co_await state->get_cache()->get_connection();
 
-  boost::redis::generic_response resp;
-  connection->set_receive_response(resp);
+  boost::redis::generic_response _response;
+  _connection->set_receive_response(_response);
 
-  while (connection->will_reconnect()) {
-    co_await connection->async_exec(req, boost::redis::ignore,
-                                    boost::asio::deferred);
+  while (_connection->will_reconnect()) {
+    co_await _connection->async_exec(_request, boost::redis::ignore,
+                                     boost::asio::deferred);
 
-    for (boost::system::error_code ec;;) {
-      connection->receive(ec);
-      if (ec == boost::redis::error::sync_receive_push_failed) {
-        ec = {};
+    for (boost::system::error_code _ec;;) {
+      _connection->receive(_ec);
+      if (_ec == boost::redis::error::sync_receive_push_failed) {
+        _ec = {};
 
-        co_await connection->async_receive(boost::asio::deferred);
+        co_await _connection->async_receive(boost::asio::deferred);
       }
 
-      if (ec) break;
+      if (_ec) break;
 
-      std::cout << resp.value().at(1).value << " " << resp.value().at(2).value
-                << " " << resp.value().at(3).value << std::endl;
+      std::cout << _response.value().at(1).value << " "
+                << _response.value().at(2).value << " "
+                << _response.value().at(3).value << std::endl;
 
-      boost::redis::consume_one(resp);
+      boost::redis::consume_one(_response);
     }
   }
 }

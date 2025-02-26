@@ -2,7 +2,6 @@
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
 #include <copper/components/response_exception.hpp>
@@ -11,7 +10,7 @@
 
 namespace copper::components {
 
-response response_exception(const request &request, long start_at,
+response response_exception(const request &request, const long start_at,
                             const shared<state> &state) {
   const auto now = chronos::now();
 
