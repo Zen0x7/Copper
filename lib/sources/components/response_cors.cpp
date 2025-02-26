@@ -18,18 +18,15 @@ response response_cors(const request &request, const long start_at,
   response _response{
       methods.empty() ? status_code::method_not_allowed : status_code::ok,
       request.version()};
-  _response.set(fields::content_type, "application/json");
 
-  containers::vector_of<std::string> authorized_methods;
+  containers::vector_of<std::string> _authorized_methods;
   for (const auto &_verb : methods)
-    authorized_methods.push_back(to_string(_verb));
-  const auto _methods_as_string = boost::join(authorized_methods, ",");
+    _authorized_methods.push_back(to_string(_verb));
+  const auto _methods_as_string = boost::join(_authorized_methods, ",");
   _response.set(fields::access_control_allow_methods,
                 methods.empty() ? "" : _methods_as_string);
 
-  const std::string _allowed_headers =
-      "Accept,Authorization,Content-Type,X-Requested-With";
-
+  const std::string _allowed_headers = "Accept,Authorization,Content-Type";
   _response.set(fields::access_control_allow_headers, _allowed_headers);
   const auto _allowed_origins =
       state->get_configuration()->get()->http_allowed_origins_;
@@ -38,6 +35,7 @@ response response_cors(const request &request, const long start_at,
 
   _response.version(request.version());
   _response.keep_alive(request.keep_alive());
+  _response.set(fields::content_type, "application/json");
 
   if (!request["Accept-Encoding"].empty() &&
       boost::contains(request["Accept-Encoding"], "gzip")) {

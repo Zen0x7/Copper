@@ -13,12 +13,7 @@ namespace copper::components {
 response response_exception(const request &request, const long start_at,
                             const shared<state> &state) {
   response _response{status_code::internal_server_error, request.version()};
-  _response.set(fields::content_type, "application/json");
 
-  const std::string _allowed_headers =
-      "Accept,Authorization,Content-Type,X-Requested-With";
-
-  _response.set(fields::access_control_allow_headers, _allowed_headers);
   const auto _allowed_origins =
       state->get_configuration()->get()->http_allowed_origins_;
 
@@ -26,6 +21,7 @@ response response_exception(const request &request, const long start_at,
 
   _response.version(request.version());
   _response.keep_alive(request.keep_alive());
+  _response.set(fields::content_type, "application/json");
 
   if (!request["Accept-Encoding"].empty() &&
       boost::contains(request["Accept-Encoding"], "gzip")) {

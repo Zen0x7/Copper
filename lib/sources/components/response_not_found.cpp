@@ -17,16 +17,7 @@ response response_not_found(const request &request, const long start_at,
   const bool _requires_html =
       request.count(fields::accept) > 0 &&
       boost::contains(request.at(fields::accept), "html");
-  if (_requires_html) {
-    _response.set(fields::content_type, "text/html");
-  } else {
-    _response.set(fields::content_type, "application/json");
-  }
 
-  const std::string _allowed_headers =
-      "Accept,Authorization,Content-Type,X-Requested-With";
-
-  _response.set(fields::access_control_allow_headers, _allowed_headers);
   const auto _allowed_origins =
       state->get_configuration()->get()->http_allowed_origins_;
 
@@ -34,6 +25,11 @@ response response_not_found(const request &request, const long start_at,
 
   _response.version(request.version());
   _response.keep_alive(request.keep_alive());
+  if (_requires_html) {
+    _response.set(fields::content_type, "text/html");
+  } else {
+    _response.set(fields::content_type, "application/json");
+  }
 
   if (!request["Accept-Encoding"].empty() &&
       boost::contains(request["Accept-Encoding"], "gzip")) {

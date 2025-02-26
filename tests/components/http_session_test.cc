@@ -605,7 +605,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(boost::starts_with(_response.body(), R"({"token":"Bearer)"));
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
 
@@ -644,7 +643,7 @@ TEST(Components_HTTP_Session, Implementation) {
         ASSERT_TRUE(boost::contains(_user_response.body(),
                                     "75a02add-cd16-4517-9c40-b57041eb2162"));
 
-        std::cout << _user_response << std::endl;
+        std::cout << _user_response << std::endl << std::endl << std::endl;
 
         _user_buffer.clear();
         _user_response.clear();
@@ -686,7 +685,7 @@ TEST(Components_HTTP_Session, Implementation) {
         ASSERT_TRUE(boost::contains(gunzip_decompress(_user_response.body()),
                                     "75a02add-cd16-4517-9c40-b57041eb2162"));
 
-        std::cout << _user_response << std::endl;
+        std::cout << _user_response << std::endl << std::endl << std::endl;
 
         _user_buffer.clear();
         _user_response.clear();
