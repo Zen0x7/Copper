@@ -24,7 +24,7 @@ std::string expression_result::get(const std::string &name) const {
 
 expression::expression(std::string regex,
                        const containers::vector_of<std::string> &arguments)
-    : regex_(std::move(regex)), arguments_(arguments) {}
+    : regex_(std::move(regex)), pattern_(regex_), arguments_(arguments) {}
 
 containers::vector_of<std::string> expression::get_arguments() const {
   return arguments_;
@@ -34,9 +34,8 @@ std::string expression::get_regex() const { return regex_; }
 
 shared<expression_result> expression::query(const std::string &input) const {
   containers::unordered_map_of_strings _bindings;
-  const std::regex _pattern(regex_);
   bool _matches = false;
-  if (std::smatch _match; std::regex_match(input, _match, _pattern)) {
+  if (std::smatch _match; std::regex_match(input, _match, pattern_)) {
     _matches = true;
     auto _iterator = _match.begin();
     ++_iterator;
