@@ -71,7 +71,8 @@ TEST(Components_WebSocket_Session, Implementation) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &exception) {
-              std::cout << "Something went wrong... " << exception.what() << std::endl;
+              std::cout << "Something went wrong... " << exception.what()
+                        << std::endl;
             }
           }
         }));

@@ -47,7 +47,8 @@ database::get_user_by_email(const std::string &email) {
 database::database(const shared<boost::mysql::connection_pool> &pool)
     : pool_(pool) {}
 
-containers::async_of<shared<models::user>> database::get_user_by_id(const uuid id) {
+containers::async_of<shared<models::user>> database::get_user_by_id(
+    const uuid id) {
   auto _connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
 
@@ -108,7 +109,8 @@ containers::async_of<void> database::session_closed(const uuid session_id,
       _result);
 }
 
-containers::async_of<void> database::session_is_encrypted(const uuid session_id) {
+containers::async_of<void> database::session_is_encrypted(
+    const uuid session_id) {
   auto _connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
 
@@ -134,7 +136,8 @@ containers::async_of<void> database::session_is_upgrade(const uuid session_id) {
 }
 
 containers::async_of<void> database::create_invocation(
-    const shared<models::request> request, const shared<models::response> response) {
+    const shared<models::request> request,
+    const shared<models::response> response) {
   auto _connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
 

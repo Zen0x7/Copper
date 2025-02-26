@@ -60,7 +60,7 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
               try {
                 boost::lexical_cast<boost::uuids::uuid>(
                     value.as_object().at(_attribute).as_string().data());
-              } catch (boost::bad_lexical_cast &/* exception */) {
+              } catch (boost::bad_lexical_cast & /* exception */) {
                 std::string _error_message =
                     "Attribute " + _attribute + " must be uuid.";
                 _response->insert_or_push(_attribute, _error_message);

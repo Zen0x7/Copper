@@ -11,8 +11,6 @@ namespace copper::components {
 
 response response_unauthorized(const request &request, const long start_at,
                                const shared<state> &state) {
-  const auto _now = chronos::now();
-
   response _response{status_code::unauthorized, request.version()};
   _response.set(fields::content_type, "application/json");
 
@@ -24,9 +22,6 @@ response response_unauthorized(const request &request, const long start_at,
       state->get_configuration()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
-
-  _response.set("X-Server", "Copper");
-  _response.set("X-Time", std::to_string(_now - start_at));
 
   _response.version(request.version());
   _response.keep_alive(request.keep_alive());
@@ -40,6 +35,10 @@ response response_unauthorized(const request &request, const long start_at,
   }
 
   _response.prepare_payload();
+
+  const auto _now = chronos::now();
+  _response.set("X-Server", "Copper");
+  _response.set("X-Time", std::to_string(_now - start_at));
 
   return _response;
 }

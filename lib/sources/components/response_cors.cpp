@@ -13,10 +13,8 @@
 namespace copper::components {
 
 response response_cors(const request &request, const long start_at,
-                       const containers::vector_of<method>& methods,
+                       const containers::vector_of<method> &methods,
                        const shared<state> &state) {
-  const auto _now = chronos::now();
-
   response _response{
       methods.empty() ? status_code::method_not_allowed : status_code::ok,
       request.version()};
@@ -38,9 +36,6 @@ response response_cors(const request &request, const long start_at,
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
-  _response.set("X-Server", "Copper");
-  _response.set("X-Time", std::to_string(_now - start_at));
-
   _response.version(request.version());
   _response.keep_alive(request.keep_alive());
 
@@ -53,6 +48,10 @@ response response_cors(const request &request, const long start_at,
   }
 
   _response.prepare_payload();
+
+  const auto _now = chronos::now();
+  _response.set("X-Server", "Copper");
+  _response.set("X-Time", std::to_string(_now - start_at));
 
   return _response;
 }

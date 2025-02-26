@@ -27,7 +27,7 @@ std::string cipher_generate_sha_256() {
   // LCOV_EXCL_STOP
 
   const std::string _result(reinterpret_cast<const char *>(_bytes),
-                      CIPHER_KEY_LENGTH);
+                            CIPHER_KEY_LENGTH);
 
   return base64_encode(_result);
 }

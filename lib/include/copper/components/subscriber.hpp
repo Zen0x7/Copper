@@ -25,7 +25,7 @@ namespace copper::components {
  * @param state
  * @return async_of<void>
  */
-containers::async_of<void> subscriber(shared<state> state);
+containers::async_of<void> subscriber(const shared<state>& state);
 }  // namespace copper::components
 
 #endif

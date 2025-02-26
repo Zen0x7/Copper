@@ -161,21 +161,21 @@ TEST(Components_HTTP_Session, Implementation) {
     co_spawn(
         make_strand(_ioc),
         listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
-        _task_group->adapt([](const std::exception_ptr & e) {
+        _task_group->adapt([](const std::exception_ptr &e) {
           if (e) {
             try {
               std::rethrow_exception(e);
-            } catch (std::exception &/*e*/) {
+            } catch (std::exception & /*e*/) {
             }
           }
         }));
 
     co_spawn(make_strand(_ioc), subscriber(_state),
-             _task_group->adapt([](const std::exception_ptr & e) {
+             _task_group->adapt([](const std::exception_ptr &e) {
                if (e) {
                  try {
                    std::rethrow_exception(e);
-                 } catch (std::exception &/*e*/) {
+                 } catch (std::exception & /*e*/) {
                    //              std::cerr << "Error in listener:
                    //              " << e.what() <<
                    //              "\n";
@@ -229,6 +229,9 @@ TEST(Components_HTTP_Session, Implementation) {
 
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -262,6 +265,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(_response.at("X-Server"), "Copper");
 
       ASSERT_TRUE(_response.count("X-Time") > 0);
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
       _response.clear();
@@ -300,6 +306,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(boost::starts_with(gunzip_decompress(_response.body()),
                                      R"(<!doctype html>)"));
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -333,6 +342,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
       ASSERT_EQ(_response.body(), "{}");
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
       _response.clear();
@@ -372,6 +384,9 @@ TEST(Components_HTTP_Session, Implementation) {
 
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -403,6 +418,9 @@ TEST(Components_HTTP_Session, Implementation) {
         ASSERT_TRUE(_response.count("X-Time") > 0);
 
         ASSERT_TRUE(boost::starts_with(_response.body(), R"({"timestamp":)"));
+
+        std::cout << _response << std::endl << std::endl << std::endl;
+        ;
 
         _buffer.clear();
         _response.clear();
@@ -436,6 +454,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Rate-Until") > 0);
 
       ASSERT_EQ(_response.body(), "{}");
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
       _response.clear();
@@ -473,6 +494,9 @@ TEST(Components_HTTP_Session, Implementation) {
 
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -503,6 +527,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
       ASSERT_EQ(_response.body(), "{}");
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
       _response.clear();
@@ -539,6 +566,9 @@ TEST(Components_HTTP_Session, Implementation) {
 
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -573,6 +603,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
       ASSERT_TRUE(boost::starts_with(_response.body(), R"({"token":"Bearer)"));
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
 
@@ -610,6 +643,8 @@ TEST(Components_HTTP_Session, Implementation) {
         ASSERT_TRUE(boost::starts_with(_user_response.body(), R"({"id":")"));
         ASSERT_TRUE(boost::contains(_user_response.body(),
                                     "75a02add-cd16-4517-9c40-b57041eb2162"));
+
+        std::cout << _user_response << std::endl;
 
         _user_buffer.clear();
         _user_response.clear();
@@ -651,6 +686,8 @@ TEST(Components_HTTP_Session, Implementation) {
         ASSERT_TRUE(boost::contains(gunzip_decompress(_user_response.body()),
                                     "75a02add-cd16-4517-9c40-b57041eb2162"));
 
+        std::cout << _user_response << std::endl;
+
         _user_buffer.clear();
         _user_response.clear();
       }
@@ -691,6 +728,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(boost::contains(_response.body(),
                                   "Password provided doesn't match."));
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -730,6 +770,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(boost::contains(_response.body(),
                                   "Email provided isn't registered."));
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -763,6 +806,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(
           boost::contains(_response.body(), "Request has been processed."));
       ASSERT_TRUE(boost::contains(_response.body(), "hello"));
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
       _response.clear();
@@ -799,6 +845,9 @@ TEST(Components_HTTP_Session, Implementation) {
           boost::contains(_response.body(), "Request has been processed."));
       ASSERT_TRUE(boost::contains(_response.body(), "hello"));
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -829,6 +878,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
       ASSERT_EQ(_response.body(), "{}");
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
       _response.clear();
@@ -865,6 +917,9 @@ TEST(Components_HTTP_Session, Implementation) {
 
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -895,6 +950,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
       ASSERT_EQ(_response.body(), "{}");
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
       _response.clear();
@@ -931,6 +989,9 @@ TEST(Components_HTTP_Session, Implementation) {
 
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -962,6 +1023,9 @@ TEST(Components_HTTP_Session, Implementation) {
 
       ASSERT_TRUE(boost::starts_with(_response.body(), R"(<!doctype html>)"));
 
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
+
       _buffer.clear();
       _response.clear();
     }
@@ -992,6 +1056,9 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
       ASSERT_TRUE(boost::starts_with(_response.body(), R"(<!doctype html>)"));
+
+      std::cout << _response << std::endl << std::endl << std::endl;
+      ;
 
       _buffer.clear();
       _response.clear();

@@ -49,7 +49,8 @@ containers::async_of<void> protocol_handler(
 
     if (!_ssl_stream.lowest_layer().is_open()) co_return;
 
-    if (auto [_ec] = co_await _ssl_stream.async_shutdown(boost::asio::as_tuple); _ec && _ec != boost::asio::ssl::error::stream_truncated)
+    if (auto [_ec] = co_await _ssl_stream.async_shutdown(boost::asio::as_tuple);
+        _ec && _ec != boost::asio::ssl::error::stream_truncated)
       throw boost::system::system_error{_ec};
   } else {
     co_await session_handler(state, server_id, session_id, stream, _buffer,

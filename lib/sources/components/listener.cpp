@@ -75,10 +75,10 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
             try {
               std::rethrow_exception(e);
             } catch (std::exception &exception) {
-              co_spawn(
-                  _executor,
-                  state->get_database()->session_closed(_session_id, exception.what()),
-                  boost::asio::detached);
+              co_spawn(_executor,
+                       state->get_database()->session_closed(_session_id,
+                                                             exception.what()),
+                       boost::asio::detached);
 
               state->get_logger()->sessions_->info(
                   "[{}] Connection [{}] error [{}]", to_string(server_id),

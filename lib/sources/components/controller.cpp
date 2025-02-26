@@ -31,7 +31,6 @@ response controller::make_response(const request &request,
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
-  _response.set("X-Server", "Copper");
   _response.version(request.version());
   _response.keep_alive(request.keep_alive());
   _response.result(status);
@@ -47,6 +46,7 @@ response controller::make_response(const request &request,
   _response.prepare_payload();
 
   const auto _resolved_at = chronos::now();
+  _response.set("X-Server", "Copper");
   _response.set("X-Time", std::to_string(_resolved_at - start_at));
 
   return _response;
@@ -68,7 +68,6 @@ response controller::make_view(const request &request, const status_code status,
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
-  _response.set("X-Server", "Copper");
   _response.version(request.version());
   _response.keep_alive(request.keep_alive());
   _response.result(status);
@@ -84,6 +83,7 @@ response controller::make_view(const request &request, const status_code status,
   _response.prepare_payload();
 
   const auto _resolved_at = chronos::now();
+  _response.set("X-Server", "Copper");
   _response.set("X-Time", std::to_string(_resolved_at - start_at));
 
   return _response;

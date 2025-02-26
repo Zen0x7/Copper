@@ -14,7 +14,8 @@ std::string normalized_path(const boost::beast::string_view base,
   for (auto& _char : _result)
     if (_char == '/') _char = _separator;
 #else
-  if (char constexpr _separator = '/'; _result.back() == _separator) _result.resize(_result.size() - 1);
+  if (char constexpr _separator = '/'; _result.back() == _separator)
+    _result.resize(_result.size() - 1);
   _result.append(path.data(), path.size());
 #endif
   return _result;
