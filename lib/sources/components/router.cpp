@@ -21,7 +21,11 @@ shared<router> router::push(const method method, const char *path,
                             const controller_configuration config) {
   controller->set_configuration(config);
 
-  get_routes()->push_back(std::pair(factory(method, path), controller));
+  if (auto _route = factory(method, path); _route.is_expression_) {
+    get_routes()->push_back(std::pair(std::move(_route), controller));
+  } else {
+    get_routes()->insert(get_routes()->begin(), std::pair(std::move(_route), controller));
+  }
 
   return shared_from_this();
 }
