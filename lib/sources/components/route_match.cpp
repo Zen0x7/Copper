@@ -2,28 +2,21 @@
 
 namespace copper::components {
 
-route_result route_match(method method, const std::string_view &path,
+route_result route_match(const method method, const std::string &url,
                          const route &route) {
-  const size_t query_ask_mark_position = path.find('?');
-  const bool path_has_params = query_ask_mark_position != std::string::npos;
-  const std::string to_compare{
-      path_has_params ? path.substr(0, query_ask_mark_position) : path};
-  const bool method_rejection = method != route.method_;
-  const bool expression_rejection = !route.is_expression_;
-  const bool signature_rejection = to_compare != route.signature_;
-
-  if (expression_rejection && (method_rejection || signature_rejection)) {
-    return {.matches_ = false, .bindings_ = {}};
-  } else if (!expression_rejection) {
-    const std::string query{path};
-    const auto expression_result_ = route.expression_->query(to_compare);
+  if (route.is_expression_) {
+    const auto _result = route.expression_->query(url);
 
     return {
-        .matches_ = expression_result_->matches(),
-        .bindings_ = expression_result_->get_bindings(),
+        .matches_ = _result->matches(),
+        .bindings_ = _result->get_bindings(),
     };
-  } else {
+  }
+
+  if (method == route.method_ && url == route.signature_) {
     return {.matches_ = true, .bindings_ = {}};
   }
+
+  return {.matches_ = false, .bindings_ = {}};
 }
 }  // namespace copper::components

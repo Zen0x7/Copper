@@ -33,41 +33,48 @@ class auth_controller final : public components::controller {
    * Invoke
    *
    * @param request
+   * @param body
+   * @param start_at
    * @return async_of<response>
    */
   components::containers::async_of<components::response> invoke(
-      const components::request &request) override {
-    std::string email{body_.as_object().at("email").as_string()};
-    std::string password{body_.as_object().at("password").as_string()};
+      const components::request &request, const components::json::value &body,
+      const components::containers::optional_of<
+          components::authentication_result> & /*auth*/,
+      const components::containers::unordered_map_of_strings & /*bindings*/,
+      const long start_at) override {
+    const std::string _email{body.as_object().at("email").as_string()};
+    const std::string _password{body.as_object().at("password").as_string()};
 
-    const auto user = co_await state_->get_database()->get_user_by_email(email);
+    const auto _user =
+        co_await state_->get_database()->get_user_by_email(_email);
 
-    if (!user.has_value()) {
-      const components::json::object errors = {
+    if (!_user.has_value()) {
+      const components::json::object _errors = {
           {"message", "Email provided isn't registered."}};
 
       co_return make_response(request, components::status_code::unauthorized,
-                              serialize(errors), "application/json");
+                              serialize(_errors), "application/json", start_at);
     }
 
-    if (components::cipher_password_validator(password,
-                                              user.value()->password_)) {
-      std::string token = components::authentication_to_bearer(
-          boost::lexical_cast<components::uuid>(user.value()->id_),
+    if (components::cipher_password_validator(_password,
+                                              _user.value()->password_)) {
+      std::string _token = components::authentication_to_bearer(
+          boost::lexical_cast<components::uuid>(_user.value()->id_),
           state_->get_configuration()->get()->app_key_);
 
-      const components::json::object data = {{"token", token}};
+      const components::json::object _data = {{"token", _token}};
 
-      auto shared_token = std::make_shared<std::string>(token.data());
+      auto _shared_token = std::make_shared<std::string>(_token.data());
       co_return make_response(request, components::status_code::ok,
-                              serialize(data), "application/json");
+                              serialize(_data), "application/json", start_at);
     }
 
-    const components::json::object errors = {
+    const components::json::object _errors = {
         {"message", "Password provided doesn't match."}};
 
     co_return make_response(request, components::status_code::unauthorized,
-                            serialize(errors), "application/json");
+                            serialize(_errors), "application/json", start_at);
   }
 };
 

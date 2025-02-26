@@ -4,10 +4,10 @@ namespace copper::components {
 
 route_result route_find(const std::string &url, const route &route) {
   if (route.is_expression_) {
-    const auto expression_result = route.expression_->query(url);
+    const auto _result = route.expression_->query(url);
     return {
-        .matches_ = expression_result->matches(),
-        .bindings_ = expression_result->get_bindings(),
+        .matches_ = _result->matches(),
+        .bindings_ = _result->get_bindings(),
     };
   }
 

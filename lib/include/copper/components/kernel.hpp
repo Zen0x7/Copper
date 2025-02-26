@@ -83,7 +83,7 @@ class kernel : public shared_enabled<kernel> {
    * @param request
    * @param ip
    * @param request_id
-   * @param now
+   * @param start_at
    * @return async_of<tuple_of<shared<models::request>,
    * shared<models::response>, response_generic>>
    */
@@ -92,7 +92,7 @@ class kernel : public shared_enabled<kernel> {
                            shared<copper::models::response>, response_generic>>
   call(uuid session_id, boost::beast::string_view /* root */,
        const request &request, const std::string &ip, const uuid &request_id,
-       long now) const;
+       long start_at) const;
 };
 
 }  // namespace copper::components

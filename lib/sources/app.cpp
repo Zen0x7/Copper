@@ -89,9 +89,10 @@ int run(int argc, const char *argv[]) {
 
   auto const _address =
       boost::asio::ip::make_address(_configuration->get()->app_host_);
-  auto const _port = (unsigned short)_configuration->get()->app_port_;
+  auto const _port =
+      static_cast<unsigned short>(_configuration->get()->app_port_);
   auto const _endpoint = boost::asio::ip::tcp::endpoint{_address, _port};
-  auto const _doc_root = std::string_view{"."};
+  constexpr auto _doc_root = std::string_view{"."};
   auto const _threads = std::max<int>(1, _configuration->get()->app_threads_);
 
   boost::asio::io_context _ioc{_threads};
@@ -157,8 +158,8 @@ int run(int argc, const char *argv[]) {
              });
 
   if (_as == "service") {
-    boost::asio::co_spawn(
-        boost::asio::make_strand(_ioc),
+    co_spawn(
+        make_strand(_ioc),
         listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
         _task_group->adapt([_state, _server_id](std::exception_ptr e) {
           if (e) {
@@ -172,22 +173,21 @@ int run(int argc, const char *argv[]) {
           }
         }));
 
-    boost::asio::co_spawn(
-        boost::asio::make_strand(_ioc), subscriber(_state),
-        _task_group->adapt([_state, _server_id](std::exception_ptr e) {
-          if (e) {
-            try {
-              std::rethrow_exception(e);
-            } catch (std::exception &e) {
-              _state->get_logger()->system_->info(
-                  "[{}] Something went wrong: [{}] on [{}]",
-                  to_string(_server_id), e.what(), "subscriber");
-            }
-          }
-        }));
+    co_spawn(make_strand(_ioc), subscriber(_state),
+             _task_group->adapt([_state, _server_id](std::exception_ptr e) {
+               if (e) {
+                 try {
+                   std::rethrow_exception(e);
+                 } catch (std::exception &e) {
+                   _state->get_logger()->system_->info(
+                       "[{}] Something went wrong: [{}] on [{}]",
+                       to_string(_server_id), e.what(), "subscriber");
+                 }
+               }
+             }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(_ioc),
-                          signal_handler(_task_group), boost::asio::detached);
+    co_spawn(make_strand(_ioc), signal_handler(_task_group),
+             boost::asio::detached);
 
     containers::vector_of<std::thread> _threads_container;
     _threads_container.reserve(_threads - 1);

@@ -12,11 +12,11 @@ namespace copper::components {
  * Route match
  *
  * @param method
- * @param path
+ * @param url
  * @param route
  * @return route_result
  */
-route_result route_match(method method, const std::string_view &path,
+route_result route_match(method method, const std::string &url,
                          const route &route);
 
 }  // namespace copper::components
