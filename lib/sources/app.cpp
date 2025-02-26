@@ -243,10 +243,10 @@ int run(int argc, const char *argv[]) {
         _response.clear();
       }
 
-      boost::system::error_code ec;
+      boost::system::error_code _ec;
       _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both,
-                                ec);
-      if (ec && ec != boost::system::errc::not_connected) {
+                                _ec);
+      if (_ec && _ec != boost::system::errc::not_connected) {
       }
       _stream.close();
       _client_ioc.run();
