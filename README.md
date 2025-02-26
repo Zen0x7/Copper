@@ -10,3 +10,67 @@
 ## About
 
 Copper is a featured components collection also HTTP/WebSockets base project.
+
+## Features
+
+### API and CLI applications
+
+You can create **controllers** using the following syntax:
+
+```c++
+/**
+ * Custom Controller
+ */
+class custom_controller final : public components::controller {
+
+    /**
+     * Invoke 
+     */
+    components::containers::async_of<components::response> invoke(
+          const components::request &request,
+          const components::json::value & body,
+          const components::containers::optional_of<
+          const components::authentication_result> & auth,
+          const components::containers::unordered_map_of_strings & bindings,
+          const long start_at
+    ) override {
+        auto _now = components::chronos::now();
+        
+        const components::json::object _data = {{"timestamp", _now}};
+        
+        co_return make_response(
+            request,
+            components::status_code::ok,
+            serialize(_data),
+            "application/json",
+             start_at
+        );
+    }
+} 
+```
+
+After that, you can push the controller to the **router**:
+
+```c++
+router->push(
+    method::get, "/api/custom",
+    boost::make_shared<custom_controller>(state),
+    {
+        .use_auth_ = true,
+        .use_throttler_ = true,
+        .rpm_ = 60,
+    });
+```
+
+And finally, you can use any HTTP client or the binary.
+
+```bash
+./copper --as=command \
+         --command=invoke \
+         --method=GET \
+         --signature=/api/custom
+```
+
+### TODO
+
+Showcase more features ...
