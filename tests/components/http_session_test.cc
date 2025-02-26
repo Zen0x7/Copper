@@ -33,39 +33,49 @@ containers::async_of<void> cancel_http_sessions() {
 
 class templated_controller final : public controller {
  public:
-  containers::async_of<copper::components::response> invoke(
-      const request &request) override {
-    json::json data;
-    co_return make_view(request, status_code::ok, "template", data);
+  containers::async_of<response> invoke(
+      const request &request, const json::value & /*body*/,
+      const containers::optional_of<authentication_result> & /*auth*/,
+      const containers::unordered_map_of_strings & /*bindings*/,
+      const long start_at) override {
+    const json::json _data;
+    co_return make_view(request, status_code::ok, "template", _data,
+                        "text/html", start_at);
   }
 };
 
 class exception_controller final : public controller {
  public:
-  containers::async_of<copper::components::response> invoke(
-      const request &request) override {
+  containers::async_of<response> invoke(
+      const request &request, const json::value & /*body*/,
+      const containers::optional_of<authentication_result> & /*auth*/,
+      const containers::unordered_map_of_strings & /*bindings*/,
+      const long start_at) override {
     throw std::runtime_error("Something went wrong");
-    auto now = chronos::now();
-    const json::object data = {{"message", "Request has been processed."},
-                               {"data", "pong"},
-                               {"timestamp", now},
-                               {"status", 200}};
-    co_return make_response(request, status_code::ok, serialize(data),
-                            "application/json");
+    auto _now = chronos::now();
+    const json::object _data = {{"message", "Request has been processed."},
+                                {"data", "pong"},
+                                {"timestamp", _now},
+                                {"status", 200}};
+    co_return make_response(request, status_code::ok, serialize(_data),
+                            "application/json", start_at);
   }
 };
 
 class params_controller final : public controller {
  public:
-  containers::async_of<copper::components::response> invoke(
-      const request &request) override {
-    auto now = chronos::now();
-    const json::object data = {{"message", "Request has been processed."},
-                               {"data", this->bindings_.at("name")},
-                               {"timestamp", now},
-                               {"status", 200}};
-    co_return make_response(request, status_code::ok, serialize(data),
-                            "application/json");
+  containers::async_of<response> invoke(
+      const request &request, const json::value & /*body*/,
+      const containers::optional_of<authentication_result> & /*auth*/,
+      const containers::unordered_map_of_strings &bindings,
+      const long start_at) override {
+    auto _now = chronos::now();
+    const json::object _data = {{"message", "Request has been processed."},
+                                {"data", bindings.at("name")},
+                                {"timestamp", _now},
+                                {"status", 200}};
+    co_return make_response(request, status_code::ok, serialize(_data),
+                            "application/json", start_at);
   }
 };
 
@@ -75,10 +85,10 @@ TEST(Components_HTTP_Session, Implementation) {
     auto _configuration = boost::make_shared<configuration>();
 
     auto const _address = boost::asio::ip::make_address("0.0.0.0");
-    auto const _port = 9001;
+    constexpr auto _port = 9001;
     auto const _endpoint = boost::asio::ip::tcp::endpoint{_address, _port};
-    auto const _doc_root = std::string_view{"."};
-    auto const _threads = 4;
+    constexpr auto _doc_root = std::string_view{"."};
+    constexpr auto _threads = 4;
 
     boost::asio::io_context _ioc{_threads};
 
@@ -139,8 +149,8 @@ TEST(Components_HTTP_Session, Implementation) {
                    .rpm_ = 5,
                });
 
-    boost::asio::co_spawn(
-        boost::asio::make_strand(_ioc),
+    co_spawn(
+        make_strand(_ioc),
         listener(_server_id, _state, task_group_, _ctx, _endpoint, _doc_root),
         task_group_->adapt([](std::exception_ptr e) {
           if (e) {
@@ -151,21 +161,21 @@ TEST(Components_HTTP_Session, Implementation) {
           }
         }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(_ioc), subscriber(_state),
-                          task_group_->adapt([](std::exception_ptr e) {
-                            if (e) {
-                              try {
-                                std::rethrow_exception(e);
-                              } catch (std::exception &e) {
-                                //              std::cerr << "Error in listener:
-                                //              " << e.what() <<
-                                //              "\n";
-                              }
-                            }
-                          }));
+    co_spawn(make_strand(_ioc), subscriber(_state),
+             task_group_->adapt([](std::exception_ptr e) {
+               if (e) {
+                 try {
+                   std::rethrow_exception(e);
+                 } catch (std::exception &e) {
+                   //              std::cerr << "Error in listener:
+                   //              " << e.what() <<
+                   //              "\n";
+                 }
+               }
+             }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(_ioc),
-                          signal_handler(task_group_), boost::asio::detached);
+    co_spawn(make_strand(_ioc), signal_handler(task_group_),
+             boost::asio::detached);
 
     boost::asio::io_context _client_ioc;
 
@@ -990,8 +1000,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     sleep(5);
 
-    boost::asio::co_spawn(boost::asio::make_strand(_ioc),
-                          cancel_http_sessions(), boost::asio::detached);
+    co_spawn(make_strand(_ioc), cancel_http_sessions(), boost::asio::detached);
     _ioc.stop();
 
     sleep(5);

@@ -35,8 +35,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                                      to_string(server_id));
 
   while (!cs.cancelled()) {
-    auto socket_executor =
-        boost::asio::make_strand(executor.get_inner_executor());
+    auto socket_executor = make_strand(executor.get_inner_executor());
     auto [ec, socket] =
         co_await acceptor.async_accept(socket_executor, boost::asio::as_tuple);
 
@@ -51,14 +50,13 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
         to_string(session_id), socket.remote_endpoint().address().to_string(),
         socket.remote_endpoint().port());
 
-    boost::asio::co_spawn(
-        executor,
-        state->get_database()->create_session(
-            session_id, socket.remote_endpoint().address().to_string(),
-            socket.remote_endpoint().port()),
-        boost::asio::detached);
+    co_spawn(executor,
+             state->get_database()->create_session(
+                 session_id, socket.remote_endpoint().address().to_string(),
+                 socket.remote_endpoint().port()),
+             boost::asio::detached);
 
-    boost::asio::co_spawn(
+    co_spawn(
         std::move(socket_executor),
         protocol_handler(
             state, server_id, session_id,
@@ -77,7 +75,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
             try {
               std::rethrow_exception(e);
             } catch (std::exception &e) {
-              boost::asio::co_spawn(
+              co_spawn(
                   executor,
                   state->get_database()->session_closed(session_id, e.what()),
                   boost::asio::detached);

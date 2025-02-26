@@ -18,14 +18,21 @@ class up_controller final : public components::controller {
    * Invoke
    *
    * @param request
+   * @param body
+   * @param start_at
    * @return async_of<response>
    */
   components::containers::async_of<components::response> invoke(
-      const components::request &request) override {
-    auto now = components::chronos::now();
-    const components::json::object data = {{"timestamp", now}};
+      const components::request &request,
+      const components::json::value & /*body*/,
+      const components::containers::optional_of<
+          components::authentication_result> & /*auth*/,
+      const components::containers::unordered_map_of_strings & /*bindings*/,
+      const long start_at) override {
+    auto _now = components::chronos::now();
+    const components::json::object _data = {{"timestamp", _now}};
     co_return make_response(request, components::status_code::ok,
-                            serialize(data), "application/json");
+                            serialize(_data), "application/json", start_at);
   }
 };
 

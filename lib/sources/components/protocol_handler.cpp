@@ -22,10 +22,9 @@ containers::async_of<void> protocol_handler(
 
   stream.expires_after(std::chrono::seconds(30));
 
-  if (co_await boost::beast::async_detect_ssl(stream, buffer)) {
-    boost::asio::co_spawn(
-        executor, state->get_database()->session_is_encrypted(session_id),
-        boost::asio::detached);
+  if (co_await async_detect_ssl(stream, buffer)) {
+    co_spawn(executor, state->get_database()->session_is_encrypted(session_id),
+             boost::asio::detached);
 
     boost::asio::ssl::stream<typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type>>::other>
@@ -39,10 +38,10 @@ containers::async_of<void> protocol_handler(
     co_await session_handler(state, server_id, session_id, ssl_stream, buffer,
                              doc_root);
 
-    boost::asio::co_spawn(executor,
-                          state->get_database()->session_closed(
-                              session_id, "The socket was closed"),
-                          boost::asio::detached);
+    co_spawn(executor,
+             state->get_database()->session_closed(session_id,
+                                                   "The socket was closed"),
+             boost::asio::detached);
 
     state->get_logger()->sessions_->info("[{}] Connection [{}] closed",
                                          to_string(server_id),
@@ -57,10 +56,10 @@ containers::async_of<void> protocol_handler(
     co_await session_handler(state, server_id, session_id, stream, buffer,
                              doc_root);
 
-    boost::asio::co_spawn(executor,
-                          state->get_database()->session_closed(
-                              session_id, "The socket was closed"),
-                          boost::asio::detached);
+    co_spawn(executor,
+             state->get_database()->session_closed(session_id,
+                                                   "The socket was closed"),
+             boost::asio::detached);
 
     state->get_logger()->sessions_->info("[{}] Connection [{}] closed",
                                          to_string(server_id),

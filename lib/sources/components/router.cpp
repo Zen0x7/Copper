@@ -2,8 +2,8 @@
 
 namespace copper::components {
 
-route router::factory(method method, const char *path) {
-  std::string route(path);
+route router::factory(const method method, const char *path) {
+  const std::string route(path);
 
   const auto expression = expression_make(route);
 
@@ -16,13 +16,12 @@ route router::factory(method method, const char *path) {
   };
 }
 
-shared<router> router::push(method method, const char *path,
+shared<router> router::push(const method method, const char *path,
                             const shared<controller> &controller,
-                            controller_configuration config) {
+                            const controller_configuration config) {
   controller->set_configuration(config);
 
-  get_routes()->push_back(
-      std::pair(components::router::factory(method, path), controller));
+  get_routes()->push_back(std::pair(factory(method, path), controller));
 
   return shared_from_this();
 }

@@ -112,7 +112,7 @@ containers::async_of<shared<boost::redis::connection>> cache::get_connection() {
   auto conn = boost::make_shared<boost::redis::connection>(
       co_await boost::asio::this_coro::executor);
   conn->async_run(*this->redis_configuration_, {},
-                  boost::asio::consign(boost::asio::detached, conn));
+                  consign(boost::asio::detached, conn));
   co_return conn;
 }
 

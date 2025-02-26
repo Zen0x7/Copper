@@ -6,7 +6,7 @@
 #include <copper/components/request.hpp>
 
 namespace copper::components {
-    std::string url_from_request(const request & request);
+std::string url_from_request(const request& request);
 }
 
 #endif

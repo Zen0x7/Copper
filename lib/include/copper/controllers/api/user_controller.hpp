@@ -19,13 +19,21 @@ class user_controller final : public components::controller {
    * Invoke
    *
    * @param request
+   * @param auth
+   * @param start_at
    * @return async_of<response>
    */
   components::containers::async_of<components::response> invoke(
-      const components::request &request) override {
-    auto _user = co_await state_->get_database()->get_user_by_id(auth_id_);
+      const components::request &request,
+      const components::json::value & /*body*/,
+      const components::containers::optional_of<
+          components::authentication_result> &auth,
+      const components::containers::unordered_map_of_strings & /*bindings*/,
+      const long start_at) override {
+    const auto _user =
+        co_await state_->get_database()->get_user_by_id(auth.value().id_);
 
-    const components::json::object data = {
+    const components::json::object _data = {
         {"id", _user->id_},
         {"name", _user->name_},
         {"email", _user->email_},
@@ -35,7 +43,7 @@ class user_controller final : public components::controller {
     };
 
     co_return make_response(request, components::status_code::ok,
-                            serialize(data), "application/json");
+                            serialize(_data), "application/json", start_at);
   }
 };
 

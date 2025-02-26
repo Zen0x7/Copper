@@ -34,8 +34,8 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     boost::asio::io_context _ioc{_threads};
 
-    boost::asio::ssl::context _ctx{boost::asio::ssl::context::tlsv12};
-    boost::asio::ssl::context _client_ctx{boost::asio::ssl::context::tlsv12};
+    ssl::context _ctx{ssl::context::tlsv12};
+    ssl::context _client_ctx{ssl::context::tlsv12};
 
     load_server_certificate(_ctx);
     load_root_certificates(_client_ctx);
@@ -63,8 +63,8 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     _state->get_database()->start();
 
-    boost::asio::co_spawn(
-        boost::asio::make_strand(_ioc),
+    co_spawn(
+        make_strand(_ioc),
         listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
         _task_group->adapt([](std::exception_ptr e) {
           if (e) {
@@ -76,20 +76,20 @@ TEST(Components_WebSocket_Session, Implementation) {
           }
         }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(_ioc), subscriber(_state),
-                          _task_group->adapt([](std::exception_ptr e) {
-                            if (e) {
-                              try {
-                                std::rethrow_exception(e);
-                              } catch (std::exception &e) {
-                                std::cout << "Something went wrong... "
-                                          << e.what() << std::endl;
-                              }
-                            }
-                          }));
+    co_spawn(make_strand(_ioc), subscriber(_state),
+             _task_group->adapt([](std::exception_ptr e) {
+               if (e) {
+                 try {
+                   std::rethrow_exception(e);
+                 } catch (std::exception &e) {
+                   std::cout << "Something went wrong... " << e.what()
+                             << std::endl;
+                 }
+               }
+             }));
 
-    boost::asio::co_spawn(boost::asio::make_strand(_ioc),
-                          signal_handler(_task_group), boost::asio::detached);
+    co_spawn(make_strand(_ioc), signal_handler(_task_group),
+             boost::asio::detached);
 
     boost::asio::io_context _client_ioc;
 
@@ -105,8 +105,7 @@ TEST(Components_WebSocket_Session, Implementation) {
     std::string _host = "127.0.0.1";
     auto const _results = _resolver.resolve(_host, "9002");
 
-    boost::beast::websocket::stream<
-        boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>
+    boost::beast::websocket::stream<ssl::stream<boost::asio::ip::tcp::socket>>
         _ws(_client_ioc, _client_ctx);
 
     auto _ep =
@@ -115,7 +114,7 @@ TEST(Components_WebSocket_Session, Implementation) {
     if (!SSL_set_tlsext_host_name(_ws.next_layer().native_handle(),
                                   _host.c_str()))
       throw boost::beast::system_error(
-          boost::beast::error_code(static_cast<int>(::ERR_get_error()),
+          boost::beast::error_code(static_cast<int>(ERR_get_error()),
                                    boost::asio::error::get_ssl_category()),
           "Failed to set SNI Hostname");
 
@@ -144,8 +143,8 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     sleep(5);
 
-    boost::asio::co_spawn(boost::asio::make_strand(_ioc),
-                          cancel_websocket_session(), boost::asio::detached);
+    co_spawn(make_strand(_ioc), cancel_websocket_session(),
+             boost::asio::detached);
     _ioc.stop();
 
     sleep(5);

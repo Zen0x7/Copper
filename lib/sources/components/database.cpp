@@ -14,7 +14,7 @@ namespace copper::components {
 
 void database::start() { pool_->async_run(boost::asio::detached); }
 
-containers::async_of<containers::optional_of<shared<copper::models::user>>>
+containers::async_of<containers::optional_of<shared<models::user>>>
 database::get_user_by_email(const std::string &email) {
   auto connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
@@ -34,7 +34,7 @@ database::get_user_by_email(const std::string &email) {
 
   const auto &row = result.rows().at(0);
 
-  co_return boost::make_shared<copper::models::user>(
+  co_return boost::make_shared<models::user>(
       row.at(0).as_string(), std::string(row.at(1).as_string()), email,
       row.at(2).as_string(),
       row.at(3).is_null()
@@ -51,8 +51,7 @@ database::get_user_by_email(const std::string &email) {
 database::database(const shared<boost::mysql::connection_pool> &pool)
     : pool_(pool) {}
 
-containers::async_of<shared<copper::models::user>> database::get_user_by_id(
-    uuid id) {
+containers::async_of<shared<models::user>> database::get_user_by_id(uuid id) {
   auto connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
 
@@ -67,7 +66,7 @@ containers::async_of<shared<copper::models::user>> database::get_user_by_id(
 
   const auto &row = result.rows().at(0);
 
-  co_return boost::make_shared<copper::models::user>(
+  co_return boost::make_shared<models::user>(
       to_string(id), row.at(1).as_string(), row.at(2).as_string(),
       row.at(3).as_string(),
       row.at(4).is_null()
@@ -142,8 +141,7 @@ containers::async_of<void> database::session_is_upgrade(uuid session_id) {
 }
 
 containers::async_of<void> database::create_invocation(
-    shared<copper::models::request> request,
-    shared<copper::models::response> response) {
+    shared<models::request> request, shared<models::response> response) {
   auto connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
 

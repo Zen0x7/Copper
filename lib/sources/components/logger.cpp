@@ -19,8 +19,8 @@ void logger_do_release(typename std::shared_ptr<T> const&, T*) {}
 template <typename T>
 typename boost::shared_ptr<T> logger_to_shared(
     typename std::shared_ptr<T> const& p) {
-  return boost::shared_ptr<T>(
-      p.get(), boost::bind(&logger_do_release<T>, p, boost::placeholders::_1));
+  return boost::shared_ptr<T>(p.get(),
+                              boost::bind(&logger_do_release<T>, p, _1));
 }
 
 logger::logger(const shared<configuration>& configuration) {
