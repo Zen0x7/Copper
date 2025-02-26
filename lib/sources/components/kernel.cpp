@@ -77,11 +77,11 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
     _bindings = _route.value().bindings_;
 
     if (_route.value().controller_->configuration_.use_throttler_) {
-      if (auto [can, TTL] = co_await state_->get_cache()->can_invoke(
+      if (auto [_can, _TTL] = co_await state_->get_cache()->can_invoke(
               request, ip, _route.value().controller_->configuration_.rpm_);
-          !can) {
+          !_can) {
         auto _service_response =
-            response_too_many_requests(request, start_at, TTL, state_);
+            response_too_many_requests(request, start_at, _TTL, state_);
 
         auto _response =
             response_from_response(session_id, _request, _service_response);
@@ -139,13 +139,13 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
           co_return std::make_tuple(_request, _response, _service_response);
         }
       } else {
-        auto error_response = json::object(
+        auto _error_response = json::object(
             {{"message", "The given data was invalid."},
              {"errors", {{"*", "The body must be a valid JSON."}}}});
 
         auto _service_response = _route.value().controller_->make_response(
             request, status_code::unprocessable_entity,
-            serialize(error_response), "application/json");
+            serialize(_error_response), "application/json");
 
         auto _response =
             response_from_response(session_id, _request, _service_response);

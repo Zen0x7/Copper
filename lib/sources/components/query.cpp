@@ -9,10 +9,10 @@ std::string query_from_request(const request &request) {
 
   const size_t _symbol = request.target().find('?');
   const bool _has_params = _symbol != std::string::npos;
-  const std::string query{_has_params ? request.target().substr(_symbol + 1)
+  const std::string _query{_has_params ? request.target().substr(_symbol + 1)
                                       : ""};
 
-  std::istringstream _ss(query);
+  std::istringstream _ss(_query);
   std::string _pair;
 
   while (std::getline(_ss, _pair, '&')) {
