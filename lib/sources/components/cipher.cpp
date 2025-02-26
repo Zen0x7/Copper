@@ -26,7 +26,7 @@ std::string cipher_generate_sha_256() {
   }
   // LCOV_EXCL_STOP
 
-  std::string _result(reinterpret_cast<const char *>(_bytes),
+  const std::string _result(reinterpret_cast<const char *>(_bytes),
                       CIPHER_KEY_LENGTH);
 
   return base64_encode(_result);
@@ -97,14 +97,14 @@ std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
   // LCOV_EXCL_START
   containers::vector_of<unsigned char> _key(CIPHER_KEY_LENGTH);
 
-  if (RAND_bytes(_key.data(), (int)_key.size()) != 1) {
+  if (RAND_bytes(_key.data(), static_cast<int>(_key.size())) != 1) {
     report_for_openssl();
   }
 
   _output.first.assign(_key.begin(), _key.end());
 
   containers::vector_of<unsigned char> _iv(CIPHER_IV_LENGTH);
-  if (RAND_bytes(_iv.data(), (int)_iv.size()) != 1) {
+  if (RAND_bytes(_iv.data(), static_cast<int>(_iv.size())) != 1) {
     report_for_openssl();
   }
   // LCOV_EXCL_STOP
@@ -143,7 +143,7 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
 
   if (EVP_EncryptUpdate(_openssl_context, _output_buffer, &_length,
                         reinterpret_cast<const unsigned char *>(input.c_str()),
-                        (int)input.size()) != 1) {
+                        static_cast<int>(input.size())) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
@@ -196,7 +196,7 @@ std::string cipher_decrypt(const std::string &input, const std::string &key,
 
   if (EVP_DecryptUpdate(_openssl_context, _input_buffer, &_length,
                         reinterpret_cast<const unsigned char *>(input.c_str()),
-                        (int)input.size()) != 1) {
+                        static_cast<int>(input.size())) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
@@ -227,7 +227,7 @@ bool cipher_password_validator(const std::string &input,
   return BCrypt::validatePassword(input, hash);
 }
 
-std::string cipher_password_hash(const std::string &input, int workload) {
+std::string cipher_password_hash(const std::string &input, const int workload) {
   return BCrypt::generateHash(input, workload);
 }
 

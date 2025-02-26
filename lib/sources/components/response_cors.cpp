@@ -13,7 +13,7 @@
 namespace copper::components {
 
 response response_cors(const request &request, const long start_at,
-                       containers::vector_of<method> methods,
+                       const containers::vector_of<method>& methods,
                        const shared<state> &state) {
   const auto _now = chronos::now();
 

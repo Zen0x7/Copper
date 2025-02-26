@@ -15,7 +15,7 @@
 #include <iostream>
 
 copper::components::containers::async_of<void> cancel_websocket_session() {
-  auto executor = co_await boost::asio::this_coro::executor;
+  const auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
 }
 
@@ -27,10 +27,10 @@ TEST(Components_WebSocket_Session, Implementation) {
     auto _configuration = boost::make_shared<configuration>();
 
     auto const _address = boost::asio::ip::make_address("0.0.0.0");
-    auto const _port = 9002;
+    constexpr auto _port = 9002;
     auto const _endpoint = boost::asio::ip::tcp::endpoint{_address, _port};
-    auto const _doc_root = std::string_view{"."};
-    auto const _threads = 4;
+    constexpr auto _doc_root = std::string_view{"."};
+    constexpr auto _threads = 4;
 
     boost::asio::io_context _ioc{_threads};
 
@@ -66,23 +66,23 @@ TEST(Components_WebSocket_Session, Implementation) {
     co_spawn(
         make_strand(_ioc),
         listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
-        _task_group->adapt([](std::exception_ptr e) {
+        _task_group->adapt([](const std::exception_ptr &e) {
           if (e) {
             try {
               std::rethrow_exception(e);
-            } catch (std::exception &e) {
-              std::cout << "Something went wrong... " << e.what() << std::endl;
+            } catch (std::exception &exception) {
+              std::cout << "Something went wrong... " << exception.what() << std::endl;
             }
           }
         }));
 
     co_spawn(make_strand(_ioc), subscriber(_state),
-             _task_group->adapt([](std::exception_ptr e) {
+             _task_group->adapt([](const std::exception_ptr &e) {
                if (e) {
                  try {
                    std::rethrow_exception(e);
-                 } catch (std::exception &e) {
-                   std::cout << "Something went wrong... " << e.what()
+                 } catch (std::exception &exception) {
+                   std::cout << "Something went wrong... " << exception.what()
                              << std::endl;
                  }
                }
@@ -96,7 +96,7 @@ TEST(Components_WebSocket_Session, Implementation) {
     std::vector<std::thread> _v;
     _v.reserve(_threads);
     for (auto i = _threads; i > 0; --i)
-      _v.emplace_back([&_ioc, i] { _ioc.run(); });
+      _v.emplace_back([&_ioc] { _ioc.run(); });
 
     sleep(1);
 

@@ -3,7 +3,7 @@
 namespace copper::models {
 
 components::shared<request> request_from_request(
-    components::uuid session_id, components::uuid request_id, long now,
+    const components::uuid session_id, const components::uuid request_id, long now,
     const components::request &request) {
   return boost::make_shared<models::request>(
       to_string(request_id), to_string(session_id),

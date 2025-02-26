@@ -25,7 +25,7 @@ class state;
  * @return response
  */
 response response_cors(const request& request, long start_at,
-                       containers::vector_of<method> methods,
+                       const containers::vector_of<method>& methods,
                        const shared<state>& state);
 
 }  // namespace copper::components

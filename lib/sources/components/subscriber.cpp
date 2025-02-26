@@ -1,7 +1,7 @@
 #include <copper/components/subscriber.hpp>
 
 namespace copper::components {
-containers::async_of<void> subscriber(shared<state> state) {
+containers::async_of<void> subscriber(const shared<state> state) {
   boost::redis::request _request;
 
   _request.push("SUBSCRIBE", "Copper_Events");

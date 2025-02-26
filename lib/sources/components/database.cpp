@@ -1,18 +1,14 @@
 #include <boost/asio/cancel_after.hpp>
 #include <boost/asio/detached.hpp>
-#include <boost/asio/use_future.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/mysql/pool_params.hpp>
 #include <boost/mysql/results.hpp>
-#include <boost/mysql/with_diagnostics.hpp>
 #include <boost/mysql/with_params.hpp>
-#include <boost/uuid/random_generator.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/database.hpp>
 
 namespace copper::components {
 
-void database::start() { pool_->async_run(boost::asio::detached); }
+void database::start() const { pool_->async_run(boost::asio::detached); }
 
 containers::async_of<containers::optional_of<shared<models::user>>>
 database::get_user_by_email(const std::string &email) {
@@ -51,7 +47,7 @@ database::get_user_by_email(const std::string &email) {
 database::database(const shared<boost::mysql::connection_pool> &pool)
     : pool_(pool) {}
 
-containers::async_of<shared<models::user>> database::get_user_by_id(uuid id) {
+containers::async_of<shared<models::user>> database::get_user_by_id(const uuid id) {
   auto _connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
 
@@ -97,7 +93,7 @@ containers::async_of<void> database::create_session(const uuid session_id,
       _result);
 }
 
-containers::async_of<void> database::session_closed(uuid session_id,
+containers::async_of<void> database::session_closed(const uuid session_id,
                                                     const char exception[]) {
   auto _now = chronos::now();
 
@@ -112,10 +108,9 @@ containers::async_of<void> database::session_closed(uuid session_id,
       _result);
 }
 
-containers::async_of<void> database::session_is_encrypted(uuid session_id) {
+containers::async_of<void> database::session_is_encrypted(const uuid session_id) {
   auto _connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
-  ;
 
   boost::mysql::results _result;
   co_await _connection->async_execute(
@@ -126,8 +121,6 @@ containers::async_of<void> database::session_is_encrypted(uuid session_id) {
 }
 
 containers::async_of<void> database::session_is_upgrade(const uuid session_id) {
-  std::chrono::steady_clock::duration timeout = std::chrono::seconds(30);
-
   auto _connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
   ;
@@ -141,7 +134,7 @@ containers::async_of<void> database::session_is_upgrade(const uuid session_id) {
 }
 
 containers::async_of<void> database::create_invocation(
-    shared<models::request> request, shared<models::response> response) {
+    const shared<models::request> request, const shared<models::response> response) {
   auto _connection = co_await pool_->async_get_connection(
       boost::asio::cancel_after(std::chrono::seconds(10)));
 

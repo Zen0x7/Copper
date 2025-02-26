@@ -2,7 +2,6 @@
 #include <boost/json/parse.hpp>
 #include <boost/json/serialize.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/system.hpp>
 #include <copper/components/authentication.hpp>
 #include <copper/components/base64url.hpp>
 #include <copper/components/chronos.hpp>
@@ -49,7 +48,7 @@ boost::optional<authentication_result> authentication_from_bearer(
             const std::string _type{_payload.as_object().at("typ").as_string()};
             auto _expires_at = _payload.as_object().at("exp").as_int64();
 
-            auto __id = boost::lexical_cast<boost::uuids::uuid>(_id);
+            auto _id_ = boost::lexical_cast<boost::uuids::uuid>(_id);
 
             // LCOV_EXCL_START
             if (auto _current_unix = chronos::now();
@@ -59,7 +58,7 @@ boost::optional<authentication_result> authentication_from_bearer(
             // LCOV_EXCL_STOP
 
             return authentication_result{
-                .id_ = __id,
+                .id_ = _id_,
                 .type_ = _type,
             };
           }

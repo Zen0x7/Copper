@@ -1,7 +1,7 @@
 #include <copper/components/base64.hpp>
 
 namespace copper::components {
-std::string base64_encode(const std::string &input, bool padding) {
+std::string base64_encode(const std::string &input, const bool padding) {
   std::string _output;
   int _value = 0;
   int _value_b = -6;
@@ -10,7 +10,7 @@ std::string base64_encode(const std::string &input, bool padding) {
     _value = (_value << 8) + _character;
     _value_b += 8;
     while (_value_b >= 0) {
-      _output.push_back(base64_charset_[(_value >> _value_b) & 0x3F]);
+      _output.push_back(base64_charset_[_value >> _value_b & 0x3F]);
       _value_b -= 6;
     }
   }
@@ -35,7 +35,7 @@ std::string base64_decode(const std::string &input) {
     _value = (_value << 6) + base64_map_charset_[_character];
     _value_b += 6;
     if (_value_b >= 0) {
-      _output.push_back(static_cast<char>((_value >> _value_b) & 0xFF));
+      _output.push_back(static_cast<char>(_value >> _value_b & 0xFF));
       _value_b -= 8;
     }
   }

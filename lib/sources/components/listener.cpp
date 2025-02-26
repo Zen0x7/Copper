@@ -67,22 +67,22 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
 
         // LCOV_EXCL_START
         task_group->adapt([server_id, _session_id, _executor,
-                           &state](std::exception_ptr e) {
+                           &state](const std::exception_ptr &e) {
           // LCOV_EXCL_STOP
 
           if (e) {
             // LCOV_EXCL_START
             try {
               std::rethrow_exception(e);
-            } catch (std::exception &e) {
+            } catch (std::exception &exception) {
               co_spawn(
                   _executor,
-                  state->get_database()->session_closed(_session_id, e.what()),
+                  state->get_database()->session_closed(_session_id, exception.what()),
                   boost::asio::detached);
 
               state->get_logger()->sessions_->info(
                   "[{}] Connection [{}] error [{}]", to_string(server_id),
-                  to_string(_session_id), e.what());
+                  to_string(_session_id), exception.what());
             }
             // LCOV_EXCL_STOP
           }

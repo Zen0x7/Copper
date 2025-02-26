@@ -19,7 +19,7 @@ TEST(Components_Validator, OnSuccess) {
   const auto _value = boost::json::parse(_valid_object);
 
   const auto _response = validator_make(_rules, _value);
-  ;
+
   ASSERT_TRUE(_response->success_);
 }
 

@@ -27,7 +27,7 @@
 using namespace copper::components;
 
 containers::async_of<void> cancel_http_sessions() {
-  auto executor = co_await boost::asio::this_coro::executor;
+  const auto executor = co_await boost::asio::this_coro::executor;
   executor.get_inner_executor().context().stop();
 }
 
@@ -161,21 +161,21 @@ TEST(Components_HTTP_Session, Implementation) {
     co_spawn(
         make_strand(_ioc),
         listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
-        _task_group->adapt([](std::exception_ptr e) {
+        _task_group->adapt([](const std::exception_ptr & e) {
           if (e) {
             try {
               std::rethrow_exception(e);
-            } catch (std::exception &e) {
+            } catch (std::exception &/*e*/) {
             }
           }
         }));
 
     co_spawn(make_strand(_ioc), subscriber(_state),
-             _task_group->adapt([](std::exception_ptr e) {
+             _task_group->adapt([](const std::exception_ptr & e) {
                if (e) {
                  try {
                    std::rethrow_exception(e);
-                 } catch (std::exception &e) {
+                 } catch (std::exception &/*e*/) {
                    //              std::cerr << "Error in listener:
                    //              " << e.what() <<
                    //              "\n";
@@ -191,7 +191,7 @@ TEST(Components_HTTP_Session, Implementation) {
     std::vector<std::thread> _v;
     _v.reserve(_threads);
     for (auto _i = _threads; _i > 0; --_i)
-      _v.emplace_back([&_ioc, _i] { _ioc.run(); });
+      _v.emplace_back([&_ioc] { _ioc.run(); });
 
     sleep(1);
 
