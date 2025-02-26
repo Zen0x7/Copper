@@ -18,7 +18,6 @@ class up_controller final : public components::controller {
    * Invoke
    *
    * @param request
-   * @param body
    * @param start_at
    * @return async_of<response>
    */

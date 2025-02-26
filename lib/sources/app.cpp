@@ -74,16 +74,16 @@ int run(int argc, const char *argv[]) {
 
   auto _configuration = boost::make_shared<configuration>();
 
-  sentry_options_t *options = sentry_options_new();
-  sentry_options_set_dsn(options, _configuration->get()->sentry_dsn_.c_str());
-  sentry_options_set_database_path(options, ".sentry-native");
+  sentry_options_t *_options = sentry_options_new();
+  sentry_options_set_dsn(_options, _configuration->get()->sentry_dsn_.c_str());
+  sentry_options_set_database_path(_options, ".sentry-native");
   sentry_options_set_handler_path(
-      options, _configuration->get()->sentry_crashpad_handler_.c_str());
-  std::string release = "copper@" + get_version();
-  sentry_options_set_release(options, release.c_str());
-  sentry_options_set_debug(options,
+      _options, _configuration->get()->sentry_crashpad_handler_.c_str());
+  std::string _release = "copper@" + get_version();
+  sentry_options_set_release(_options, _release.c_str());
+  sentry_options_set_debug(_options,
                            _configuration->get()->app_debug_ == true ? 1 : 0);
-  sentry_init(options);
+  sentry_init(_options);
 
   const auto _as = _vm["as"].as<std::string>();
 
@@ -122,10 +122,10 @@ int run(int argc, const char *argv[]) {
       _configuration->get()->database_pool_initial_size_;
   _database_params.max_size = _configuration->get()->database_pool_max_size_;
 
-  auto database_pool = boost::make_shared<boost::mysql::connection_pool>(
+  auto _database_pool = boost::make_shared<boost::mysql::connection_pool>(
       _ioc, std::move(_database_params));
 
-  auto _state = boost::make_shared<state>(_configuration, database_pool);
+  auto _state = boost::make_shared<state>(_configuration, _database_pool);
 
   if (_as == "service") {
     _state->get_logger()->system_->info(
@@ -191,7 +191,7 @@ int run(int argc, const char *argv[]) {
 
     containers::vector_of<std::thread> _threads_container;
     _threads_container.reserve(_threads - 1);
-    for (auto i = _threads - 1; i > 0; --i)
+    for (auto _i = _threads - 1; _i > 0; --_i)
       _threads_container.emplace_back([&_ioc] { _ioc.run(); });
     _ioc.run();
 
@@ -243,10 +243,10 @@ int run(int argc, const char *argv[]) {
         _response.clear();
       }
 
-      boost::system::error_code ec;
+      boost::system::error_code _ec;
       _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both,
-                                ec);
-      if (ec && ec != boost::system::errc::not_connected) {
+                                _ec);
+      if (_ec && _ec != boost::system::errc::not_connected) {
       }
       _stream.close();
       _client_ioc.run();

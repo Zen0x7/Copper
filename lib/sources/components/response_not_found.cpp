@@ -25,10 +25,10 @@ response response_not_found(const request &request, const long start_at,
     _response.set(fields::content_type, "application/json");
   }
 
-  const std::string allowed_headers =
+  const std::string _allowed_headers =
       "Accept,Authorization,Content-Type,X-Requested-With";
 
-  _response.set(fields::access_control_allow_headers, allowed_headers);
+  _response.set(fields::access_control_allow_headers, _allowed_headers);
   const auto _allowed_origins =
       state->get_configuration()->get()->http_allowed_origins_;
 

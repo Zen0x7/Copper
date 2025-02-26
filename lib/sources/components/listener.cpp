@@ -12,61 +12,61 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                                     boost::asio::ssl::context &ctx,
                                     boost::asio::ip::tcp::endpoint endpoint,
                                     boost::beast::string_view doc_root) {
-  auto cs = co_await boost::asio::this_coro::cancellation_state;
-  auto executor = co_await boost::asio::this_coro::executor;
-  auto acceptor = typename boost::asio::ip::tcp::acceptor::rebind_executor<
+  auto _cs = co_await boost::asio::this_coro::cancellation_state;
+  auto _executor = co_await boost::asio::this_coro::executor;
+  auto _acceptor = typename boost::asio::ip::tcp::acceptor::rebind_executor<
       boost::asio::strand<boost::asio::io_context::executor_type>>::other{
-      executor, endpoint};
+      _executor, endpoint};
 
   co_await boost::asio::this_coro::reset_cancellation_state(
       boost::asio::enable_total_cancellation());
 
-  auto uuid_generator = boost::uuids::random_generator();
-  auto transaction_id = uuid_generator();
+  auto _generator = boost::uuids::random_generator();
+  auto _transaction_id = _generator();
 
-  json::object server_registered = {
-      {"transaction_id", to_string(transaction_id)},
+  json::object _server_registered = {
+      {"transaction_id", to_string(_transaction_id)},
       {"event", "server_registered"},
       {"data", {{"id", to_string(server_id)}}}};
 
-  co_await state->get_cache()->publish("events", serialize(server_registered));
+  co_await state->get_cache()->publish("events", serialize(_server_registered));
 
   state->get_logger()->system_->info("[{}] Server is open",
                                      to_string(server_id));
 
-  while (!cs.cancelled()) {
-    auto socket_executor = make_strand(executor.get_inner_executor());
-    auto [ec, socket] =
-        co_await acceptor.async_accept(socket_executor, boost::asio::as_tuple);
+  while (!_cs.cancelled()) {
+    auto _socket_executor = make_strand(_executor.get_inner_executor());
+    auto [_ec, _socket] = co_await _acceptor.async_accept(
+        _socket_executor, boost::asio::as_tuple);
 
-    if (ec == boost::asio::error::operation_aborted) co_return;
+    if (_ec == boost::asio::error::operation_aborted) co_return;
 
-    if (ec) throw boost::system::system_error{ec};
+    if (_ec) throw boost::system::system_error{_ec};
 
-    auto session_id = uuid_generator();
+    auto _session_id = _generator();
 
     state->get_logger()->sessions_->info(
         "[{}] Connection [{}] from [{}:{}] accepted", to_string(server_id),
-        to_string(session_id), socket.remote_endpoint().address().to_string(),
-        socket.remote_endpoint().port());
+        to_string(_session_id), _socket.remote_endpoint().address().to_string(),
+        _socket.remote_endpoint().port());
 
-    co_spawn(executor,
+    co_spawn(_executor,
              state->get_database()->create_session(
-                 session_id, socket.remote_endpoint().address().to_string(),
-                 socket.remote_endpoint().port()),
+                 _session_id, _socket.remote_endpoint().address().to_string(),
+                 _socket.remote_endpoint().port()),
              boost::asio::detached);
 
     co_spawn(
-        std::move(socket_executor),
+        std::move(_socket_executor),
         protocol_handler(
-            state, server_id, session_id,
+            state, server_id, _session_id,
             typename boost::beast::tcp_stream::rebind_executor<
                 boost::asio::strand<boost::asio::io_context::executor_type>>::
-                other{std::move(socket)},
+                other{std::move(_socket)},
             ctx, doc_root),
 
         // LCOV_EXCL_START
-        task_group->adapt([server_id, session_id, executor,
+        task_group->adapt([server_id, _session_id, _executor,
                            &state](std::exception_ptr e) {
           // LCOV_EXCL_STOP
 
@@ -76,13 +76,13 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
               std::rethrow_exception(e);
             } catch (std::exception &e) {
               co_spawn(
-                  executor,
-                  state->get_database()->session_closed(session_id, e.what()),
+                  _executor,
+                  state->get_database()->session_closed(_session_id, e.what()),
                   boost::asio::detached);
 
               state->get_logger()->sessions_->info(
                   "[{}] Connection [{}] error [{}]", to_string(server_id),
-                  to_string(session_id), e.what());
+                  to_string(_session_id), e.what());
             }
             // LCOV_EXCL_STOP
           }

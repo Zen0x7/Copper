@@ -10,9 +10,9 @@ containers::async_of<void> protocol_handler(
         boost::asio::strand<boost::asio::io_context::executor_type>>::other
         stream,
     boost::asio::ssl::context &ctx, boost::beast::string_view doc_root) {
-  auto executor = co_await boost::asio::this_coro::executor;
+  auto _executor = co_await boost::asio::this_coro::executor;
 
-  boost::beast::flat_buffer buffer;
+  boost::beast::flat_buffer _buffer;
 
   co_await boost::asio::this_coro::reset_cancellation_state(
       boost::asio::enable_total_cancellation(),
@@ -22,23 +22,23 @@ containers::async_of<void> protocol_handler(
 
   stream.expires_after(std::chrono::seconds(30));
 
-  if (co_await async_detect_ssl(stream, buffer)) {
-    co_spawn(executor, state->get_database()->session_is_encrypted(session_id),
+  if (co_await async_detect_ssl(stream, _buffer)) {
+    co_spawn(_executor, state->get_database()->session_is_encrypted(session_id),
              boost::asio::detached);
 
     boost::asio::ssl::stream<typename boost::beast::tcp_stream::rebind_executor<
         boost::asio::strand<boost::asio::io_context::executor_type>>::other>
-        ssl_stream{std::move(stream), ctx};
+        _ssl_stream{std::move(stream), ctx};
 
-    auto bytes_transferred = co_await ssl_stream.async_handshake(
-        boost::asio::ssl::stream_base::server, buffer.data());
+    auto _bytes_transferred = co_await _ssl_stream.async_handshake(
+        boost::asio::ssl::stream_base::server, _buffer.data());
 
-    buffer.consume(bytes_transferred);
+    _buffer.consume(_bytes_transferred);
 
-    co_await session_handler(state, server_id, session_id, ssl_stream, buffer,
+    co_await session_handler(state, server_id, session_id, _ssl_stream, _buffer,
                              doc_root);
 
-    co_spawn(executor,
+    co_spawn(_executor,
              state->get_database()->session_closed(session_id,
                                                    "The socket was closed"),
              boost::asio::detached);
@@ -47,16 +47,16 @@ containers::async_of<void> protocol_handler(
                                          to_string(server_id),
                                          to_string(session_id));
 
-    if (!ssl_stream.lowest_layer().is_open()) co_return;
+    if (!_ssl_stream.lowest_layer().is_open()) co_return;
 
-    auto [ec] = co_await ssl_stream.async_shutdown(boost::asio::as_tuple);
-    if (ec && ec != boost::asio::ssl::error::stream_truncated)
-      throw boost::system::system_error{ec};
+    auto [_ec] = co_await _ssl_stream.async_shutdown(boost::asio::as_tuple);
+    if (_ec && _ec != boost::asio::ssl::error::stream_truncated)
+      throw boost::system::system_error{_ec};
   } else {
-    co_await session_handler(state, server_id, session_id, stream, buffer,
+    co_await session_handler(state, server_id, session_id, stream, _buffer,
                              doc_root);
 
-    co_spawn(executor,
+    co_spawn(_executor,
              state->get_database()->session_closed(session_id,
                                                    "The socket was closed"),
              boost::asio::detached);

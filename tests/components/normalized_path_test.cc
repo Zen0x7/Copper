@@ -5,7 +5,7 @@
 TEST(Components_Filesystem_NormalizedPath, Usage) {
   using namespace copper::components;
 
-  auto value = normalized_path("srv/app/bin/", "/../main.cpp");
+  auto _value = normalized_path("srv/app/bin/", "/../main.cpp");
 
-  ASSERT_EQ(value, "srv/app/bin/../main.cpp");
+  ASSERT_EQ(_value, "srv/app/bin/../main.cpp");
 }

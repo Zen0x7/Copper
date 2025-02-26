@@ -5,8 +5,8 @@
 using namespace copper::components;
 
 TEST(Components_Chronos, To_Timestamp) {
-  auto now = std::chrono::system_clock::now();
-  const auto timestamp = chronos::to_timestamp(now);
+  const auto _now = std::chrono::system_clock::now();
+  const auto _timestamp = chronos::to_timestamp(_now);
 
-  ASSERT_TRUE(timestamp > 0);
+  ASSERT_TRUE(_timestamp > 0);
 }

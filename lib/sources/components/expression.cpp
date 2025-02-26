@@ -15,10 +15,10 @@ std::string expression_result::get(const std::string &name) const {
   if (bindings_.contains(name)) return bindings_.at(name);
 
   // LCOV_EXCL_START
-  std::string error_output = "Expression error: Parameter ";
-  error_output.append(name);
-  error_output.append(" doesn't has.");
-  throw std::runtime_error(error_output.c_str());
+  std::string _error_output = "Expression error: Parameter ";
+  _error_output.append(name);
+  _error_output.append(" doesn't has.");
+  throw std::runtime_error(_error_output.c_str());
 }
 // LCOV_EXCL_STOP
 

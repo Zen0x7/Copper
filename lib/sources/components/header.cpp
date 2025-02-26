@@ -3,22 +3,22 @@
 namespace copper::components {
 
 std::string header_from_request(const request& request) {
-  json::object headers;
-  for (const auto& header : request.base()) {
-    if (header.name_string() != "Authorization") {
-      headers[header.name_string()] = header.value();
+  json::object _headers;
+  for (const auto& _header : request.base()) {
+    if (_header.name_string() != "Authorization") {
+      _headers[_header.name_string()] = _header.value();
     } else {
-      headers[header.name_string()] = "***";
+      _headers[_header.name_string()] = "***";
     }
   }
-  return serialize(headers);
+  return serialize(_headers);
 }
 
 std::string header_from_response(const response& response) {
-  json::object headers;
-  for (const auto& header : response.base()) {
-    headers[header.name_string()] = header.value();
+  json::object _headers;
+  for (const auto& _header : response.base()) {
+    _headers[_header.name_string()] = _header.value();
   }
-  return serialize(headers);
+  return serialize(_headers);
 }
 }  // namespace copper::components

@@ -77,6 +77,7 @@ class state : public shared_enabled<state> {
   /**
    * Constructor
    *
+   * @param configuration
    * @param pool
    */
   state(const shared<configuration>& configuration,

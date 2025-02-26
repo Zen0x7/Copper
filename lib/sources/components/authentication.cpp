@@ -15,52 +15,52 @@ namespace copper::components {
 boost::optional<authentication_result> authentication_from_bearer(
     const std::string &bearer, const std::string &app_key) {
   if (bearer != "") {
-    std::string token =
+    std::string _token =
         boost::starts_with(bearer, "Bearer ") ? bearer.substr(7) : bearer;
 
-    containers::vector_of<std::string> parts;
-    std::size_t position = 0;
+    containers::vector_of<std::string> _parts;
+    std::size_t _position = 0;
 
-    while ((position = token.find('.')) != std::string::npos) {
-      std::string piece = token.substr(0, position);
-      parts.push_back(piece);
-      token.erase(0, position + 1);
+    while ((_position = _token.find('.')) != std::string::npos) {
+      std::string _piece = _token.substr(0, _position);
+      _parts.push_back(_piece);
+      _token.erase(0, _position + 1);
     }
 
-    parts.push_back(token);
+    _parts.push_back(_token);
 
-    if (parts.size() == 3) {
-      std::string merged = parts[0] + "." + parts[1];
-      if (const std::string signature_ =
-              base64url_encode(cipher_hmac(merged, app_key), false);
-          signature_ == parts[2]) {
-        boost::system::error_code ec;
-        auto payload = boost::json::parse(base64url_decode(parts[1]), ec);
+    if (_parts.size() == 3) {
+      std::string _merged = _parts[0] + "." + _parts[1];
+      if (const std::string _signature =
+              base64url_encode(cipher_hmac(_merged, app_key), false);
+          _signature == _parts[2]) {
+        boost::system::error_code _ec;
+        auto _payload = boost::json::parse(base64url_decode(_parts[1]), _ec);
 
-        if (!ec) {
-          containers::map_of_strings rules = {
+        if (!_ec) {
+          containers::map_of_strings _rules = {
               {"*", "is_object"},   {"sub", "is_uuid"},   {"typ", "is_string"},
               {"iat", "is_number"}, {"exp", "is_number"},
           };
 
-          if (auto instance = validator_make(rules, payload);
-              instance->success_) {
-            const std::string id{payload.as_object().at("sub").as_string()};
-            const std::string type{payload.as_object().at("typ").as_string()};
-            auto expires_at_ = payload.as_object().at("exp").as_int64();
+          if (auto _instance = validator_make(_rules, _payload);
+              _instance->success_) {
+            const std::string _id{_payload.as_object().at("sub").as_string()};
+            const std::string _type{_payload.as_object().at("typ").as_string()};
+            auto _expires_at = _payload.as_object().at("exp").as_int64();
 
-            auto id_ = boost::lexical_cast<boost::uuids::uuid>(id);
+            auto __id = boost::lexical_cast<boost::uuids::uuid>(_id);
 
             // LCOV_EXCL_START
-            if (auto current_unix = chronos::now();
-                current_unix > expires_at_) {
+            if (auto _current_unix = chronos::now();
+                _current_unix > _expires_at) {
               return boost::none;
             }
             // LCOV_EXCL_STOP
 
             return authentication_result{
-                .id_ = id_,
-                .type_ = type,
+                .id_ = __id,
+                .type_ = _type,
             };
           }
         }

@@ -134,9 +134,9 @@ TEST(Components_WebSocket_Session, Implementation) {
     boost::beast::flat_buffer _buffer;
     _ws.read(_buffer);
 
-    boost::beast::error_code ec;
-    _ws.close(boost::beast::websocket::close_code::normal, ec);
-    if (ec) {
+    boost::beast::error_code _ec;
+    _ws.close(boost::beast::websocket::close_code::normal, _ec);
+    if (_ec) {
     }
 
     _client_ioc.run();

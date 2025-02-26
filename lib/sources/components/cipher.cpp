@@ -18,203 +18,206 @@
 namespace copper::components {
 
 std::string cipher_generate_sha_256() {
-  unsigned char bytes[CIPHER_KEY_LENGTH];
+  unsigned char _bytes[CIPHER_KEY_LENGTH];
 
   // LCOV_EXCL_START
-  if (RAND_bytes(bytes, CIPHER_KEY_LENGTH) != 1) {
+  if (RAND_bytes(_bytes, CIPHER_KEY_LENGTH) != 1) {
     report_for_openssl();
   }
   // LCOV_EXCL_STOP
 
-  std::string result(reinterpret_cast<const char *>(bytes), CIPHER_KEY_LENGTH);
+  std::string _result(reinterpret_cast<const char *>(_bytes),
+                      CIPHER_KEY_LENGTH);
 
-  return base64_encode(result);
+  return base64_encode(_result);
 }
 
 std::string cipher_hmac(const std::string &input, const std::string &app_key) {
-  std::string output;
+  std::string _output;
 
   // LCOV_EXCL_START
-  EVP_PKEY *public_key = EVP_PKEY_new_mac_key(
+  EVP_PKEY *_public_key = EVP_PKEY_new_mac_key(
       EVP_PKEY_HMAC, nullptr,
       reinterpret_cast<const unsigned char *>(app_key.data()),
       CIPHER_KEY_LENGTH);
 
-  if (!public_key) {
+  if (!_public_key) {
     report_for_openssl();
   }
 
-  EVP_MD_CTX *openssl_context = EVP_MD_CTX_new();
-  if (!openssl_context) {
-    EVP_PKEY_free(public_key);
+  EVP_MD_CTX *_openssl_context = EVP_MD_CTX_new();
+  if (!_openssl_context) {
+    EVP_PKEY_free(_public_key);
     report_for_openssl();
   }
 
-  std::size_t length;
-  unsigned char digest[CIPHER_DIGEST_LENGTH];
+  std::size_t _length;
+  unsigned char _digest[CIPHER_DIGEST_LENGTH];
 
-  if (EVP_DigestSignInit(openssl_context, nullptr, EVP_sha256(), nullptr,
-                         public_key) != 1) {
-    EVP_MD_CTX_free(openssl_context);
-    EVP_PKEY_free(public_key);
+  if (EVP_DigestSignInit(_openssl_context, nullptr, EVP_sha256(), nullptr,
+                         _public_key) != 1) {
+    EVP_MD_CTX_free(_openssl_context);
+    EVP_PKEY_free(_public_key);
     report_for_openssl();
   }
 
-  if (EVP_DigestSignUpdate(openssl_context, input.c_str(), input.size()) != 1) {
-    EVP_MD_CTX_free(openssl_context);
-    EVP_PKEY_free(public_key);
+  if (EVP_DigestSignUpdate(_openssl_context, input.c_str(), input.size()) !=
+      1) {
+    EVP_MD_CTX_free(_openssl_context);
+    EVP_PKEY_free(_public_key);
     report_for_openssl();
   }
 
-  if (EVP_DigestSignFinal(openssl_context, nullptr, &length) != 1) {
-    EVP_MD_CTX_free(openssl_context);
-    EVP_PKEY_free(public_key);
+  if (EVP_DigestSignFinal(_openssl_context, nullptr, &_length) != 1) {
+    EVP_MD_CTX_free(_openssl_context);
+    EVP_PKEY_free(_public_key);
     report_for_openssl();
   }
 
-  if (EVP_DigestSignFinal(openssl_context, digest, &length) != 1) {
-    EVP_MD_CTX_free(openssl_context);
-    EVP_PKEY_free(public_key);
+  if (EVP_DigestSignFinal(_openssl_context, _digest, &_length) != 1) {
+    EVP_MD_CTX_free(_openssl_context);
+    EVP_PKEY_free(_public_key);
     report_for_openssl();
   }
 
-  EVP_MD_CTX_free(openssl_context);
-  EVP_PKEY_free(public_key);
+  EVP_MD_CTX_free(_openssl_context);
+  EVP_PKEY_free(_public_key);
   // LCOV_EXCL_STOP
 
-  output.assign(reinterpret_cast<char *>(digest), length);
+  _output.assign(reinterpret_cast<char *>(_digest), _length);
 
-  return output;
+  return _output;
   // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP
 
 std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
-  std::pair<std::string, std::string> output;
+  std::pair<std::string, std::string> _output;
 
   // LCOV_EXCL_START
-  containers::vector_of<unsigned char> key(CIPHER_KEY_LENGTH);
+  containers::vector_of<unsigned char> _key(CIPHER_KEY_LENGTH);
 
-  if (RAND_bytes(key.data(), (int)key.size()) != 1) {
+  if (RAND_bytes(_key.data(), (int)_key.size()) != 1) {
     report_for_openssl();
   }
 
-  output.first.assign(key.begin(), key.end());
+  _output.first.assign(_key.begin(), _key.end());
 
-  containers::vector_of<unsigned char> iv(CIPHER_IV_LENGTH);
-  if (RAND_bytes(iv.data(), (int)iv.size()) != 1) {
+  containers::vector_of<unsigned char> _iv(CIPHER_IV_LENGTH);
+  if (RAND_bytes(_iv.data(), (int)_iv.size()) != 1) {
     report_for_openssl();
   }
   // LCOV_EXCL_STOP
 
-  output.second.assign(iv.begin(), iv.end());
+  _output.second.assign(_iv.begin(), _iv.end());
 
-  return output;
+  return _output;
   // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP
 
 std::string cipher_encrypt(const std::string &input, const std::string &key,
                            const std::string &iv) {
-  std::string output;
+  std::string _output;
 
   // LCOV_EXCL_START
-  EVP_CIPHER_CTX *openssl_context = EVP_CIPHER_CTX_new();
-  if (!openssl_context) {
+  EVP_CIPHER_CTX *_openssl_context = EVP_CIPHER_CTX_new();
+  if (!_openssl_context) {
     report_for_openssl();
   }
 
-  if (EVP_EncryptInit_ex(openssl_context, EVP_aes_256_cbc(), nullptr,
+  if (EVP_EncryptInit_ex(_openssl_context, EVP_aes_256_cbc(), nullptr,
                          reinterpret_cast<const unsigned char *>(key.c_str()),
                          reinterpret_cast<const unsigned char *>(iv.c_str())) !=
       1) {
-    EVP_CIPHER_CTX_free(openssl_context);
+    EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  int length;
-  int output_length;
+  int _length;
+  int _output_length;
 
-  auto *output_buffer =
+  auto *_output_buffer =
       new unsigned char[input.size() +
                         EVP_CIPHER_block_size(EVP_aes_256_cbc())];
 
-  if (EVP_EncryptUpdate(openssl_context, output_buffer, &length,
+  if (EVP_EncryptUpdate(_openssl_context, _output_buffer, &_length,
                         reinterpret_cast<const unsigned char *>(input.c_str()),
                         (int)input.size()) != 1) {
-    EVP_CIPHER_CTX_free(openssl_context);
+    EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  output_length = length;
+  _output_length = _length;
 
-  if (EVP_EncryptFinal_ex(openssl_context, output_buffer + length, &length) !=
-      1) {
-    EVP_CIPHER_CTX_free(openssl_context);
+  if (EVP_EncryptFinal_ex(_openssl_context, _output_buffer + _length,
+                          &_length) != 1) {
+    EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
   // LCOV_EXCL_STOP
 
-  output_length += length;
+  _output_length += _length;
 
-  output.assign(reinterpret_cast<char *>(output_buffer), output_length);
+  _output.assign(reinterpret_cast<char *>(_output_buffer), _output_length);
 
-  delete[] output_buffer;
-  EVP_CIPHER_CTX_free(openssl_context);
+  delete[] _output_buffer;
+  EVP_CIPHER_CTX_free(_openssl_context);
 
-  return output;
+  return _output;
   // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP
 
 std::string cipher_decrypt(const std::string &input, const std::string &key,
                            const std::string &iv) {
-  std::string output;
+  std::string _output;
 
   // LCOV_EXCL_START
 
-  EVP_CIPHER_CTX *openssl_context = EVP_CIPHER_CTX_new();
-  if (!openssl_context) {
+  EVP_CIPHER_CTX *_openssl_context = EVP_CIPHER_CTX_new();
+  if (!_openssl_context) {
     report_for_openssl();
   }
 
-  if (EVP_DecryptInit_ex(openssl_context, EVP_aes_256_cbc(), nullptr,
+  if (EVP_DecryptInit_ex(_openssl_context, EVP_aes_256_cbc(), nullptr,
                          reinterpret_cast<const unsigned char *>(key.c_str()),
                          reinterpret_cast<const unsigned char *>(iv.c_str())) !=
       1) {
-    EVP_CIPHER_CTX_free(openssl_context);
+    EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  int length;
-  int input_length;
-  auto *input_buffer = new unsigned char[input.size() + EVP_CIPHER_block_size(
-                                                            EVP_aes_256_cbc())];
+  int _length;
+  int _input_length;
+  auto *_input_buffer =
+      new unsigned char[input.size() +
+                        EVP_CIPHER_block_size(EVP_aes_256_cbc())];
 
-  if (EVP_DecryptUpdate(openssl_context, input_buffer, &length,
+  if (EVP_DecryptUpdate(_openssl_context, _input_buffer, &_length,
                         reinterpret_cast<const unsigned char *>(input.c_str()),
                         (int)input.size()) != 1) {
-    EVP_CIPHER_CTX_free(openssl_context);
+    EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  input_length = length;
+  _input_length = _length;
 
-  if (EVP_DecryptFinal_ex(openssl_context, input_buffer + length, &length) !=
-      1) {
-    EVP_CIPHER_CTX_free(openssl_context);
+  if (EVP_DecryptFinal_ex(_openssl_context, _input_buffer + _length,
+                          &_length) != 1) {
+    EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  input_length += length;
+  _input_length += _length;
 
-  output.assign(reinterpret_cast<char *>(input_buffer), input_length);
+  _output.assign(reinterpret_cast<char *>(_input_buffer), _input_length);
 
-  delete[] input_buffer;
-  EVP_CIPHER_CTX_free(openssl_context);
+  delete[] _input_buffer;
+  EVP_CIPHER_CTX_free(_openssl_context);
   // LCOV_EXCL_STOP
 
-  return output;
+  return _output;
   // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP
