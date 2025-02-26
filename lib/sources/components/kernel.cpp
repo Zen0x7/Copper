@@ -26,7 +26,7 @@
 namespace copper::components {
 
 containers::optional_of<kernel_result> kernel::find_on_routes(
-    method method, const std::string &url) const {
+    const method method, const std::string &url) const {
   for (const auto &[_route, _controller] :
        *state_->get_router()->get_routes()) {
     if (auto [_matches, _bindings] = route_match(method, url, _route);
@@ -164,7 +164,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
           _route.value().controller_->configuration_.use_protector_ == true;
 
       co_return std::make_tuple(_request, _response, _service_response);
-    } catch (std::exception &exception) {
+    } catch (std::exception & /*exception*/) {
       auto _service_response = response_exception(request, start_at, state_);
 
       auto _response =

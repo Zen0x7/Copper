@@ -16,7 +16,7 @@ std::string query_from_request(const request &request) {
   std::string _pair;
 
   while (std::getline(_ss, _pair, '&')) {
-    size_t _pos = _pair.find('=');
+    const size_t _pos = _pair.find('=');
     if (_pos == std::string::npos) continue;
 
     std::string _key = _pair.substr(0, _pos);

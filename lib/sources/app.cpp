@@ -161,30 +161,31 @@ int run(int argc, const char *argv[]) {
     co_spawn(
         make_strand(_ioc),
         listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
-        _task_group->adapt([_state, _server_id](std::exception_ptr e) {
+        _task_group->adapt([_state, _server_id](const std::exception_ptr &e) {
           if (e) {
             try {
               std::rethrow_exception(e);
-            } catch (std::exception &e) {
+            } catch (std::exception &exception) {
               _state->get_logger()->system_->info(
                   "[{}] Something went wrong: [{}] on [{}]",
-                  to_string(_server_id), e.what(), "listener");
+                  to_string(_server_id), exception.what(), "listener");
             }
           }
         }));
 
-    co_spawn(make_strand(_ioc), subscriber(_state),
-             _task_group->adapt([_state, _server_id](std::exception_ptr e) {
-               if (e) {
-                 try {
-                   std::rethrow_exception(e);
-                 } catch (std::exception &e) {
-                   _state->get_logger()->system_->info(
-                       "[{}] Something went wrong: [{}] on [{}]",
-                       to_string(_server_id), e.what(), "subscriber");
-                 }
-               }
-             }));
+    co_spawn(
+        make_strand(_ioc), subscriber(_state),
+        _task_group->adapt([_state, _server_id](const std::exception_ptr &e) {
+          if (e) {
+            try {
+              std::rethrow_exception(e);
+            } catch (std::exception &exception) {
+              _state->get_logger()->system_->info(
+                  "[{}] Something went wrong: [{}] on [{}]",
+                  to_string(_server_id), exception.what(), "subscriber");
+            }
+          }
+        }));
 
     co_spawn(make_strand(_ioc), signal_handler(_task_group),
              boost::asio::detached);
@@ -200,13 +201,12 @@ int run(int argc, const char *argv[]) {
     _state->get_logger()->system_->info("[{}] Server has been shutdown",
                                         to_string(_server_id));
   } else {
-    const auto _command = _vm["command"].as<std::string>();
+    if (const auto _command = _vm["command"].as<std::string>();
+        _command == "keygen") {
+      auto [_key, _iv] = cipher_generate_aes_key_iv();
 
-    if (_command == "keygen") {
-      auto _key = cipher_generate_aes_key_iv();
-
-      fmt::print("APP_KEY={}\n", base64_encode(_key.first));
-      fmt::print("APP_KEY_IV={}\n", base64_encode(_key.second));
+      fmt::print("APP_KEY={}\n", base64_encode(_key));
+      fmt::print("APP_KEY_IV={}\n", base64_encode(_iv));
     } else if (_command == "invoke") {
       auto _method = _vm["method"].as<std::string>();
       auto _signature = _vm["signature"].as<std::string>();

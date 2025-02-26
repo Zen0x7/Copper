@@ -85,13 +85,13 @@ class response : public components::shared_enabled<response> {
 /**
  * Create response from HTTP response
  *
- * @param session
+ * @param session_id
  * @param request
  * @param service_response
  * @return
  */
 components::shared<response> response_from_response(
-    components::uuid session, const components::shared<request> &request,
+    components::uuid session_id, const components::shared<request> &request,
     const components::response &service_response);
 
 }  // namespace copper::models

@@ -18,23 +18,15 @@ response controller::make_response(const request &request,
                                    const status_code status,
                                    const std::string &data, const char *type,
                                    const long start_at) const {
-  response _response{};
+  response _response{status, request.version()};
 
-  _response.set(fields::content_type, type);
-  _response.set(fields::allow, request.method_string());
-  const std::string _allowed_headers =
-      "Accept,Authorization,Content-Type,X-Requested-With";
-
-  _response.set(fields::access_control_allow_headers, _allowed_headers);
   const auto _allowed_origins =
       state_->get_configuration()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
-  _response.set("X-Server", "Copper");
-  _response.version(request.version());
   _response.keep_alive(request.keep_alive());
-  _response.result(status);
+  _response.set(fields::content_type, type);
 
   if (!request["Accept-Encoding"].empty() &&
       boost::contains(request["Accept-Encoding"], "gzip")) {
@@ -47,6 +39,7 @@ response controller::make_response(const request &request,
   _response.prepare_payload();
 
   const auto _resolved_at = chronos::now();
+  _response.set("X-Server", "Copper");
   _response.set("X-Time", std::to_string(_resolved_at - start_at));
 
   return _response;
@@ -55,23 +48,15 @@ response controller::make_response(const request &request,
 response controller::make_view(const request &request, const status_code status,
                                const std::string &view, const json::json &data,
                                const char *type, const long start_at) const {
-  response _response{};
+  response _response{status, request.version()};
 
-  _response.set(fields::content_type, type);
-  _response.set(fields::allow, request.method_string());
-  const std::string _allowed_headers =
-      "Accept,Authorization,Content-Type,X-Requested-With";
-
-  _response.set(fields::access_control_allow_headers, _allowed_headers);
   const auto _allowed_origins =
       state_->get_configuration()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
-  _response.set("X-Server", "Copper");
-  _response.version(request.version());
   _response.keep_alive(request.keep_alive());
-  _response.result(status);
+  _response.set(fields::content_type, type);
 
   if (!request["Accept-Encoding"].empty() &&
       boost::contains(request["Accept-Encoding"], "gzip")) {
@@ -84,6 +69,7 @@ response controller::make_view(const request &request, const status_code status,
   _response.prepare_payload();
 
   const auto _resolved_at = chronos::now();
+  _response.set("X-Server", "Copper");
   _response.set("X-Time", std::to_string(_resolved_at - start_at));
 
   return _response;

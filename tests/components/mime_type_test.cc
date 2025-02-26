@@ -5,7 +5,7 @@
 TEST(Components_Filesystem_MimeType, Binary) {
   using namespace copper::components;
 
-  auto _value = mime_type("data.bin");
+  const auto _value = mime_type("data.bin");
 
   ASSERT_EQ(_value, "application/text");
 }
@@ -13,7 +13,7 @@ TEST(Components_Filesystem_MimeType, Binary) {
 TEST(Components_Filesystem_MimeType, Empty) {
   using namespace copper::components;
 
-  auto _value = mime_type("data");
+  const auto _value = mime_type("data");
 
   ASSERT_EQ(_value, "application/text");
 }

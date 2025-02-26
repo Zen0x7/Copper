@@ -5,7 +5,7 @@
 TEST(Components_Report, Call) {
   using namespace copper::components;
 
-  boost::system::error_code _ec;
+  constexpr boost::system::error_code _ec;
 
   report(_ec, "OK");
 }

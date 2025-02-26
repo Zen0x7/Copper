@@ -64,7 +64,8 @@ std::string cache::get_key_for(const request &request, const std::string &ip) {
 }
 
 containers::async_of<std::tuple<bool, int>> cache::can_invoke(
-    const request &request, const std::string &ip, const int &max_requests) {
+    const request &request, const std::string &ip,
+    const int &max_requests) const {
   const auto _key = get_key_for(request, ip);
   const auto _connection = co_await this->get_connection();
 
