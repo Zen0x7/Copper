@@ -54,6 +54,8 @@ class controller : public shared_enabled<controller> {
   controller_configuration configuration_;
 
   // LCOV_EXCL_START
+  explicit controller(const shared<state> &state);
+
   /**
    * Constructor
    */
@@ -82,13 +84,6 @@ class controller : public shared_enabled<controller> {
   virtual containers::map_of_strings rules() const { return {}; }
 
   // LCOV_EXCL_STOP
-
-  /**
-   * Set state
-   *
-   * @param state
-   */
-  void set_state(const shared<state> &state);
 
   /**
    * Set configuration
