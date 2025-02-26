@@ -65,9 +65,14 @@ class expression_result : public shared_enabled<expression_result> {
  */
 class expression : public shared_enabled<expression> {
   /**
-   * Regex expression
+   * Regex
    */
   std::string regex_;
+
+  /**
+   * Pattern
+   */
+  std::regex pattern_;
 
   /**
    * Arguments
