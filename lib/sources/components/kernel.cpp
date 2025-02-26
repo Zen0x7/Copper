@@ -20,6 +20,7 @@
 #include <copper/components/route_match.hpp>
 #include <copper/components/state.hpp>
 #include <copper/components/validator.hpp>
+#include <copper/components/url.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
 
@@ -54,24 +55,21 @@ containers::async_of<
                shared<copper::models::response>, response_generic>>
 kernel::call(uuid session_id, boost::beast::string_view, const request &request,
              const std::string &ip, const uuid &request_id, long now) const {
-  const size_t ask_symbol_position = request.target().find('?');
-  const bool has_query_params = ask_symbol_position != std::string::npos;
-  const std::string url{has_query_params
-                            ? request.target().substr(0, ask_symbol_position)
-                            : request.target()};
+  const std::string _url = url_from_request(request);
+  uuid _user_id;
 
   auto _request =
       models::request_from_request(session_id, request_id, now, request);
 
-  if (const auto route = find_on_routes(request.method(), url);
-      route.has_value()) {
-    containers::unordered_map_of_strings bindings = route.value().bindings_;
+  if (const auto _route = find_on_routes(request.method(), _url);
+      _route.has_value()) {
+    containers::unordered_map_of_strings bindings = _route.value().bindings_;
 
-    route.value().controller_->set_start_at(now);
+    _route.value().controller_->set_start_at(now);
 
-    if (route.value().controller_->configuration_.use_throttler_) {
+    if (_route.value().controller_->configuration_.use_throttler_) {
       if (auto [can, TTL] = co_await state_->get_cache()->can_invoke(
-              request, ip, route.value().controller_->configuration_.rpm_);
+          request, ip, _route.value().controller_->configuration_.rpm_);
           !can) {
         auto _service_response =
             response_too_many_requests(request, now, TTL, state_);
@@ -83,7 +81,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
       }
     }
 
-    if (route.value().controller_->configuration_.use_auth_) {
+    if (_route.value().controller_->configuration_.use_auth_) {
       std::string bearer{request["Authorization"]};
 
       std::string token =
@@ -100,27 +98,27 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
             session_id, _request, _service_response);
 
         _response->protected_ =
-            route.value().controller_->configuration_.use_protector_ == true;
+          _route.value().controller_->configuration_.use_protector_ == true;
 
         co_return std::make_tuple(_request, _response, _service_response);
       };
 
-      route.value().controller_->set_user(user_id.get().id_);
+      _route.value().controller_->set_user(user_id.get().id_);
     }
 
-    route.value().controller_->set_bindings(bindings);
-    route.value().controller_->set_state(state_);
+    _route.value().controller_->set_bindings(bindings);
+    _route.value().controller_->set_state(state_);
 
-    if (route.value().controller_->configuration_.use_validator_) {
+    if (_route.value().controller_->configuration_.use_validator_) {
       boost::system::error_code json_parse_error_code;
 
       json::value value =
           boost::json::parse(request.body(), json_parse_error_code);
 
       if (!json_parse_error_code) {
-        route.value().controller_->set_body(value);
+        _route.value().controller_->set_body(value);
 
-        auto rules = route.value().controller_->rules();
+        auto rules = _route.value().controller_->rules();
 
         if (auto validator = validator_make(rules, value);
             !validator->success_) {
@@ -128,7 +126,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
               json::object({{"message", "The given data was invalid."},
                             {"errors", validator->errors_}});
 
-          auto _service_response = route.value().controller_->make_response(
+          auto _service_response = _route.value().controller_->make_response(
               request, status_code::unprocessable_entity,
               serialize(error_response), "application/json");
 
@@ -136,7 +134,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
               session_id, _request, _service_response);
 
           _response->protected_ =
-              route.value().controller_->configuration_.use_protector_ == true;
+            _route.value().controller_->configuration_.use_protector_ == true;
 
           co_return std::make_tuple(_request, _response, _service_response);
         }
@@ -145,7 +143,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
             {{"message", "The given data was invalid."},
              {"errors", {{"*", "The body must be a valid JSON."}}}});
 
-        auto _service_response = route.value().controller_->make_response(
+        auto _service_response = _route.value().controller_->make_response(
             request, status_code::unprocessable_entity,
             serialize(error_response), "application/json");
 
@@ -153,7 +151,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
             session_id, _request, _service_response);
 
         _response->protected_ =
-            route.value().controller_->configuration_.use_protector_ == true;
+          _route.value().controller_->configuration_.use_protector_ == true;
 
         co_return std::make_tuple(_request, _response, _service_response);
       }
@@ -161,13 +159,13 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
 
     try {
       auto _service_response =
-          co_await route.value().controller_->invoke(request);
+          co_await _route.value().controller_->invoke(request);
 
       auto _response = copper::models::response_from_response(
           session_id, _request, _service_response);
 
       _response->protected_ =
-          route.value().controller_->configuration_.use_protector_ == true;
+        _route.value().controller_->configuration_.use_protector_ == true;
 
       co_return std::make_tuple(_request, _response, _service_response);
     } catch (std::exception &exception) {
@@ -177,17 +175,17 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
           session_id, _request, _service_response);
 
       _response->protected_ =
-          route.value().controller_->configuration_.use_protector_ == true;
+        _route.value().controller_->configuration_.use_protector_ == true;
 
       co_return std::make_tuple(_request, _response, _service_response);
     }
   }
 
   if (request.method() == method::options) {
-    auto available_verbs = get_available_methods(url);
+    auto _available_verbs = get_available_methods(_url);
 
     auto _service_response =
-        response_cors(request, now, available_verbs, state_);
+        response_cors(request, now, _available_verbs, state_);
 
     auto _response = copper::models::response_from_response(
         session_id, _request, _service_response);
