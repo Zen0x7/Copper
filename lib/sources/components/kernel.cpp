@@ -26,11 +26,9 @@
 namespace copper::components {
 
 containers::optional_of<kernel_result> kernel::find_on_routes(
-    const request &request) const {
+    method method, const std::string &url) const {
   for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
-    if (auto [matches, bindings] =
-            route_match(request.method(), request.target(), route);
-        matches) {
+    if (auto [matches, bindings] = route_match(method, url, route); matches) {
       return kernel_result{
           .route_ = route, .controller_ = controller, .bindings_ = bindings};
     }
@@ -40,10 +38,10 @@ containers::optional_of<kernel_result> kernel::find_on_routes(
 }
 
 containers::vector_of<method> kernel::get_available_methods(
-    const request &request) const {
+    const std::string &url) const {
   containers::vector_of<method> methods;
   for (const auto &[route, controller] : *state_->get_router()->get_routes()) {
-    if (auto [matches, bindings] = route_find(request.target(), route); matches)
+    if (auto [matches, bindings] = route_find(url, route); matches)
       methods.push_back(route.method_);
   }
   return methods;
@@ -56,10 +54,17 @@ containers::async_of<
                shared<copper::models::response>, response_generic>>
 kernel::call(uuid session_id, boost::beast::string_view, const request &request,
              const std::string &ip, const uuid &request_id, long now) const {
+  const size_t ask_symbol_position = request.target().find('?');
+  const bool has_query_params = ask_symbol_position != std::string::npos;
+  const std::string url{has_query_params
+                            ? request.target().substr(0, ask_symbol_position)
+                            : request.target()};
+
   auto _request =
       models::request_from_request(session_id, request_id, now, request);
 
-  if (const auto route = find_on_routes(request); route.has_value()) {
+  if (const auto route = find_on_routes(request.method(), url);
+      route.has_value()) {
     containers::unordered_map_of_strings bindings = route.value().bindings_;
 
     route.value().controller_->set_start_at(now);
@@ -179,7 +184,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
   }
 
   if (request.method() == method::options) {
-    auto available_verbs = get_available_methods(request);
+    auto available_verbs = get_available_methods(url);
 
     auto _service_response =
         response_cors(request, now, available_verbs, state_);

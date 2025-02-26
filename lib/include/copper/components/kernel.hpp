@@ -65,16 +65,16 @@ class kernel : public shared_enabled<kernel> {
    * @return optional_of<kernel_result>
    */
   containers::optional_of<kernel_result> find_on_routes(
-      const request &request) const;
+      method method, const std::string &url) const;
 
   /**
    * Get available methods
    *
-   * @param request
+   * @param url
    * @return vector_of<method>
    */
   containers::vector_of<method> get_available_methods(
-      const request &request) const;
+      const std::string &url) const;
 
   /**
    * Call
