@@ -33,6 +33,8 @@ containers::async_of<void> cancel_http_sessions() {
 
 class templated_controller final : public controller {
  public:
+  using controller::controller;
+
   containers::async_of<response> invoke(
       const request &request, const json::value & /*body*/,
       const containers::optional_of<authentication_result> & /*auth*/,
@@ -46,6 +48,8 @@ class templated_controller final : public controller {
 
 class exception_controller final : public controller {
  public:
+  using controller::controller;
+
   containers::async_of<response> invoke(
       const request &request, const json::value & /*body*/,
       const containers::optional_of<authentication_result> & /*auth*/,
@@ -64,6 +68,8 @@ class exception_controller final : public controller {
 
 class params_controller final : public controller {
  public:
+  using controller::controller;
+
   containers::async_of<response> invoke(
       const request &request, const json::value & /*body*/,
       const containers::optional_of<authentication_result> & /*auth*/,
@@ -120,20 +126,22 @@ TEST(Components_HTTP_Session, Implementation) {
     _state->get_database()->start();
 
     _state->get_router()
-        ->push(method::get, "/api/up",
-               boost::make_shared<copper::controllers::api::up_controller>(),
-               {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
+        ->push(
+            method::get, "/api/up",
+            boost::make_shared<copper::controllers::api::up_controller>(_state),
+            {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(method::get, "/api/templated",
-               boost::make_shared<templated_controller>(),
+               boost::make_shared<templated_controller>(_state),
                {.use_throttler_ = false, .use_protector_ = false})
         ->push(method::get, "/api/params/{name}",
-               boost::make_shared<params_controller>(),
+               boost::make_shared<params_controller>(_state),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(method::get, "/api/exception",
-               boost::make_shared<exception_controller>(),
+               boost::make_shared<exception_controller>(_state),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(method::get, "/api/user",
-               boost::make_shared<copper::controllers::api::user_controller>(),
+               boost::make_shared<copper::controllers::api::user_controller>(
+                   _state),
                {
                    .use_auth_ = true,
                    .use_throttler_ = true,
@@ -141,7 +149,8 @@ TEST(Components_HTTP_Session, Implementation) {
                    .rpm_ = 5,
                })
         ->push(method::post, "/api/auth",
-               boost::make_shared<copper::controllers::api::auth_controller>(),
+               boost::make_shared<copper::controllers::api::auth_controller>(
+                   _state),
                {
                    .use_throttler_ = true,
                    .use_validator_ = true,

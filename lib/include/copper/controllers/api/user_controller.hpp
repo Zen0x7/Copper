@@ -15,6 +15,8 @@ namespace copper::controllers::api {
  */
 class user_controller final : public components::controller {
  public:
+  using controller::controller;
+
   /**
    * Invoke
    *

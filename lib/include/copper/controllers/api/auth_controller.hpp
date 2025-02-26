@@ -16,6 +16,8 @@ namespace copper::controllers::api {
  */
 class auth_controller final : public components::controller {
  public:
+  using controller::controller;
+
   /**
    * Rules
    *

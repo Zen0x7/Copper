@@ -68,10 +68,6 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
     containers::unordered_map_of_strings _bindings;
     boost::optional<authentication_result> _user;
 
-    if (_route.value().controller_->count_ == 0) {
-      _route.value().controller_->set_state(state_);
-    }
-
     ++_route.value().controller_->count_;
 
     _bindings = _route.value().bindings_;
