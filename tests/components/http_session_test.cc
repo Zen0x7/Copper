@@ -193,8 +193,6 @@ TEST(Components_HTTP_Session, Implementation) {
     for (auto _i = _threads; _i > 0; --_i)
       _v.emplace_back([&_ioc] { _ioc.run(); });
 
-    sleep(1);
-
     boost::asio::ip::tcp::resolver _resolver(_client_ioc);
     boost::beast::tcp_stream _stream(_client_ioc);
 
@@ -1073,12 +1071,8 @@ TEST(Components_HTTP_Session, Implementation) {
 
     _client_ioc.run();
 
-    sleep(5);
-
     co_spawn(make_strand(_ioc), cancel_http_sessions(), boost::asio::detached);
     _ioc.stop();
-
-    sleep(5);
 
     for (auto &t : _v) t.join();
 

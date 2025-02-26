@@ -99,8 +99,6 @@ TEST(Components_WebSocket_Session, Implementation) {
     for (auto i = _threads; i > 0; --i)
       _v.emplace_back([&_ioc] { _ioc.run(); });
 
-    sleep(1);
-
     boost::asio::ip::tcp::resolver _resolver(_client_ioc);
 
     std::string _host = "127.0.0.1";
@@ -142,13 +140,9 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     _client_ioc.run();
 
-    sleep(5);
-
     co_spawn(make_strand(_ioc), cancel_websocket_session(),
              boost::asio::detached);
     _ioc.stop();
-
-    sleep(5);
 
     for (auto &t : _v) t.join();
 
