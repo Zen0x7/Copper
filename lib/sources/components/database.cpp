@@ -106,7 +106,7 @@ containers::async_of<void> database::create_session(const uuid session_id,
                                   to_string(session_id), ip, port, _now),
         _result);
   } catch (boost::mysql::error_with_diagnostics &error) {
-    logger_->on_database_error("session_closed", error);
+    logger_->on_database_error("create_session", error);
   }
 }
 

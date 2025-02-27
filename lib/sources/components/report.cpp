@@ -1,12 +1,13 @@
 #include <openssl/err.h>
 
 #include <copper/components/report.hpp>
+#include <iostream>
 
 namespace copper::components {
 
-void report(boost::beast::error_code /* ec */, const char* /* what */) {
-  //  std::cerr << boost::stacktrace::stacktrace() << '\n';
-  //  std::cerr << what << ": " << ec.message() << "\n";
+void report(const boost::beast::error_code& ec, const char* what) {
+  std::cerr << boost::stacktrace::stacktrace() << '\n';
+  std::cerr << what << ": " << ec.message() << "\n";
 }
 
 // LCOV_EXCL_START

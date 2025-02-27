@@ -27,11 +27,6 @@ class state;
  * Logger
  */
 class logger : public shared_enabled<logger> {
-  /**
-   * State
-   */
-  shared<state> state_;
-
  public:
   /**
    * System
@@ -56,8 +51,7 @@ class logger : public shared_enabled<logger> {
   /**
    * Constructor
    */
-  explicit logger(const shared<configuration>& configuration,
-                  const shared<state>& state);
+  explicit logger(const shared<configuration>& configuration);
 
   /**
    * On database error

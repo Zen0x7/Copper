@@ -23,9 +23,7 @@ typename boost::shared_ptr<T> logger_to_shared(
                               boost::bind(&logger_do_release<T>, p, _1));
 }
 
-logger::logger(const shared<configuration>& configuration,
-               const shared<state>& state)
-    : state_(state) {
+logger::logger(const shared<configuration>& configuration) {
   const auto _max_size = configuration->get()->logging_max_size_;
   const auto _max_files = configuration->get()->logging_max_files_;
   auto _generator = boost::uuids::random_generator();
