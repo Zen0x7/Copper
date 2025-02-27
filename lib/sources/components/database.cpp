@@ -129,23 +129,6 @@ containers::async_of<void> database::session_closed(const uuid session_id,
   }
 }
 
-containers::async_of<void> database::session_is_encrypted(
-    const uuid session_id) {
-  try {
-    auto _connection = co_await pool_->async_get_connection(
-        boost::asio::cancel_after(std::chrono::seconds(10)));
-
-    boost::mysql::results _result;
-    co_await _connection->async_execute(
-        boost::mysql::with_params(
-            "UPDATE sessions SET is_encrypted = true WHERE id = {}",
-            to_string(session_id)),
-        _result);
-  } catch (boost::mysql::error_with_diagnostics &error) {
-    logger_->on_database_error("session_is_encrypted", error);
-  }
-}
-
 containers::async_of<void> database::session_is_upgrade(const uuid session_id) {
   try {
     auto _connection = co_await pool_->async_get_connection(

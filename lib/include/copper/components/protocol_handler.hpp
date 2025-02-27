@@ -16,12 +16,10 @@ namespace copper::components {
  * @param doc_root
  * @return async_of<void>
  */
-containers::async_of<void> protocol_handler(
-    shared<state> state, uuid server_id, uuid session_id,
-    typename boost::beast::tcp_stream::rebind_executor<
-        boost::asio::strand<boost::asio::io_context::executor_type> >::other
-        stream,
-    boost::asio::ssl::context &ctx, boost::beast::string_view doc_root);
+containers::async_of<void> protocol_handler(shared<state> state, uuid server_id,
+                                            uuid session_id,
+                                            boost::beast::tcp_stream stream,
+                                            boost::beast::string_view doc_root);
 
 }  // namespace copper::components
 

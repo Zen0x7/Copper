@@ -98,10 +98,6 @@ TEST(Components_HTTP_Session, Implementation) {
 
     boost::asio::io_context _ioc{_threads};
 
-    boost::asio::ssl::context _ctx{boost::asio::ssl::context::tlsv12};
-
-    load_server_certificate(_ctx);
-
     auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
 
     boost::mysql::pool_params _database_params;
@@ -158,17 +154,16 @@ TEST(Components_HTTP_Session, Implementation) {
                    .rpm_ = 5,
                });
 
-    co_spawn(
-        make_strand(_ioc),
-        listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
-        _task_group->adapt([](const std::exception_ptr &e) {
-          if (e) {
-            try {
-              std::rethrow_exception(e);
-            } catch (std::exception & /*e*/) {
-            }
-          }
-        }));
+    co_spawn(make_strand(_ioc),
+             listener(_server_id, _state, _task_group, _endpoint, _doc_root),
+             _task_group->adapt([](const std::exception_ptr &e) {
+               if (e) {
+                 try {
+                   std::rethrow_exception(e);
+                 } catch (std::exception & /*e*/) {
+                 }
+               }
+             }));
 
     co_spawn(make_strand(_ioc), subscriber(_state),
              _task_group->adapt([](const std::exception_ptr &e) {
@@ -228,7 +223,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -265,7 +259,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(_response.count("X-Time") > 0);
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -305,7 +298,6 @@ TEST(Components_HTTP_Session, Implementation) {
                                      R"(<!doctype html>)"));
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -342,7 +334,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(_response.body(), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -383,7 +374,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -418,7 +408,6 @@ TEST(Components_HTTP_Session, Implementation) {
         ASSERT_TRUE(boost::starts_with(_response.body(), R"({"timestamp":)"));
 
         std::cout << _response << std::endl << std::endl << std::endl;
-        ;
 
         _buffer.clear();
         _response.clear();
@@ -454,7 +443,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(_response.body(), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -493,7 +481,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -527,7 +514,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(_response.body(), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -565,7 +551,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -726,7 +711,6 @@ TEST(Components_HTTP_Session, Implementation) {
                                   "Password provided doesn't match."));
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -768,7 +752,6 @@ TEST(Components_HTTP_Session, Implementation) {
                                   "Email provided isn't registered."));
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -805,7 +788,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(boost::contains(_response.body(), "hello"));
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -843,7 +825,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(boost::contains(_response.body(), "hello"));
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -877,7 +858,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(_response.body(), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -915,7 +895,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -949,7 +928,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(_response.body(), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -987,7 +965,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_EQ(gunzip_decompress(_response.body()), "{}");
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -1021,7 +998,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(boost::starts_with(_response.body(), R"(<!doctype html>)"));
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -1031,7 +1007,7 @@ TEST(Components_HTTP_Session, Implementation) {
       // Templated
       boost::beast::flat_buffer _buffer;
       response _response;
-      request _request{method::get, "/api/templated", 11};
+      request _request{method::get, "/api/templated", 10};
 
       _request.set(fields::host, _host);
       _request.set(fields::accept, "text/html");
@@ -1055,7 +1031,6 @@ TEST(Components_HTTP_Session, Implementation) {
       ASSERT_TRUE(boost::starts_with(_response.body(), R"(<!doctype html>)"));
 
       std::cout << _response << std::endl << std::endl << std::endl;
-      ;
 
       _buffer.clear();
       _response.clear();
@@ -1065,6 +1040,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, _ec);
     if (_ec && _ec != boost::system::errc::not_connected) {
+      std::cout << _ec.message() << std::endl;
     }
 
     _stream.close();
