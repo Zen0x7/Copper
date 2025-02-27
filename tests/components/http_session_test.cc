@@ -1007,11 +1007,10 @@ TEST(Components_HTTP_Session, Implementation) {
       // Templated
       boost::beast::flat_buffer _buffer;
       response _response;
-      request _request{method::get, "/api/templated", 11};
+      request _request{method::get, "/api/templated", 10};
 
       _request.set(fields::host, _host);
       _request.set(fields::accept, "text/html");
-      _request.set(fields::connection, "close");
 
       boost::beast::http::write(_stream, _request);
       boost::beast::http::read(_stream, _buffer, _response);
@@ -1041,6 +1040,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, _ec);
     if (_ec && _ec != boost::system::errc::not_connected) {
+      std::cout << _ec.message() << std::endl;
     }
 
     _stream.close();
