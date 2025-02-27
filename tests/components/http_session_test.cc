@@ -98,10 +98,6 @@ TEST(Components_HTTP_Session, Implementation) {
 
     boost::asio::io_context _ioc{_threads};
 
-    boost::asio::ssl::context _ctx{boost::asio::ssl::context::tlsv12};
-
-    load_server_certificate(_ctx);
-
     auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
 
     boost::mysql::pool_params _database_params;
@@ -158,17 +154,16 @@ TEST(Components_HTTP_Session, Implementation) {
                    .rpm_ = 5,
                });
 
-    co_spawn(
-        make_strand(_ioc),
-        listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
-        _task_group->adapt([](const std::exception_ptr &e) {
-          if (e) {
-            try {
-              std::rethrow_exception(e);
-            } catch (std::exception & /*e*/) {
-            }
-          }
-        }));
+    co_spawn(make_strand(_ioc),
+             listener(_server_id, _state, _task_group, _endpoint, _doc_root),
+             _task_group->adapt([](const std::exception_ptr &e) {
+               if (e) {
+                 try {
+                   std::rethrow_exception(e);
+                 } catch (std::exception & /*e*/) {
+                 }
+               }
+             }));
 
     co_spawn(make_strand(_ioc), subscriber(_state),
              _task_group->adapt([](const std::exception_ptr &e) {

@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <copper/components/shared.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/beast/websocket/stream.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
+#include <boost/beast/websocket/stream.hpp>
+#include <copper/components/shared.hpp>
 
 namespace copper::components {
 class websocket : public shared<websocket> {

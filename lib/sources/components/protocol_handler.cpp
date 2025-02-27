@@ -6,8 +6,7 @@ namespace copper::components {
 
 containers::async_of<void> protocol_handler(
     shared<state> state, uuid server_id, uuid session_id,
-    boost::beast::tcp_stream stream, boost::asio::ssl::context &ctx,
-    boost::beast::string_view doc_root) {
+    boost::beast::tcp_stream stream, boost::beast::string_view doc_root) {
   auto _executor = co_await boost::asio::this_coro::executor;
 
   boost::beast::flat_buffer _buffer;

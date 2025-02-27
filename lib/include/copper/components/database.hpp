@@ -93,14 +93,6 @@ class database : public shared_enabled<database> {
                                             const char exception[]);
 
   /**
-   * Session is encrypted
-   *
-   * @param session_id
-   * @return async_of<void>
-   */
-  containers::async_of<void> session_is_encrypted(uuid session_id);
-
-  /**
    * Session is upgraded
    *
    * @param session_id

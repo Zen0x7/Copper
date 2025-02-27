@@ -19,7 +19,6 @@ namespace copper::components {
 containers::async_of<void> protocol_handler(shared<state> state, uuid server_id,
                                             uuid session_id,
                                             boost::beast::tcp_stream stream,
-                                            boost::asio::ssl::context &ctx,
                                             boost::beast::string_view doc_root);
 
 }  // namespace copper::components

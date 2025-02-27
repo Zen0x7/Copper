@@ -160,7 +160,7 @@ int run(int argc, const char *argv[]) {
   if (_as == "service") {
     co_spawn(
         make_strand(_ioc),
-        listener(_server_id, _state, _task_group, _ctx, _endpoint, _doc_root),
+        listener(_server_id, _state, _task_group, _endpoint, _doc_root),
         _task_group->adapt([_state, _server_id](const std::exception_ptr &e) {
           if (e) {
             try {

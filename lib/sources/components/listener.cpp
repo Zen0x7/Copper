@@ -9,7 +9,6 @@ namespace copper::components {
 containers::async_of<void> listener(boost::uuids::uuid server_id,
                                     shared<state> state,
                                     shared<task_group> task_group,
-                                    boost::asio::ssl::context &ctx,
                                     boost::asio::ip::tcp::endpoint endpoint,
                                     boost::beast::string_view doc_root) {
   auto _cs = co_await boost::asio::this_coro::cancellation_state;
@@ -56,16 +55,13 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
 
     co_spawn(std::move(_socket_executor),
              protocol_handler(state, server_id, _session_id,
-                              boost::beast::tcp_stream{std::move(_socket)}, ctx,
+                              boost::beast::tcp_stream{std::move(_socket)},
                               doc_root),
 
              // LCOV_EXCL_START
              task_group->adapt([server_id, _session_id, _executor,
                                 &state](const std::exception_ptr &e) {
-               // LCOV_EXCL_STOP
-
                if (e) {
-                 // LCOV_EXCL_START
                  try {
                    std::rethrow_exception(e);
                  } catch (std::exception &exception) {
@@ -78,9 +74,9 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                        "[{}] Connection [{}] error [{}]", to_string(server_id),
                        to_string(_session_id), exception.what());
                  }
-                 // LCOV_EXCL_STOP
                }
              }));
+    // LCOV_EXCL_STOP
   }
 }
 
