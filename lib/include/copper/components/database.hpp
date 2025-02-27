@@ -18,6 +18,10 @@
 #include <copper/models/user.hpp>
 
 namespace copper::components {
+/**
+ * Forward logger
+ */
+class logger;
 
 /**
  * Database
@@ -28,13 +32,20 @@ class database : public shared_enabled<database> {
    */
   shared<boost::mysql::connection_pool> pool_;
 
+  /**
+   * Logger
+   */
+  shared<logger> logger_;
+
  public:
   /**
    * Constructor
    *
    * @param pool
+   * @param logger
    */
-  database(const shared<boost::mysql::connection_pool> &pool);
+  database(const shared<boost::mysql::connection_pool> &pool,
+           const shared<logger> &logger);
 
   /**
    * Start
@@ -56,7 +67,8 @@ class database : public shared_enabled<database> {
    * @param id
    * @return shared<models::user>
    */
-  containers::async_of<shared<models::user>> get_user_by_id(uuid id);
+  containers::async_of<containers::optional_of<shared<models::user>>>
+  get_user_by_id(uuid id);
 
   /**
    * Creates a session

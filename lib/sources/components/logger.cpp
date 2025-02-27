@@ -36,5 +36,16 @@ logger::logger(const shared<configuration>& configuration) {
 
   requests_ = logger_to_shared(spdlog::rotating_logger_mt(
       to_string(_generator()), "./logs/requests.log", _max_size, _max_files));
+
+  errors_ = logger_to_shared(spdlog::rotating_logger_mt(
+      to_string(_generator()), "./logs/errors.log", _max_size, _max_files));
+}
+
+void logger::on_database_error(
+    std::string_view where,
+    const boost::mysql::error_with_diagnostics& error) const {
+  errors_->info("[MySQL] [{}] [{}] [{}] [{}]", where, error.what(),
+                error.get_diagnostics().client_message(),
+                error.get_diagnostics().server_message());
 }
 }  // namespace copper::components
