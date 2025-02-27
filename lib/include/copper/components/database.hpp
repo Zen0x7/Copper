@@ -67,7 +67,8 @@ class database : public shared_enabled<database> {
    * @param id
    * @return shared<models::user>
    */
-  containers::async_of<containers::optional_of<shared<models::user>>> get_user_by_id(uuid id);
+  containers::async_of<containers::optional_of<shared<models::user>>>
+  get_user_by_id(uuid id);
 
   /**
    * Creates a session

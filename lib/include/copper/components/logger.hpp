@@ -65,7 +65,9 @@ class logger : public shared_enabled<logger> {
    * @param where
    * @param error
    */
-  void on_database_error(std::string_view where, const boost::mysql::error_with_diagnostics& error) const;
+  void on_database_error(
+      std::string_view where,
+      const boost::mysql::error_with_diagnostics& error) const;
 };
 }  // namespace copper::components
 

@@ -43,7 +43,9 @@ logger::logger(const shared<configuration>& configuration,
       to_string(_generator()), "./logs/errors.log", _max_size, _max_files));
 }
 
-void logger::on_database_error(std::string_view where, const boost::mysql::error_with_diagnostics &error) const {
+void logger::on_database_error(
+    std::string_view where,
+    const boost::mysql::error_with_diagnostics& error) const {
   errors_->info("[MySQL] [{}] [{}] [{}] [{}]", where, error.what(),
                 error.get_diagnostics().client_message(),
                 error.get_diagnostics().server_message());
