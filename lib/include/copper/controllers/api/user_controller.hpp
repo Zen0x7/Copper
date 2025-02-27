@@ -36,12 +36,12 @@ class user_controller final : public components::controller {
         co_await state_->get_database()->get_user_by_id(auth.value().id_);
 
     const components::json::object _data = {
-        {"id", _user->id_},
-        {"name", _user->name_},
-        {"email", _user->email_},
-        {"email_verified_at", _user->email_verified_at_},
-        {"created_at", _user->created_at_},
-        {"updated_at", _user->updated_at_},
+        {"id", _user.value()->id_},
+        {"name", _user.value()->name_},
+        {"email", _user.value()->email_},
+        {"email_verified_at", _user.value()->email_verified_at_},
+        {"created_at", _user.value()->created_at_},
+        {"updated_at", _user.value()->updated_at_},
     };
 
     co_return make_response(request, components::status_code::ok,

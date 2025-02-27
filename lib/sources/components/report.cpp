@@ -18,6 +18,7 @@ void report_for_openssl() {
   _error_output.append(_error_message);
   throw std::runtime_error(_error_output.c_str());
 }
+
 // LCOV_EXCL_STOP
 
 }  // namespace copper::components

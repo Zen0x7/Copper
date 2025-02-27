@@ -49,6 +49,11 @@ class state : public shared_enabled<state> {
   shared<configuration> configuration_;
 
   /**
+   * Logger
+   */
+  shared<logger> logger_;
+
+  /**
    * Router
    */
   shared<router> router_;
@@ -67,11 +72,6 @@ class state : public shared_enabled<state> {
    * Views
    */
   shared<views> views_;
-
-  /**
-   * Views
-   */
-  shared<logger> logger_;
 
  public:
   /**
