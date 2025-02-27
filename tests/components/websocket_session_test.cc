@@ -35,10 +35,8 @@ TEST(Components_WebSocket_Session, Implementation) {
     boost::asio::io_context _ioc{_threads};
 
     ssl::context _ctx{ssl::context::tlsv12};
-    ssl::context _client_ctx{ssl::context::tlsv12};
 
     load_server_certificate(_ctx);
-    load_root_certificates(_client_ctx);
 
     auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
 
@@ -104,25 +102,16 @@ TEST(Components_WebSocket_Session, Implementation) {
     std::string _host = "127.0.0.1";
     auto const _results = _resolver.resolve(_host, "9002");
 
-    boost::beast::websocket::stream<ssl::stream<boost::asio::ip::tcp::socket>>
-        _ws(_client_ioc, _client_ctx);
+    boost::beast::websocket::stream<boost::asio::ip::tcp::socket> _ws(_client_ioc);
 
     auto _ep =
         boost::asio::connect(boost::beast::get_lowest_layer(_ws), _results);
 
-    if (!SSL_set_tlsext_host_name(_ws.next_layer().native_handle(),
-                                  _host.c_str()))
-      throw boost::beast::system_error(
-          boost::beast::error_code(static_cast<int>(ERR_get_error()),
-                                   boost::asio::error::get_ssl_category()),
-          "Failed to set SNI Hostname");
-
     _host += ':' + std::to_string(_ep.port());
-
-    _ws.next_layer().handshake(ssl::stream_base::client);
 
     _ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(
         boost::beast::role_type::client));
+
     _ws.set_option(boost::beast::websocket::stream_base::decorator(
         [](boost::beast::websocket::request_type &req) {
           req.set(boost::beast::http::field::user_agent, "Copper");
