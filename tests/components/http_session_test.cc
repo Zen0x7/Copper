@@ -36,13 +36,10 @@ class templated_controller final : public controller {
   using controller::controller;
 
   containers::async_of<response> invoke(
-      const request &request, const json::value & /*body*/,
-      const containers::optional_of<authentication_result> & /*auth*/,
-      const containers::unordered_map_of_strings & /*bindings*/,
-      const long start_at) override {
+      const shared<controller_parameters> &parameters) override {
     const json::json _data;
-    co_return make_view(request, status_code::ok, "template", _data,
-                        "text/html", start_at);
+    co_return make_view(parameters, status_code::ok, "template", _data,
+                        "text/html");
   }
 };
 
@@ -51,18 +48,15 @@ class exception_controller final : public controller {
   using controller::controller;
 
   containers::async_of<response> invoke(
-      const request &request, const json::value & /*body*/,
-      const containers::optional_of<authentication_result> & /*auth*/,
-      const containers::unordered_map_of_strings & /*bindings*/,
-      const long start_at) override {
+      const shared<controller_parameters> &parameters) override {
     throw std::runtime_error("Something went wrong");
     auto _now = chronos::now();
     const json::object _data = {{"message", "Request has been processed."},
                                 {"data", "pong"},
                                 {"timestamp", _now},
                                 {"status", 200}};
-    co_return make_response(request, status_code::ok, serialize(_data),
-                            "application/json", start_at);
+    co_return make_response(parameters, status_code::ok, serialize(_data),
+                            "application/json");
   }
 };
 
@@ -71,17 +65,14 @@ class params_controller final : public controller {
   using controller::controller;
 
   containers::async_of<response> invoke(
-      const request &request, const json::value & /*body*/,
-      const containers::optional_of<authentication_result> & /*auth*/,
-      const containers::unordered_map_of_strings &bindings,
-      const long start_at) override {
+      const shared<controller_parameters> &parameters) override {
     auto _now = chronos::now();
     const json::object _data = {{"message", "Request has been processed."},
-                                {"data", bindings.at("name")},
+                                {"data", parameters->get_bindings().at("name")},
                                 {"timestamp", _now},
                                 {"status", 200}};
-    co_return make_response(request, status_code::ok, serialize(_data),
-                            "application/json", start_at);
+    co_return make_response(parameters, status_code::ok, serialize(_data),
+                            "application/json");
   }
 };
 
