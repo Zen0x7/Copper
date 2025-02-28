@@ -23,7 +23,7 @@
 
 namespace copper {
 
-std::string get_version() { return "5.0.0"; }
+std::string get_version() { return "6.0.0"; }
 
 // LCOV_EXCL_START
 int run(int argc, const char *argv[]) {
