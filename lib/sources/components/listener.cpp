@@ -3,6 +3,7 @@
 #include <copper/components/listener.hpp>
 #include <copper/components/logger.hpp>
 #include <copper/components/state.hpp>
+#include <iostream>
 
 namespace copper::components {
 
@@ -53,18 +54,19 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                  _socket.remote_endpoint().port()),
              boost::asio::detached);
 
+    // LCOV_EXCL_START
     co_spawn(std::move(_socket_executor),
              protocol_handler(state, server_id, _session_id,
                               boost::beast::tcp_stream{std::move(_socket)},
                               doc_root),
 
-             // LCOV_EXCL_START
              task_group->adapt([server_id, _session_id, _executor,
                                 &state](const std::exception_ptr &e) {
                if (e) {
                  try {
                    std::rethrow_exception(e);
                  } catch (std::exception &exception) {
+                   std::cout << "Exception happens" << std::endl;
                    co_spawn(_executor,
                             state->get_database()->session_closed(
                                 _session_id, exception.what()),

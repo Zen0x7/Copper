@@ -27,26 +27,20 @@ class custom_controller final : public components::controller {
      * Invoke 
      */
     components::containers::async_of<components::response> invoke(
-          const components::request &request,
-          const components::json::value & body,
-          const components::containers::optional_of<
-          const components::authentication_result> & auth,
-          const components::containers::unordered_map_of_strings & bindings,
-          const long start_at
+          const components::controller_parameters &parameters
     ) override {
         auto _now = components::chronos::now();
         
         const components::json::object _data = {{"timestamp", _now}};
         
         co_return make_response(
-            request,
+            parameters,
             components::status_code::ok,
             serialize(_data),
-            "application/json",
-             start_at
+            "application/json"
         );
     }
-} 
+}
 ```
 
 After that, you can push the controller to the **router**:

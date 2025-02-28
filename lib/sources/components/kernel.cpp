@@ -22,6 +22,7 @@
 #include <copper/components/validator.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
+#include <iostream>
 
 namespace copper::components {
 
@@ -64,9 +65,9 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
 
   if (const auto _route = find_on_routes(request.method(), _url);
       _route.has_value()) {
-    json::value _body;
-    containers::unordered_map_of_strings _bindings;
-    boost::optional<authentication_result> _user;
+    json::value _body = {};
+    containers::unordered_map_of_strings _bindings = {};
+    boost::optional<authentication_result> _user = boost::none;
 
     ++_route.value().controller_->count_;
 
@@ -123,8 +124,10 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
                             {"errors", _validator->errors_}});
 
           auto _service_response = _route.value().controller_->make_response(
-              request, status_code::unprocessable_entity,
-              serialize(_error_response), "application/json");
+              boost::make_shared<controller_parameters>(request, _body, _user,
+                                                        _bindings, start_at),
+              status_code::unprocessable_entity, serialize(_error_response),
+              "application/json");
 
           auto _response =
               response_from_response(session_id, _request, _service_response);
@@ -140,8 +143,10 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
              {"errors", {{"*", "The body must be a valid JSON."}}}});
 
         auto _service_response = _route.value().controller_->make_response(
-            request, status_code::unprocessable_entity,
-            serialize(_error_response), "application/json");
+            boost::make_shared<controller_parameters>(request, _body, _user,
+                                                      _bindings, start_at),
+            status_code::unprocessable_entity, serialize(_error_response),
+            "application/json");
 
         auto _response =
             response_from_response(session_id, _request, _service_response);
@@ -155,7 +160,8 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
 
     try {
       auto _service_response = co_await _route.value().controller_->invoke(
-          request, _body, _user, _bindings, start_at);
+          boost::make_shared<controller_parameters>(request, _body, _user,
+                                                    _bindings, start_at));
 
       auto _response =
           response_from_response(session_id, _request, _service_response);

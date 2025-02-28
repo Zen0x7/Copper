@@ -14,22 +14,21 @@ void controller::set_configuration(
   configuration_ = configuration;
 }
 
-response controller::make_response(const request &request,
-                                   const status_code status,
-                                   const std::string &data, const char *type,
-                                   const long start_at) const {
-  response _response{status, request.version()};
+response controller::make_response(
+    const shared<controller_parameters> &parameters, const status_code status,
+    const std::string &data, const char *type) const {
+  response _response{status, parameters->get_request().version()};
 
   const auto _allowed_origins =
       state_->get_configuration()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
-  _response.keep_alive(request.keep_alive());
+  _response.keep_alive(parameters->get_request().keep_alive());
   _response.set(fields::content_type, type);
 
-  if (!request["Accept-Encoding"].empty() &&
-      boost::contains(request["Accept-Encoding"], "gzip")) {
+  if (!parameters->get_request()["Accept-Encoding"].empty() &&
+      boost::contains(parameters->get_request()["Accept-Encoding"], "gzip")) {
     _response.body() = gunzip_compress(data);
     _response.set(fields::content_encoding, "gzip");
   } else {
@@ -40,26 +39,28 @@ response controller::make_response(const request &request,
 
   const auto _resolved_at = chronos::now();
   _response.set("X-Server", "Copper");
-  _response.set("X-Time", std::to_string(_resolved_at - start_at));
+  _response.set("X-Time",
+                std::to_string(_resolved_at - parameters->get_start_at()));
 
   return _response;
 }
 
-response controller::make_view(const request &request, const status_code status,
+response controller::make_view(const shared<controller_parameters> &parameters,
+                               const status_code status,
                                const std::string &view, const json::json &data,
-                               const char *type, const long start_at) const {
-  response _response{status, request.version()};
+                               const char *type) const {
+  response _response{status, parameters->get_request().version()};
 
   const auto _allowed_origins =
       state_->get_configuration()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
-  _response.keep_alive(request.keep_alive());
+  _response.keep_alive(parameters->get_request().keep_alive());
   _response.set(fields::content_type, type);
 
-  if (!request["Accept-Encoding"].empty() &&
-      boost::contains(request["Accept-Encoding"], "gzip")) {
+  if (!parameters->get_request()["Accept-Encoding"].empty() &&
+      boost::contains(parameters->get_request()["Accept-Encoding"], "gzip")) {
     _response.body() = gunzip_compress(state_->get_views()->render(view, data));
     _response.set(fields::content_encoding, "gzip");
   } else {
@@ -70,7 +71,8 @@ response controller::make_view(const request &request, const status_code status,
 
   const auto _resolved_at = chronos::now();
   _response.set("X-Server", "Copper");
-  _response.set("X-Time", std::to_string(_resolved_at - start_at));
+  _response.set("X-Time",
+                std::to_string(_resolved_at - parameters->get_start_at()));
 
   return _response;
 }

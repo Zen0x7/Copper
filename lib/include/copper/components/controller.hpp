@@ -13,6 +13,7 @@
 #include <copper/components/chronos.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/controller_configuration.hpp>
+#include <copper/components/controller_parameters.hpp>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/json.hpp>
@@ -67,11 +68,7 @@ class controller : public shared_enabled<controller> {
    * @return async_of<response>
    */
   virtual containers::async_of<response> invoke(
-      const request & /*request*/, const json::value & /*body*/,
-      const containers::optional_of<authentication_result> & /*auth*/,
-      const containers::unordered_map_of_strings & /*bindings*/,
-      const long /*start_at*/
-  ) {
+      const shared<controller_parameters> & /*parameters*/) {
     response response;
     co_return response;
   };
@@ -95,32 +92,31 @@ class controller : public shared_enabled<controller> {
   /**
    * Make response
    *
-   * @param request
+   * @param parameters
    * @param status
    * @param data
    * @param type
-   * @param start_at
    * @return response
    */
-  response make_response(const request &request, status_code status,
-                         const std::string &data,
-                         const char *type = "text/html",
-                         long start_at = 0) const;
+  response make_response(const shared<controller_parameters> &parameters,
+                         status_code status, const std::string &data,
+                         const char *type = "text/html") const;
 
   /**
    * Make view
    *
-   * @param request
+   * @param parameters
    * @param status
    * @param view
    * @param data
    * @param type
-   * @param start_at
    * @return response
    */
-  response make_view(const request &request, status_code status,
-                     const std::string &view, const json::json &data,
-                     const char *type = "text/html", long start_at = 0) const;
+  response make_view(
+
+      const shared<controller_parameters> &parameters, status_code status,
+      const std::string &view, const json::json &data,
+      const char *type = "text/html") const;
 };
 
 }  // namespace copper::components
