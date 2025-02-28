@@ -65,9 +65,9 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
 
   if (const auto _route = find_on_routes(request.method(), _url);
       _route.has_value()) {
-    json::value _body;
-    containers::unordered_map_of_strings _bindings;
-    boost::optional<authentication_result> _user;
+    json::value _body = {};
+    containers::unordered_map_of_strings _bindings = {};
+    boost::optional<authentication_result> _user = boost::none;
 
     ++_route.value().controller_->count_;
 
