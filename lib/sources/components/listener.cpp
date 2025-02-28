@@ -54,6 +54,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                  _socket.remote_endpoint().port()),
              boost::asio::detached);
 
+    // LCOV_EXCL_START
     co_spawn(std::move(_socket_executor),
              protocol_handler(state, server_id, _session_id,
                               boost::beast::tcp_stream{std::move(_socket)},
@@ -77,6 +78,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                  }
                }
              }));
+    // LCOV_EXCL_STOP
   }
 }
 

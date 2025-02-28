@@ -68,7 +68,7 @@ class controller : public shared_enabled<controller> {
    * @return async_of<response>
    */
   virtual containers::async_of<response> invoke(
-      const shared<controller_parameters> &/*parameters*/) {
+      const shared<controller_parameters> & /*parameters*/) {
     response response;
     co_return response;
   };
