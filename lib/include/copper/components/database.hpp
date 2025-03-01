@@ -8,21 +8,13 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/thread_pool.hpp>
 #include <boost/mysql/connection_pool.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/shared.hpp>
-#include <copper/components/uuid.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
 #include <copper/models/user.hpp>
 
 namespace copper::components {
-/**
- * Forward logger
- */
-class logger;
 
 /**
  * Database
@@ -95,7 +87,7 @@ class database : public shared_enabled<database> {
   containers::async_of<void> session_is_upgrade(uuid session_id);
 
   /**
-   * Creates a invocation
+   * Create invocation
    *
    * @param request
    * @param response

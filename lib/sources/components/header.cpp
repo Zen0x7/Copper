@@ -1,3 +1,4 @@
+#include <boost/json/serialize.hpp>
 #include <copper/components/header.hpp>
 
 namespace copper::components {

@@ -2,8 +2,10 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
 #include <boost/json/parse.hpp>
 #include <boost/json/serialize.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/controller.hpp>
@@ -15,7 +17,6 @@
 #include <copper/components/router.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/signal_handler.hpp>
-#include <copper/components/state.hpp>
 #include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/controllers/api/auth_controller.hpp>

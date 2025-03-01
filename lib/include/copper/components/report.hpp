@@ -9,7 +9,6 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/beast/core/error.hpp>
-#include <boost/stacktrace.hpp>
 
 #ifndef BOOST_STACKTRACE_USE_ADDR2LINE
 #define BOOST_STACKTRACE_USE_ADDR2LINE

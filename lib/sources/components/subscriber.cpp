@@ -1,4 +1,11 @@
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/consign.hpp>
+#include <boost/asio/redirect_error.hpp>
+#include <boost/asio/signal_set.hpp>
+#include <boost/redis/connection.hpp>
+#include <copper/components/cache.hpp>
 #include <copper/components/subscriber.hpp>
+#include <iostream>
 
 namespace copper::components {
 containers::async_of<void> subscriber() {

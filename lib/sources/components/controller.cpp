@@ -1,8 +1,10 @@
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/smart_ptr.hpp>
+#include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/controller.hpp>
+#include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
-#include <copper/components/state.hpp>
 #include <copper/components/views.hpp>
 
 namespace copper::components {

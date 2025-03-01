@@ -8,30 +8,20 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/strand.hpp>
 #include <boost/atomic.hpp>
-#include <boost/json/serialize.hpp>
-#include <boost/smart_ptr.hpp>
-#include <copper/components/authentication.hpp>
-#include <copper/components/chronos.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/controller_configuration.hpp>
 #include <copper/components/controller_parameters.hpp>
-#include <copper/components/dotenv.hpp>
-#include <copper/components/fields.hpp>
 #include <copper/components/json.hpp>
-#include <copper/components/request.hpp>
 #include <copper/components/response.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/status_code.hpp>
 #include <copper/components/uuid.hpp>
 
 namespace copper::components {
-
-class state;
-
+/**
+ * Controller
+ */
 class controller : public shared_enabled<controller> {
  public:
   /**

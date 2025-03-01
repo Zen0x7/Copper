@@ -14,8 +14,6 @@
 #include <boost/mysql/error_with_diagnostics.hpp>
 #include <copper/components/shared.hpp>
 
-#include "spdlog/sinks/basic_file_sink.h"
-
 namespace copper::components {
 
 /**

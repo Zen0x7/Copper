@@ -1,3 +1,4 @@
+#include <boost/uuid/random_generator.hpp>
 #include <copper/components/uuid.hpp>
 #include <copper/models/response.hpp>
 

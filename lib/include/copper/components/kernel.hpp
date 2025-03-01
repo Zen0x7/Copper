@@ -25,11 +25,6 @@
 namespace copper::components {
 
 /**
- * Forward state
- */
-class state;
-
-/**
  * Forward controller
  */
 class controller;

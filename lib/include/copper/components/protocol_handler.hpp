@@ -9,7 +9,6 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <copper/components/session_handler.hpp>
-#include <copper/models/session.hpp>
 
 namespace copper::components {
 

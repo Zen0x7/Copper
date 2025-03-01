@@ -1,3 +1,7 @@
+#include <boost/asio/as_tuple.hpp>
+#include <boost/beast/core/detect_ssl.hpp>
+#include <boost/beast/ssl/ssl_stream.hpp>
+#include <copper/components/report.hpp>
 #include <copper/components/websocket.hpp>
 #include <copper/components/websocket_handler.hpp>
 

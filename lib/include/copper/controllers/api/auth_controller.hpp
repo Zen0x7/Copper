@@ -8,11 +8,13 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/json/serialize.hpp>
 #include <boost/lexical_cast.hpp>
 #include <copper/components/authentication.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/controller.hpp>
+#include <copper/components/database.hpp>
 #include <copper/components/json.hpp>
 
 namespace copper::controllers::api {

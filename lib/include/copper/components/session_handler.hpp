@@ -8,23 +8,9 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/asio/co_spawn.hpp>
-#include <boost/asio/detached.hpp>
-#include <boost/beast/core/error.hpp>
-#include <boost/uuid/random_generator.hpp>
-#include <copper/components/chronos.hpp>
-#include <copper/components/configuration.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/database.hpp>
-#include <copper/components/header.hpp>
-#include <copper/components/kernel.hpp>
-#include <copper/components/logger.hpp>
-#include <copper/components/report.hpp>
-#include <copper/components/state.hpp>
 #include <copper/components/websocket_handler.hpp>
 #include <copper/models/request.hpp>
-#include <copper/models/response.hpp>
-#include <copper/models/session.hpp>
 
 namespace copper::components {
 
