@@ -37,7 +37,7 @@ std::string base64url_decode(const std::string &input) {
   int _value_b = -8;
   for (const char _character : input) {
     if (_character == '=') break;
-    _value = (_value << 6) + base64url_map_charset_[_character];
+    _value = (_value << 6) + base64url_map_charset_.at(_character);
     _value_b += 6;
     if (_value_b >= 0) {
       _output.push_back(static_cast<char>(_value >> _value_b & 0xFF));
