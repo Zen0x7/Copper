@@ -45,8 +45,7 @@ class auth_controller final : public controller {
     const std::string _password{
         parameters->get_body().as_object().at("password").as_string()};
 
-    const auto _user =
-        co_await state_->get_database()->get_user_by_email(_email);
+    const auto _user = co_await database::instance()->get_user_by_email(_email);
 
     if (!_user.has_value()) {
       const json::object _errors = {

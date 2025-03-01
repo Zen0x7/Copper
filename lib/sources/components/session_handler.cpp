@@ -1,8 +1,7 @@
 #include <copper/components/session_handler.hpp>
 
 namespace copper::components {
-containers::async_of<void> session_handler(shared<state> state, uuid server_id,
-                                           uuid session_id,
+containers::async_of<void> session_handler(uuid server_id, uuid session_id,
                                            boost::beast::tcp_stream &stream,
                                            boost::beast::flat_buffer &buffer,
                                            boost::beast::string_view doc_root) {
@@ -23,18 +22,18 @@ containers::async_of<void> session_handler(shared<state> state, uuid server_id,
     if (_ec == boost::beast::http::error::end_of_stream) co_return;
 
     if (boost::beast::websocket::is_upgrade(_parser.get())) {
-      co_spawn(_executor, state->get_database()->session_is_upgrade(session_id),
+      co_spawn(_executor, database::instance()->session_is_upgrade(session_id),
                boost::asio::detached);
 
       get_lowest_layer(stream).expires_never();
 
-      co_await websocket_handler(state, server_id, session_id, stream, buffer,
+      co_await websocket_handler(server_id, session_id, stream, buffer,
                                  _parser.release(), doc_root);
 
       co_return;
     }
 
-    const auto _kernel = boost::make_shared<kernel>(state);
+    const auto _kernel = boost::make_shared<kernel>();
 
     if (_ec == boost::beast::error::timeout) {
       throw boost::system::system_error{_ec};
@@ -58,7 +57,7 @@ containers::async_of<void> session_handler(shared<state> state, uuid server_id,
       co_await boost::beast::async_write(stream, std::move(_generic_response));
 
       co_spawn(_executor,
-               state->get_database()->create_invocation(_request, _response),
+               database::instance()->create_invocation(_request, _response),
                boost::asio::detached);
 
       logger::instance()->requests_->info(
@@ -71,7 +70,7 @@ containers::async_of<void> session_handler(shared<state> state, uuid server_id,
 
     co_await boost::beast::async_write(stream, std::move(_generic_response));
     co_spawn(_executor,
-             state->get_database()->create_invocation(_request, _response),
+             database::instance()->create_invocation(_request, _response),
              boost::asio::detached);
 
     logger::instance()->requests_->info(

@@ -36,29 +36,10 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
 
-    boost::mysql::pool_params _database_params;
-    _database_params.server_address.emplace_host_and_port(
-        _configuration->get()->database_host_,
-        _configuration->get()->database_port_);
-
-    _database_params.username = _configuration->get()->database_user_;
-    _database_params.password = _configuration->get()->database_password_;
-    _database_params.database = _configuration->get()->database_name_;
-    _database_params.thread_safe =
-        _configuration->get()->database_pool_thread_safe_;
-    _database_params.initial_size =
-        _configuration->get()->database_pool_initial_size_;
-    _database_params.max_size = _configuration->get()->database_pool_max_size_;
-
-    auto _database_pool = boost::make_shared<boost::mysql::connection_pool>(
-        _ioc, std::move(_database_params));
-
-    auto _state = boost::make_shared<state>(_database_pool);
-
-    _state->get_database()->start();
+    database::setup(_ioc);
 
     co_spawn(make_strand(_ioc),
-             listener(_server_id, _state, _task_group, _endpoint, _doc_root),
+             listener(_server_id, _task_group, _endpoint, _doc_root),
              _task_group->adapt([](const std::exception_ptr &e) {
                if (e) {
                  try {

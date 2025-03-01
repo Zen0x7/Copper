@@ -35,11 +35,6 @@ class controller : public shared_enabled<controller> {
   virtual ~controller() = default;
 
   /**
-   * State
-   */
-  shared<state> state_;
-
-  /**
    * Auth ID
    */
   uuid auth_id_;

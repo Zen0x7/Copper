@@ -9,11 +9,16 @@
 
 namespace copper::components {
 
-state::state(const shared<boost::mysql::connection_pool>& pool)
-    : database_(boost::make_shared<database>(pool)) {
-  views::instance()->push("404", "404");
+state::state() { views::instance()->push("404", "404"); }
+
+shared<state> state::instance_ = nullptr;
+
+std::once_flag state::initialization_flag_;
+
+shared<state> state::instance() {
+  std::call_once(initialization_flag_,
+                 [] { instance_ = boost::make_shared<state>(); });
+
+  return instance_->shared_from_this();
 }
-
-shared<database> state::get_database() { return database_; }
-
 }  // namespace copper::components

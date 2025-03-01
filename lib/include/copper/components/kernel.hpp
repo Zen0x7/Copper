@@ -46,18 +46,11 @@ struct kernel_result {
  * Kernel
  */
 class kernel : public shared_enabled<kernel> {
-  /**
-   * State
-   */
-  shared<state> state_;
-
  public:
   /**
    * Constructor
-   *
-   * @param state
    */
-  explicit kernel(const shared<state> &state) : state_(state) {}
+  explicit kernel() {}
 
   /**
    * Find on routes
@@ -65,8 +58,8 @@ class kernel : public shared_enabled<kernel> {
    * @param url
    * @return optional_of<kernel_result>
    */
-  static containers::optional_of<kernel_result> find_on_routes(
-      method method, const std::string &url);
+  containers::optional_of<kernel_result> find_on_routes(
+      method method, const std::string &url) const;
 
   /**
    * Get available methods
@@ -74,8 +67,8 @@ class kernel : public shared_enabled<kernel> {
    * @param url
    * @return vector_of<method>
    */
-  static containers::vector_of<method> get_available_methods(
-      const std::string &url);
+  containers::vector_of<method> get_available_methods(
+      const std::string &url) const;
 
   /**
    * Call

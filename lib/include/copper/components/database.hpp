@@ -102,6 +102,23 @@ class database : public shared_enabled<database> {
    */
   containers::async_of<void> create_invocation(
       shared<models::request> request, shared<models::response> response);
+
+  /**
+   * Get instance
+   *
+   * @return shared<cache>
+   */
+  static shared<database> instance();
+
+  /**
+   * Instance
+   */
+  static shared<database> instance_;
+
+  /**
+   * Setup
+   */
+  static void setup(boost::asio::io_context &context);
 };
 
 }  // namespace copper::components

@@ -16,8 +16,7 @@ namespace copper::components {
  * @param doc_root
  * @return async_of<void>
  */
-containers::async_of<void> protocol_handler(shared<state> state, uuid server_id,
-                                            uuid session_id,
+containers::async_of<void> protocol_handler(uuid server_id, uuid session_id,
                                             boost::beast::tcp_stream stream,
                                             boost::beast::string_view doc_root);
 

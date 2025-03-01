@@ -10,58 +10,32 @@
 namespace copper::components {
 
 /**
- * Forward cache
- */
-class cache;
-
-/**
- * Forward Router
- */
-class router;
-
-/**
- * Forward configuration
- */
-class configuration;
-
-/**
- * Forward database
- */
-class database;
-
-/**
- * Forward views
- */
-class views;
-
-/**
- * Forward logger
- */
-class logger;
-
-/**
  * State
  */
 class state : public shared_enabled<state> {
-  /**
-   * Database
-   */
-  shared<database> database_;
-
  public:
   /**
    * Constructor
-   *
-   * @param pool
    */
-  state(const shared<boost::mysql::connection_pool>& pool);
+  state();
 
   /**
-   * Get database
+   * Get instance
    *
-   * @return shared<database>
+   * @return shared<state>
    */
-  shared<database> get_database();
+  static shared<state> instance();
+
+ private:
+  /**
+   * Instance
+   */
+  static shared<state> instance_;
+
+  /**
+   * Initialization flag
+   */
+  static std::once_flag initialization_flag_;
 };
 
 }  // namespace copper::components
