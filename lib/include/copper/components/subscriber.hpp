@@ -19,13 +19,13 @@
 #include <iostream>
 
 namespace copper::components {
+
 /**
  * Subscriber
  *
- * @param state
  * @return async_of<void>
  */
-containers::async_of<void> subscriber(const shared<state>& state);
+containers::async_of<void> subscriber();
 }  // namespace copper::components
 
 #endif

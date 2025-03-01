@@ -74,7 +74,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
     _bindings = _route.value().bindings_;
 
     if (_route.value().controller_->configuration_.use_throttler_) {
-      if (auto [_can, _TTL] = co_await state_->get_cache()->can_invoke(
+      if (auto [_can, _TTL] = co_await cache::instance()->can_invoke(
               request, ip, _route.value().controller_->configuration_.rpm_);
           !_can) {
         auto _service_response =

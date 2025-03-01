@@ -27,7 +27,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
       {"event", "server_registered"},
       {"data", {{"id", to_string(server_id)}}}};
 
-  co_await state->get_cache()->publish("events", serialize(_server_registered));
+  co_await cache::instance()->publish("events", serialize(_server_registered));
 
   logger::instance()->system_->info("[{}] Server is open",
                                     to_string(server_id));

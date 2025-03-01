@@ -70,7 +70,7 @@ TEST(Components_WebSocket_Session, Implementation) {
                }
              }));
 
-    co_spawn(make_strand(_ioc), subscriber(_state),
+    co_spawn(make_strand(_ioc), subscriber(),
              _task_group->adapt([](const std::exception_ptr &e) {
                if (e) {
                  try {

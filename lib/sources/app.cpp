@@ -174,7 +174,7 @@ int run(int argc, const char *argv[]) {
         }));
 
     co_spawn(
-        make_strand(_ioc), subscriber(_state),
+        make_strand(_ioc), subscriber(),
         _task_group->adapt([_state, _server_id](const std::exception_ptr &e) {
           if (e) {
             try {

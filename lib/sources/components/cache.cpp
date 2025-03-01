@@ -125,4 +125,15 @@ containers::async_of<void> cache::publish(const std::string &channel,
   co_await _connection->async_exec(_request, boost::redis::ignore,
                                    boost::asio::deferred);
 }
+
+shared<cache> cache::instance_ = nullptr;
+
+std::once_flag cache::initialization_flag_;
+
+shared<cache> cache::instance() {
+  std::call_once(initialization_flag_,
+                 [] { instance_ = boost::make_shared<cache>(); });
+
+  return instance_->shared_from_this();
+}
 }  // namespace copper::components
