@@ -1,3 +1,8 @@
+//          Copyright Ian Torres 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef BOOST_BIND_GLOBAL_PLACEHOLDERS
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #endif
