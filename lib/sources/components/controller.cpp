@@ -20,7 +20,7 @@ response controller::make_response(
   response _response{status, parameters->get_request().version()};
 
   const auto _allowed_origins =
-      state_->get_configuration()->get()->http_allowed_origins_;
+      configuration::instance()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
@@ -52,7 +52,7 @@ response controller::make_view(const shared<controller_parameters> &parameters,
   response _response{status, parameters->get_request().version()};
 
   const auto _allowed_origins =
-      state_->get_configuration()->get()->http_allowed_origins_;
+      configuration::instance()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
@@ -61,10 +61,10 @@ response controller::make_view(const shared<controller_parameters> &parameters,
 
   if (!parameters->get_request()["Accept-Encoding"].empty() &&
       boost::contains(parameters->get_request()["Accept-Encoding"], "gzip")) {
-    _response.body() = gunzip_compress(state_->get_views()->render(view, data));
+    _response.body() = gunzip_compress(views::instance()->render(view, data));
     _response.set(fields::content_encoding, "gzip");
   } else {
-    _response.body() = state_->get_views()->render(view, data);
+    _response.body() = views::instance()->render(view, data);
   }
 
   _response.prepare_payload();

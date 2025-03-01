@@ -21,8 +21,7 @@ class state;
  * @param state
  * @return response
  */
-response response_exception(const request& request, long start_at,
-                            const shared<state>& state);
+response response_exception(const request& request, long start_at);
 
 }  // namespace copper::components
 

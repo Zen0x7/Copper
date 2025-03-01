@@ -128,7 +128,7 @@ int run(int argc, const char *argv[]) {
   auto _state = boost::make_shared<state>(_database_pool);
 
   if (_as == "service") {
-    _state->get_logger()->system_->info(
+    logger::instance()->system_->info(
         "[{}] Server is running on [{}:{}]", to_string(_server_id),
         _configuration->get()->app_host_, _configuration->get()->app_port_);
 
@@ -166,7 +166,7 @@ int run(int argc, const char *argv[]) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &exception) {
-              _state->get_logger()->system_->info(
+              logger::instance()->system_->info(
                   "[{}] Something went wrong: [{}] on [{}]",
                   to_string(_server_id), exception.what(), "listener");
             }
@@ -180,7 +180,7 @@ int run(int argc, const char *argv[]) {
             try {
               std::rethrow_exception(e);
             } catch (std::exception &exception) {
-              _state->get_logger()->system_->info(
+              logger::instance()->system_->info(
                   "[{}] Something went wrong: [{}] on [{}]",
                   to_string(_server_id), exception.what(), "subscriber");
             }
@@ -198,8 +198,8 @@ int run(int argc, const char *argv[]) {
 
     for (auto &t : _threads_container) t.join();
 
-    _state->get_logger()->system_->info("[{}] Server has been shutdown",
-                                        to_string(_server_id));
+    logger::instance()->system_->info("[{}] Server has been shutdown",
+                                      to_string(_server_id));
   } else {
     if (const auto _command = _vm["command"].as<std::string>();
         _command == "keygen") {

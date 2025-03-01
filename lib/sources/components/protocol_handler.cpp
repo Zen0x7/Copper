@@ -33,9 +33,9 @@ containers::async_of<void> protocol_handler(
                                                  "The socket was closed"),
            boost::asio::detached);
 
-  state->get_logger()->sessions_->info("[{}] Connection [{}] closed",
-                                       to_string(server_id),
-                                       to_string(session_id));
+  logger::instance()->sessions_->info("[{}] Connection [{}] closed",
+                                      to_string(server_id),
+                                      to_string(session_id));
 
   if (!stream.socket().is_open()) co_return;
 

@@ -29,8 +29,8 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
 
   co_await state->get_cache()->publish("events", serialize(_server_registered));
 
-  state->get_logger()->system_->info("[{}] Server is open",
-                                     to_string(server_id));
+  logger::instance()->system_->info("[{}] Server is open",
+                                    to_string(server_id));
 
   while (!_cs.cancelled()) {
     auto _socket_executor = make_strand(_executor.get_inner_executor());
@@ -43,7 +43,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
 
     auto _session_id = _generator();
 
-    state->get_logger()->sessions_->info(
+    logger::instance()->sessions_->info(
         "[{}] Connection [{}] from [{}:{}] accepted", to_string(server_id),
         to_string(_session_id), _socket.remote_endpoint().address().to_string(),
         _socket.remote_endpoint().port());
@@ -72,7 +72,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                                 _session_id, exception.what()),
                             boost::asio::detached);
 
-                   state->get_logger()->sessions_->info(
+                   logger::instance()->sessions_->info(
                        "[{}] Connection [{}] error [{}]", to_string(server_id),
                        to_string(_session_id), exception.what());
                  }

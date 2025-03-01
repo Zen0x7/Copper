@@ -78,7 +78,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
               request, ip, _route.value().controller_->configuration_.rpm_);
           !_can) {
         auto _service_response =
-            response_too_many_requests(request, start_at, _TTL, state_);
+            response_too_many_requests(request, start_at, _TTL);
 
         auto _response =
             response_from_response(session_id, _request, _service_response);
@@ -94,11 +94,10 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
           boost::starts_with(_bearer, "Bearer ") ? _bearer.substr(7) : _bearer;
 
       _user = authentication_from_bearer(
-          _bearer, state_->get_configuration()->get()->app_key_);
+          _bearer, configuration::instance()->get()->app_key_);
 
       if (!_user.has_value()) {
-        auto _service_response =
-            response_unauthorized(request, start_at, state_);
+        auto _service_response = response_unauthorized(request, start_at);
 
         auto _response =
             response_from_response(session_id, _request, _service_response);
@@ -171,7 +170,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
 
       co_return std::make_tuple(_request, _response, _service_response);
     } catch (std::exception & /*exception*/) {
-      auto _service_response = response_exception(request, start_at, state_);
+      auto _service_response = response_exception(request, start_at);
 
       auto _response =
           response_from_response(session_id, _request, _service_response);
@@ -186,8 +185,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
   if (request.method() == method::options) {
     auto _available_verbs = get_available_methods(_url);
 
-    auto _service_response =
-        response_cors(request, start_at, _available_verbs, state_);
+    auto _service_response = response_cors(request, start_at, _available_verbs);
 
     auto _response =
         response_from_response(session_id, _request, _service_response);
@@ -196,7 +194,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
   }
 
   if (request_is_illegal(request)) {
-    auto _service_response = response_bad_request(request, start_at, state_);
+    auto _service_response = response_bad_request(request, start_at);
 
     auto _response =
         response_from_response(session_id, _request, _service_response);
@@ -204,7 +202,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request &request,
     co_return std::make_tuple(_request, _response, _service_response);
   }
 
-  auto _service_response = response_not_found(request, start_at, state_);
+  auto _service_response = response_not_found(request, start_at);
 
   auto _response =
       response_from_response(session_id, _request, _service_response);

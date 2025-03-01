@@ -10,11 +10,11 @@
 namespace copper::components {
 
 response response_too_many_requests(const request &request, const long start_at,
-                                    const int ttl, const shared<state> &state) {
+                                    const int ttl) {
   response _response{status_code::too_many_requests, request.version()};
 
   const auto _allowed_origins =
-      state->get_configuration()->get()->http_allowed_origins_;
+      configuration::instance()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 

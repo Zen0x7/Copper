@@ -10,8 +10,7 @@
 
 namespace copper::components {
 
-response response_not_found(const request &request, const long start_at,
-                            const shared<state> &state) {
+response response_not_found(const request &request, const long start_at) {
   response _response{status_code::not_found, request.version()};
 
   const bool _requires_html =
@@ -19,7 +18,7 @@ response response_not_found(const request &request, const long start_at,
       boost::contains(request.at(fields::accept), "html");
 
   const auto _allowed_origins =
-      state->get_configuration()->get()->http_allowed_origins_;
+      configuration::instance()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 
@@ -35,13 +34,13 @@ response response_not_found(const request &request, const long start_at,
       boost::contains(request["Accept-Encoding"], "gzip")) {
     _response.set(fields::content_encoding, "gzip");
     if (_requires_html) {
-      _response.body() = gunzip_compress(state->get_views()->render("404"));
+      _response.body() = gunzip_compress(views::instance()->render("404"));
     } else {
       _response.body() = gunzip_compress("{}");
     }
   } else {
     if (_requires_html) {
-      _response.body() = state->get_views()->render("404");
+      _response.body() = views::instance()->render("404");
     } else {
       _response.body() = "{}";
     }

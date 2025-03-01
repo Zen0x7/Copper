@@ -13,8 +13,7 @@
 namespace copper::components {
 
 response response_cors(const request &request, const long start_at,
-                       const containers::vector_of<method> &methods,
-                       const shared<state> &state) {
+                       const containers::vector_of<method> &methods) {
   response _response{
       methods.empty() ? status_code::method_not_allowed : status_code::ok,
       request.version()};
@@ -29,7 +28,7 @@ response response_cors(const request &request, const long start_at,
   const std::string _allowed_headers = "Accept,Authorization,Content-Type";
   _response.set(fields::access_control_allow_headers, _allowed_headers);
   const auto _allowed_origins =
-      state->get_configuration()->get()->http_allowed_origins_;
+      configuration::instance()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 

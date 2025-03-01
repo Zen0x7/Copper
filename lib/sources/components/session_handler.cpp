@@ -13,7 +13,7 @@ containers::async_of<void> session_handler(shared<state> state, uuid server_id,
 
   while (!_cs.cancelled()) {
     boost::beast::http::request_parser<boost::beast::http::string_body> _parser;
-    _parser.body_limit(state->get_configuration()->get()->http_body_limit_);
+    _parser.body_limit(configuration::instance()->get()->http_body_limit_);
 
     auto [_ec, _] = co_await boost::beast::http::async_read(
         stream, buffer, _parser, boost::asio::as_tuple);
@@ -61,7 +61,7 @@ containers::async_of<void> session_handler(shared<state> state, uuid server_id,
                state->get_database()->create_invocation(_request, _response),
                boost::asio::detached);
 
-      state->get_logger()->requests_->info(
+      logger::instance()->requests_->info(
           "[{}] [{}] [{}] {} {} {} {}", to_string(server_id),
           to_string(session_id), to_string(_request_id), _request->version_,
           _request->method_, _request->path_, _response->status_code_);
@@ -74,7 +74,7 @@ containers::async_of<void> session_handler(shared<state> state, uuid server_id,
              state->get_database()->create_invocation(_request, _response),
              boost::asio::detached);
 
-    state->get_logger()->requests_->info(
+    logger::instance()->requests_->info(
         "[{}] [{}] [{}] {} {} {} {}", to_string(server_id),
         to_string(session_id), to_string(_request_id), _request->version_,
         _request->method_, _request->path_, _response->status_code_);
