@@ -77,11 +77,9 @@ class state : public shared_enabled<state> {
   /**
    * Constructor
    *
-   * @param configuration
    * @param pool
    */
-  state(const shared<configuration>& configuration,
-        const shared<boost::mysql::connection_pool>& pool);
+  state(const shared<boost::mysql::connection_pool>& pool);
 
   /**
    * Get configuration

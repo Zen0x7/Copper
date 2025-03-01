@@ -22,8 +22,6 @@ class configuration;
  * Cache
  */
 class cache : public shared_enabled<cache> {
-  shared<configuration> configuration_;
-
   /**
    * Configuration
    */
@@ -32,9 +30,8 @@ class cache : public shared_enabled<cache> {
  public:
   /**
    * Constructor
-   * @param configuration
    */
-  cache(const shared<configuration> &configuration);
+  cache();
 
   /**
    * Retrieve connection

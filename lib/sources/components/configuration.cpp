@@ -59,4 +59,15 @@ configuration::configuration() {
 }
 
 shared<configurations> configuration::get() { return values_; }
+
+shared<configuration> configuration::instance_ = nullptr;
+
+std::once_flag configuration::initialization_flag_;
+
+shared<configuration> configuration::instance() {
+  std::call_once(initialization_flag_,
+                 [] { instance_ = boost::make_shared<configuration>(); });
+
+  return instance_->shared_from_this();
+}
 }  // namespace copper::components

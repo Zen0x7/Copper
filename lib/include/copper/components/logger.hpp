@@ -51,7 +51,7 @@ class logger : public shared_enabled<logger> {
   /**
    * Constructor
    */
-  explicit logger(const shared<configuration>& configuration);
+  explicit logger();
 
   /**
    * On database error
@@ -62,6 +62,24 @@ class logger : public shared_enabled<logger> {
   void on_database_error(
       std::string_view where,
       const boost::mysql::error_with_diagnostics& error) const;
+
+  /**
+   * Get instance
+   *
+   * @return shared<logger>
+   */
+  static shared<logger> instance();
+
+ private:
+  /**
+   * Instance
+   */
+  static shared<logger> instance_;
+
+  /**
+   * Initialization flag
+   */
+  static std::once_flag initialization_flag_;
 };
 }  // namespace copper::components
 

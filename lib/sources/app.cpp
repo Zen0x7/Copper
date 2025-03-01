@@ -125,7 +125,7 @@ int run(int argc, const char *argv[]) {
   auto _database_pool = boost::make_shared<boost::mysql::connection_pool>(
       _ioc, std::move(_database_params));
 
-  auto _state = boost::make_shared<state>(_configuration, _database_pool);
+  auto _state = boost::make_shared<state>(_database_pool);
 
   if (_as == "service") {
     _state->get_logger()->system_->info(

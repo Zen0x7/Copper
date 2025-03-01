@@ -34,7 +34,8 @@ TEST(Components_Expression, Assertions) {
   ASSERT_EQ(_multi_expression->get_arguments().at(1), "y");
   ASSERT_EQ(_multi_expression->get_arguments().at(2), "z");
 
-  const auto _multi_expression_result = _multi_expression->query("/u/c80b/d/5/x/7");
+  const auto _multi_expression_result =
+      _multi_expression->query("/u/c80b/d/5/x/7");
 
   ASSERT_TRUE(_multi_expression_result->matches());
   ASSERT_FALSE(_multi_expression_result->get_bindings().empty());
