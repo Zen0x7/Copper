@@ -204,7 +204,7 @@ void database::setup(boost::asio::io_context &context) {
 
   instance_ = boost::make_shared<database>(
       boost::make_shared<boost::mysql::connection_pool>(
-          context, std::move(_database_params)));
+          make_strand(context), std::move(_database_params)));
 
   instance_->start();
 }

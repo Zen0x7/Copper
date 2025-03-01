@@ -18,6 +18,7 @@
 #include <copper/components/route_find.hpp>
 #include <copper/components/route_match.hpp>
 #include <copper/components/router.hpp>
+#include <copper/components/routes.hpp>
 #include <copper/components/url.hpp>
 #include <copper/components/validator.hpp>
 #include <copper/models/request.hpp>
@@ -28,11 +29,14 @@ namespace copper::components {
 
 containers::optional_of<kernel_result> kernel::find_on_routes(
     const method method, const std::string &url) const {
-  for (const auto &[_route, _controller] : *router::instance()->get_routes()) {
-    if (auto [_matches, _bindings] = route_match(method, url, _route);
+  auto _router = router::instance();
+
+  for (auto _item : *_router->get_routes()) {
+    if (auto [_matches, _bindings] = route_match(method, url, _item.first);
         _matches) {
-      return kernel_result{
-          .route_ = _route, .controller_ = _controller, .bindings_ = _bindings};
+      return kernel_result{.route_ = _item.first,
+                           .controller_ = _item.second,
+                           .bindings_ = _bindings};
     }
   }
 
@@ -41,10 +45,11 @@ containers::optional_of<kernel_result> kernel::find_on_routes(
 
 containers::vector_of<method> kernel::get_available_methods(
     const std::string &url) const {
+  auto _router = router::instance();
   containers::vector_of<method> _methods;
-  for (const auto &[_route, _controller] : *router::instance()->get_routes()) {
-    if (auto [_matches, _bindings] = route_find(url, _route); _matches)
-      _methods.push_back(_route.method_);
+  for (auto _item : *_router->get_routes()) {
+    if (auto [_matches, _bindings] = route_find(url, _item.first); _matches)
+      _methods.push_back(_item.first.method_);
   }
   return _methods;
   // LCOV_EXCL_START

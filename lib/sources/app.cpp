@@ -222,6 +222,7 @@ int run(int argc, const char *argv[]) {
   }
 
   sentry_close();
+  database::instance_.reset();
   return EXIT_SUCCESS;
 }
 

@@ -66,6 +66,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                    std::rethrow_exception(e);
                  } catch (std::exception &exception) {
                    std::cout << "Exception happens" << std::endl;
+                   std::cout << exception.what() << std::endl;
                    co_spawn(_executor,
                             database::instance()->session_closed(
                                 _session_id, exception.what()),

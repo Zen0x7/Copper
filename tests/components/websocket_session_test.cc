@@ -114,6 +114,8 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     ASSERT_TRUE(true);
 
+    database::instance_.reset();
+
   } catch (std::runtime_error &e) {
     std::cout << e.what() << std::endl;
   } catch (std::exception &e) {

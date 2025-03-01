@@ -73,7 +73,6 @@ class params_controller final : public controller {
 TEST(Components_HTTP_Session, Implementation) {
   try {
     auto _server_id = boost::uuids::random_generator()();
-    auto _configuration = configuration::instance();
 
     auto const _address = boost::asio::ip::make_address("0.0.0.0");
     constexpr auto _port = 9001;
@@ -84,6 +83,8 @@ TEST(Components_HTTP_Session, Implementation) {
     boost::asio::io_context _ioc{_threads};
 
     auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
+
+    const auto _configuration = configuration::instance();
 
     database::setup(_ioc);
 
@@ -1016,6 +1017,8 @@ TEST(Components_HTTP_Session, Implementation) {
     for (auto &t : _v) t.join();
 
     ASSERT_TRUE(true);
+
+    database::instance_.reset();
 
   } catch (std::runtime_error &e) {
     std::cout << e.what() << std::endl;
