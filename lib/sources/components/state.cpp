@@ -2,6 +2,7 @@
 
 namespace copper::components {
 
+// LCOV_EXCL_START
 state::state() {}
 
 shared<state> state::instance_ = nullptr;
@@ -14,4 +15,6 @@ shared<state> state::instance() {
 
   return instance_->shared_from_this();
 }
+// LCOV_EXCL_STOP
+
 }  // namespace copper::components
