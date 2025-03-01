@@ -18,27 +18,36 @@ Copper is a featured components collection also HTTP/WebSockets base project.
 You can create **controllers** using the following syntax:
 
 ```c++
-/**
- * Custom Controller
- */
-class custom_controller final : public components::controller {
+#include <copper/components/controller.hpp>
+
+#include <copper/components/chronos.hpp>
+#include <copper/components/json.hpp>
+
+namespace copper::controllers::api {
+    using namespace copper::components;
 
     /**
-     * Invoke 
+     * Custom Controller
      */
-    components::containers::async_of<components::response> invoke(
-          const components::controller_parameters &parameters
-    ) override {
-        auto _now = components::chronos::now();
-        
-        const components::json::object _data = {{"timestamp", _now}};
-        
-        co_return make_response(
-            parameters,
-            components::status_code::ok,
-            serialize(_data),
-            "application/json"
-        );
+    class custom_controller final : public components::controller {
+    
+        /**
+         * Invoke 
+         */
+        components::containers::async_of<components::response> invoke(
+              const components::controller_parameters &parameters
+        ) override {
+            auto _now = components::chronos::now();
+            
+            const components::json::object _data = {{"timestamp", _now}};
+            
+            co_return make_response(
+                parameters,
+                components::status_code::ok,
+                serialize(_data),
+                "application/json"
+            );
+        }
     }
 }
 ```
@@ -46,9 +55,9 @@ class custom_controller final : public components::controller {
 After that, you can push the controller to the **router**:
 
 ```c++
-router->push(
+router::instance()->push(
     method::get, "/api/custom",
-    boost::make_shared<custom_controller>(state),
+    boost::make_shared<custom_controller>(),
     {
         .use_auth_ = true,
         .use_throttler_ = true,
@@ -68,3 +77,7 @@ And finally, you can use any HTTP client or the binary.
 ### TODO
 
 Showcase more features ...
+
+## License
+
+This software is released PARTIALLY based on his derivative source licenses and ALL OTHERS uses the repository license. 
