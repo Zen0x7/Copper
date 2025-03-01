@@ -31,12 +31,11 @@ containers::optional_of<kernel_result> kernel::find_on_routes(
     const method method, const std::string &url) const {
   auto _router = router::instance();
 
-  for (auto _item : *_router->get_routes()) {
-    if (auto [_matches, _bindings] = route_match(method, url, _item.first);
+  for (const auto &[_route, _controller] : *_router->get_routes()) {
+    if (auto [_matches, _bindings] = route_match(method, url, _route);
         _matches) {
-      return kernel_result{.route_ = _item.first,
-                           .controller_ = _item.second,
-                           .bindings_ = _bindings};
+      return kernel_result{
+          .route_ = _route, .controller_ = _controller, .bindings_ = _bindings};
     }
   }
 
@@ -47,9 +46,9 @@ containers::vector_of<method> kernel::get_available_methods(
     const std::string &url) const {
   auto _router = router::instance();
   containers::vector_of<method> _methods;
-  for (auto _item : *_router->get_routes()) {
-    if (auto [_matches, _bindings] = route_find(url, _item.first); _matches)
-      _methods.push_back(_item.first.method_);
+  for (const auto &[_route, _controller] : *_router->get_routes()) {
+    if (auto [_matches, _bindings] = route_find(url, _route); _matches)
+      _methods.push_back(_route.method_);
   }
   return _methods;
   // LCOV_EXCL_START
