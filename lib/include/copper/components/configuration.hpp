@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <mutex>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/shared.hpp>
 
@@ -174,6 +175,24 @@ class configuration : public shared_enabled<configuration> {
    * @return configurations
    */
   shared<configurations> get();
+
+  /**
+   * Get instance
+   *
+   * @return shared<configuration>
+   */
+  static shared<configuration> instance();
+
+private:
+  /**
+   * Instance
+   */
+  static shared<configuration> instance_;
+
+  /**
+   * Initialization flag
+   */
+  static std::once_flag initialization_flag_;
 };
 }  // namespace copper::components
 

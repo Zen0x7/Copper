@@ -9,14 +9,13 @@
 
 namespace copper::components {
 
-state::state(const shared<configuration>& configuration,
-             const shared<boost::mysql::connection_pool>& pool)
-    : configuration_(configuration),
-      logger_(boost::make_shared<logger>(configuration->shared_from_this())),
+state::state(const shared<boost::mysql::connection_pool>& pool)
+    : configuration_(configuration::instance()),
+      logger_(boost::make_shared<logger>()),
       router_(boost::make_shared<router>()),
-      cache_(boost::make_shared<cache>(configuration->shared_from_this())),
+      cache_(boost::make_shared<cache>()),
       database_(
-          boost::make_shared<database>(pool, logger_->shared_from_this())),
+          boost::make_shared<database>(pool)),
       views_(boost::make_shared<views>()) {
   this->get_views()->push("404", "404");
 }

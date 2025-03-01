@@ -45,14 +45,13 @@ database::get_user_by_email(const std::string &email) {
             ? 0
             : chronos::to_timestamp(_row.at(5).as_datetime().as_time_point()));
   } catch (boost::mysql::error_with_diagnostics &error) {
-    logger_->on_database_error("get_user_by_email", error);
+    logger::instance()->on_database_error("get_user_by_email", error);
     co_return boost::none;
   }
 }
 
-database::database(const shared<boost::mysql::connection_pool> &pool,
-                   const shared<logger> &logger)
-    : pool_(pool), logger_(logger) {}
+database::database(const shared<boost::mysql::connection_pool> &pool)
+    : pool_(pool) {}
 
 containers::async_of<containers::optional_of<shared<models::user>>>
 database::get_user_by_id(const uuid id) {
@@ -84,7 +83,7 @@ database::get_user_by_id(const uuid id) {
             ? 0
             : chronos::to_timestamp(_row.at(6).as_datetime().as_time_point()));
   } catch (boost::mysql::error_with_diagnostics &error) {
-    logger_->on_database_error("get_user_by_id", error);
+    logger::instance()->on_database_error("get_user_by_id", error);
     co_return boost::none;
   }
 }
@@ -106,7 +105,7 @@ containers::async_of<void> database::create_session(const uuid session_id,
                                   to_string(session_id), ip, port, _now),
         _result);
   } catch (boost::mysql::error_with_diagnostics &error) {
-    logger_->on_database_error("create_session", error);
+    logger::instance()->on_database_error("create_session", error);
   }
 }
 
@@ -125,7 +124,7 @@ containers::async_of<void> database::session_closed(const uuid session_id,
                                   _now, exception, to_string(session_id)),
         _result);
   } catch (boost::mysql::error_with_diagnostics &error) {
-    logger_->on_database_error("session_closed", error);
+    logger::instance()->on_database_error("session_closed", error);
   }
 }
 
@@ -141,7 +140,7 @@ containers::async_of<void> database::session_is_upgrade(const uuid session_id) {
             to_string(session_id)),
         _result);
   } catch (boost::mysql::error_with_diagnostics &error) {
-    logger_->on_database_error("session_is_upgrade", error);
+    logger::instance()->on_database_error("session_is_upgrade", error);
   }
 }
 
@@ -177,7 +176,7 @@ containers::async_of<void> database::create_invocation(
             response->status_code_, response->headers_, _response_body),
         _result);
   } catch (boost::mysql::error_with_diagnostics &error) {
-    logger_->on_database_error("create_invocation", error);
+    logger::instance()->on_database_error("create_invocation", error);
   }
 }
 }  // namespace copper::components

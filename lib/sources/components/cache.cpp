@@ -86,25 +86,27 @@ containers::async_of<std::tuple<bool, int>> cache::can_invoke(
   co_return std::tuple{true, 0};
 }
 
-cache::cache(const shared<configuration> &configuration)
-    : configuration_(configuration),
+cache::cache() :
       redis_configuration_(boost::make_shared<boost::redis::config>()) {
+
+    auto _configuration = configuration::instance();
+
   const std::string _redis_port =
-      std::to_string(configuration_->get()->redis_port_);
+      std::to_string(_configuration->get()->redis_port_);
 
   redis_configuration_->addr =
-      boost::redis::address{configuration_->get()->redis_host_, _redis_port};
+      boost::redis::address{_configuration->get()->redis_host_, _redis_port};
 
   redis_configuration_->health_check_interval =
-      std::chrono::seconds{configuration_->get()->redis_health_check_interval_};
+      std::chrono::seconds{_configuration->get()->redis_health_check_interval_};
 
   redis_configuration_->connect_timeout =
-      std::chrono::seconds{configuration_->get()->redis_connection_timeout_};
+      std::chrono::seconds{_configuration->get()->redis_connection_timeout_};
 
   redis_configuration_->reconnect_wait_interval = std::chrono::seconds{
-      configuration_->get()->redis_reconnection_wait_interval_};
+      _configuration->get()->redis_reconnection_wait_interval_};
 
-  redis_configuration_->clientname = configuration_->get()->redis_client_name_;
+  redis_configuration_->clientname = _configuration->get()->redis_client_name_;
 }
 
 containers::async_of<shared<boost::redis::connection>> cache::get_connection()

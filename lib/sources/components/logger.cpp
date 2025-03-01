@@ -23,9 +23,10 @@ typename boost::shared_ptr<T> logger_to_shared(
                               boost::bind(&logger_do_release<T>, p, _1));
 }
 
-logger::logger(const shared<configuration>& configuration) {
-  const auto _max_size = configuration->get()->logging_max_size_;
-  const auto _max_files = configuration->get()->logging_max_files_;
+logger::logger() {
+    const auto configuration_ = configuration::instance();
+  const auto _max_size = configuration_->get()->logging_max_size_;
+  const auto _max_files = configuration_->get()->logging_max_files_;
   auto _generator = boost::uuids::random_generator();
 
   system_ = logger_to_shared(spdlog::rotating_logger_mt(
@@ -47,5 +48,17 @@ void logger::on_database_error(
   errors_->info("[MySQL] [{}] [{}] [{}] [{}]", where, error.what(),
                 error.get_diagnostics().client_message(),
                 error.get_diagnostics().server_message());
+}
+
+    shared<logger> logger::instance_ = nullptr;
+
+    std::once_flag logger::initialization_flag_;
+
+shared<logger> logger::instance() {
+    std::call_once(initialization_flag_, [] {
+    instance_ = boost::make_shared<logger>();
+});
+
+    return instance_->shared_from_this();
 }
 }  // namespace copper::components
