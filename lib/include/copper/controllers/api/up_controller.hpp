@@ -15,8 +15,6 @@ using namespace copper::components;
  */
 class up_controller final : public controller {
  public:
-  using controller::controller;
-
   /**
    * Invoke
    *

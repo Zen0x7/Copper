@@ -56,6 +56,24 @@ class router : public shared_enabled<router> {
    * @return route
    */
   static route factory(method method, const char* path);
+
+  /**
+   * Get instance
+   *
+   * @return shared<router>
+   */
+  static shared<router> instance();
+
+ private:
+  /**
+   * Instance
+   */
+  static shared<router> instance_;
+
+  /**
+   * Initialization flag
+   */
+  static std::once_flag initialization_flag_;
 };
 
 }  // namespace copper::components

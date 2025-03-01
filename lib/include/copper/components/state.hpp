@@ -44,11 +44,6 @@ class logger;
  */
 class state : public shared_enabled<state> {
   /**
-   * Router
-   */
-  shared<router> router_;
-
-  /**
    * Database
    */
   shared<database> database_;
@@ -60,13 +55,6 @@ class state : public shared_enabled<state> {
    * @param pool
    */
   state(const shared<boost::mysql::connection_pool>& pool);
-
-  /**
-   * Get Router
-   *
-   * @return shared<router>
-   */
-  shared<router> get_router();
 
   /**
    * Get database

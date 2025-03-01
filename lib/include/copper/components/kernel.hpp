@@ -65,8 +65,8 @@ class kernel : public shared_enabled<kernel> {
    * @param url
    * @return optional_of<kernel_result>
    */
-  containers::optional_of<kernel_result> find_on_routes(
-      method method, const std::string &url) const;
+  static containers::optional_of<kernel_result> find_on_routes(
+      method method, const std::string &url);
 
   /**
    * Get available methods
@@ -74,8 +74,8 @@ class kernel : public shared_enabled<kernel> {
    * @param url
    * @return vector_of<method>
    */
-  containers::vector_of<method> get_available_methods(
-      const std::string &url) const;
+  static containers::vector_of<method> get_available_methods(
+      const std::string &url);
 
   /**
    * Call

@@ -10,12 +10,9 @@
 namespace copper::components {
 
 state::state(const shared<boost::mysql::connection_pool>& pool)
-    : router_(boost::make_shared<router>()),
-      database_(boost::make_shared<database>(pool)) {
+    : database_(boost::make_shared<database>(pool)) {
   views::instance()->push("404", "404");
 }
-
-shared<router> state::get_router() { return router_; }
 
 shared<database> state::get_database() { return database_; }
 

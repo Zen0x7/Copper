@@ -16,6 +16,17 @@ route router::factory(const method method, const char *path) {
   };
 }
 
+shared<router> router::instance_ = nullptr;
+
+std::once_flag router::initialization_flag_;
+
+shared<router> router::instance() {
+  std::call_once(initialization_flag_,
+                 [] { instance_ = boost::make_shared<router>(); });
+
+  return instance_->shared_from_this();
+}
+
 shared<router> router::push(const method method, const char *path,
                             const shared<controller> &controller,
                             const controller_configuration config) {

@@ -27,9 +27,8 @@
 namespace copper::components {
 
 containers::optional_of<kernel_result> kernel::find_on_routes(
-    const method method, const std::string &url) const {
-  for (const auto &[_route, _controller] :
-       *state_->get_router()->get_routes()) {
+    const method method, const std::string &url) {
+  for (const auto &[_route, _controller] : *router::instance()->get_routes()) {
     if (auto [_matches, _bindings] = route_match(method, url, _route);
         _matches) {
       return kernel_result{
@@ -41,10 +40,9 @@ containers::optional_of<kernel_result> kernel::find_on_routes(
 }
 
 containers::vector_of<method> kernel::get_available_methods(
-    const std::string &url) const {
+    const std::string &url) {
   containers::vector_of<method> _methods;
-  for (const auto &[_route, _controller] :
-       *state_->get_router()->get_routes()) {
+  for (const auto &[_route, _controller] : *router::instance()->get_routes()) {
     if (auto [_matches, _bindings] = route_find(url, _route); _matches)
       _methods.push_back(_route.method_);
   }

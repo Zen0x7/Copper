@@ -72,7 +72,7 @@ int run(int argc, const char *argv[]) {
     return EXIT_SUCCESS;
   }
 
-  auto _configuration = boost::make_shared<configuration>();
+  auto _configuration = configuration::instance();
 
   sentry_options_t *_options = sentry_options_new();
   sentry_options_set_dsn(_options, _configuration->get()->sentry_dsn_.c_str());
@@ -135,22 +135,22 @@ int run(int argc, const char *argv[]) {
     _state->get_database()->start();
   }
 
-  _state->get_router()
+  router::instance()
       ->push(method::get, "/api/user",
-             boost::make_shared<controllers::api::user_controller>(_state),
+             boost::make_shared<controllers::api::user_controller>(),
              {
                  .use_auth_ = true,
                  .use_throttler_ = true,
                  .rpm_ = 5,
              })
       ->push(method::get, "/api/up",
-             boost::make_shared<controllers::api::up_controller>(_state),
+             boost::make_shared<controllers::api::up_controller>(),
              {
                  .use_throttler_ = true,
                  .rpm_ = 5,
              })
       ->push(method::post, "/api/auth",
-             boost::make_shared<controllers::api::auth_controller>(_state),
+             boost::make_shared<controllers::api::auth_controller>(),
              {
                  .use_throttler_ = true,
                  .use_validator_ = true,

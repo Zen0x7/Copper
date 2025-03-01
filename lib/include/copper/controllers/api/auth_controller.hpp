@@ -19,8 +19,6 @@ using namespace copper::components;
  */
 class auth_controller final : public controller {
  public:
-  using controller::controller;
-
   /**
    * Rules
    *
