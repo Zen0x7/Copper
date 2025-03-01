@@ -9,12 +9,11 @@
 
 namespace copper::components {
 
-response response_unauthorized(const request &request, const long start_at,
-                               const shared<state> &state) {
+response response_unauthorized(const request &request, const long start_at) {
   response _response{status_code::unauthorized, request.version()};
 
   const auto _allowed_origins =
-      state->get_configuration()->get()->http_allowed_origins_;
+      configuration::instance()->get()->http_allowed_origins_;
 
   _response.set(fields::access_control_allow_origin, _allowed_origins);
 

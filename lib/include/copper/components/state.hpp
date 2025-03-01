@@ -68,11 +68,6 @@ class state : public shared_enabled<state> {
    */
   shared<database> database_;
 
-  /**
-   * Views
-   */
-  shared<views> views_;
-
  public:
   /**
    * Constructor
@@ -80,13 +75,6 @@ class state : public shared_enabled<state> {
    * @param pool
    */
   state(const shared<boost::mysql::connection_pool>& pool);
-
-  /**
-   * Get configuration
-   *
-   * @return shared<configuration>
-   */
-  shared<configuration> get_configuration();
 
   /**
    * Get Router
@@ -108,20 +96,6 @@ class state : public shared_enabled<state> {
    * @return shared<database>
    */
   shared<database> get_database();
-
-  /**
-   * Get views
-   *
-   * @return shared<views>
-   */
-  shared<views> get_views();
-
-  /**
-   * Get logger
-   *
-   * @return shared<logger>
-   */
-  shared<logger> get_logger();
 };
 
 }  // namespace copper::components

@@ -45,7 +45,7 @@ class views : public shared_enabled<views> {
    * @param data
    * @return string
    */
-  std::string render(std::string name, json::json data = {}) {
+  std::string render(std::string name, json::json data = {}) const {
     for (auto& item : items_) {
       if (item.first == name) {
         return environment_->render(item.second->template_, data);
@@ -54,6 +54,24 @@ class views : public shared_enabled<views> {
 
     return environment_->render(items_.at("404")->template_, data);
   }
+
+  /**
+   * Get instance
+   *
+   * @return shared<views>
+   */
+  static shared<views> instance();
+
+ private:
+  /**
+   * Instance
+   */
+  static shared<views> instance_;
+
+  /**
+   * Initialization flag
+   */
+  static std::once_flag initialization_flag_;
 };
 
 }  // namespace copper::components

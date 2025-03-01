@@ -8,11 +8,12 @@
 #include <copper/components/json.hpp>
 
 namespace copper::controllers::api {
+using namespace copper::components;
 
 /**
  * UP Controller
  */
-class up_controller final : public components::controller {
+class up_controller final : public controller {
  public:
   using controller::controller;
 
@@ -22,13 +23,12 @@ class up_controller final : public components::controller {
    * @param parameters
    * @return async_of<response>
    */
-  components::containers::async_of<components::response> invoke(
-      const components::shared<components::controller_parameters> &parameters)
-      override {
-    auto _now = components::chronos::now();
-    const components::json::object _data = {{"timestamp", _now}};
-    co_return make_response(parameters, components::status_code::ok,
-                            serialize(_data), "application/json");
+  containers::async_of<response> invoke(
+      const shared<controller_parameters> &parameters) override {
+    auto _now = chronos::now();
+    const json::object _data = {{"timestamp", _now}};
+    co_return make_response(parameters, status_code::ok, serialize(_data),
+                            "application/json");
   }
 };
 

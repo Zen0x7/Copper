@@ -14,21 +14,14 @@ state::state(const shared<boost::mysql::connection_pool>& pool)
       logger_(boost::make_shared<logger>()),
       router_(boost::make_shared<router>()),
       cache_(boost::make_shared<cache>()),
-      database_(boost::make_shared<database>(pool)),
-      views_(boost::make_shared<views>()) {
-  this->get_views()->push("404", "404");
+      database_(boost::make_shared<database>(pool)) {
+  views::instance()->push("404", "404");
 }
-
-shared<configuration> state::get_configuration() { return configuration_; }
 
 shared<router> state::get_router() { return router_; }
 
 shared<cache> state::get_cache() { return cache_; }
 
 shared<database> state::get_database() { return database_; }
-
-shared<views> state::get_views() { return views_; }
-
-shared<logger> state::get_logger() { return logger_; }
 
 }  // namespace copper::components
