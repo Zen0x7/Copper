@@ -4,17 +4,13 @@
 #pragma once
 
 #include <boost/asio/awaitable.hpp>
-#include <boost/asio/strand.hpp>
 #include <boost/asio/thread_pool.hpp>
 #include <boost/mysql/connection_pool.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/dotenv.hpp>
-#include <copper/components/report.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
-#include <copper/models/session.hpp>
 #include <copper/models/user.hpp>
 
 namespace copper::components {

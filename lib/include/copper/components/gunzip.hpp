@@ -3,11 +3,6 @@
 
 #pragma once
 
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <copper/components/shared.hpp>
-#include <sstream>
 #include <string>
 
 namespace copper::components {

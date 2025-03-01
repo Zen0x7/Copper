@@ -2,7 +2,6 @@
 
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/ssl.hpp>
-#include <copper/components/client_certificates.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/listener.hpp>

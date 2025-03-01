@@ -3,19 +3,15 @@
 
 #pragma once
 
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/strand.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/normalized_path.hpp>
 #include <copper/components/request.hpp>
-#include <copper/components/response.hpp>
 #include <copper/components/response_generic.hpp>
 #include <copper/components/route.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
-#include <copper/models/session.hpp>
 
 #ifndef HTTP_SERVER_HEADER_CONTENT
 #define HTTP_SERVER_HEADER_CONTENT "Copper"

@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <boost/mysql/connection_pool.hpp>
-#include <copper/components/containers.hpp>
 #include <copper/components/shared.hpp>
+#include <mutex>
 
 namespace copper::components {
 

@@ -5,10 +5,8 @@
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/detached.hpp>
-#include <boost/asio/strand.hpp>
 #include <boost/redis/connection.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/dotenv.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/shared.hpp>
 
