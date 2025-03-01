@@ -8,14 +8,7 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/core/span.hpp>
-#include <boost/describe/class.hpp>
-#include <boost/mysql/datetime.hpp>
-#include <boost/optional.hpp>
 #include <copper/components/shared.hpp>
-#include <copper/components/uuid.hpp>
-#include <cstdint>
-#include <utility>
 
 namespace copper::models {
 

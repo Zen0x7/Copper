@@ -7,7 +7,6 @@
 #include <copper/components/cipher.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/report.hpp>
-#include <sstream>
 #include <string>
 #include <vector>
 

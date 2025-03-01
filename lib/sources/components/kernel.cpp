@@ -8,7 +8,6 @@
 #include <copper/components/header.hpp>
 #include <copper/components/kernel.hpp>
 #include <copper/components/mime_type.hpp>
-#include <copper/components/query.hpp>
 #include <copper/components/response_bad_request.hpp>
 #include <copper/components/response_cors.hpp>
 #include <copper/components/response_exception.hpp>
@@ -18,7 +17,6 @@
 #include <copper/components/route_find.hpp>
 #include <copper/components/route_match.hpp>
 #include <copper/components/router.hpp>
-#include <copper/components/routes.hpp>
 #include <copper/components/url.hpp>
 #include <copper/components/validator.hpp>
 #include <copper/models/request.hpp>

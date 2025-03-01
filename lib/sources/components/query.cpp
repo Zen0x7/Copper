@@ -1,4 +1,9 @@
+#include <boost/json/serialize.hpp>
+#include <copper/components/containers.hpp>
 #include <copper/components/query.hpp>
+#include <istream>
+#include <map>
+#include <sstream>
 
 namespace copper::components {
 

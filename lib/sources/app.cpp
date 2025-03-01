@@ -1,17 +1,19 @@
 #include <sentry.h>
 
 #include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
 #include <boost/program_options.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include <copper/app.hpp>
 #include <copper/components/base64.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/configuration.hpp>
+#include <copper/components/fields.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/logger.hpp>
 #include <copper/components/router.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/signal_handler.hpp>
-#include <copper/components/state.hpp>
 #include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
 #include <copper/controllers/api/auth_controller.hpp>

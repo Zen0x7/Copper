@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
 #include <boost/asio/co_spawn.hpp>
-#include <boost/asio/ssl.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/containers.hpp>
+#include <copper/components/database.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/router.hpp>
 #include <copper/components/signal_handler.hpp>
-#include <copper/components/state.hpp>
 #include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
 #include <iostream>

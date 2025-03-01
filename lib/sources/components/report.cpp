@@ -1,5 +1,6 @@
 #include <openssl/err.h>
 
+#include <boost/stacktrace.hpp>
 #include <copper/components/report.hpp>
 #include <iostream>
 

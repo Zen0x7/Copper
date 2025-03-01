@@ -15,11 +15,6 @@
 namespace copper::components {
 
 /**
- * Forward state
- */
-class state;
-
-/**
  * Listener
  *
  * @param state

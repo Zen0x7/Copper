@@ -11,8 +11,6 @@
 #include <copper/components/containers.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/shared.hpp>
-#include <map>
-#include <string>
 
 namespace copper::components {
 

@@ -8,10 +8,7 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <copper/components/containers.hpp>
 #include <copper/components/controller.hpp>
-#include <copper/components/route.hpp>
-#include <copper/components/shared.hpp>
 
 namespace copper::components {
 

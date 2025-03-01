@@ -8,20 +8,9 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/core/span.hpp>
-#include <boost/describe/class.hpp>
-#include <boost/mysql/datetime.hpp>
-#include <boost/optional.hpp>
-#include <boost/uuid/random_generator.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <copper/components/header.hpp>
-#include <copper/components/request.hpp>
 #include <copper/components/response.hpp>
 #include <copper/components/shared.hpp>
-#include <copper/components/uuid.hpp>
 #include <copper/models/request.hpp>
-#include <copper/models/session.hpp>
-#include <cstdint>
 #include <utility>
 
 namespace copper::models {

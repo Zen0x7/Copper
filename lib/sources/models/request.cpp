@@ -1,3 +1,4 @@
+#include <copper/components/url.hpp>
 #include <copper/models/request.hpp>
 
 namespace copper::models {

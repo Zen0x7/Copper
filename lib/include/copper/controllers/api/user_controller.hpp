@@ -8,8 +8,6 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <copper/components/chronos.hpp>
-#include <copper/components/cipher.hpp>
 #include <copper/components/controller.hpp>
 #include <copper/components/json.hpp>
 

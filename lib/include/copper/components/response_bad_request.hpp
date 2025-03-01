@@ -10,14 +10,8 @@
 
 #include <copper/components/request.hpp>
 #include <copper/components/response.hpp>
-#include <copper/components/shared.hpp>
 
 namespace copper::components {
-/**
- * Forward state
- */
-class state;
-
 /**
  * Generates response on bad requests
  *

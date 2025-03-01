@@ -8,20 +8,11 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/asio/as_tuple.hpp>
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/ssl.hpp>
-#include <boost/asio/strand.hpp>
-#include <boost/beast/core/detect_ssl.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
-#include <boost/beast/ssl/ssl_stream.hpp>
 #include <boost/beast/websocket/stream.hpp>
-#include <boost/scope/scope_exit.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/report.hpp>
 #include <copper/components/request.hpp>
-#include <copper/components/state.hpp>
 #include <copper/components/uuid.hpp>
 
 namespace copper::components {
