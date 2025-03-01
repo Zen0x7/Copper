@@ -44,24 +44,9 @@ class logger;
  */
 class state : public shared_enabled<state> {
   /**
-   * Configuration
-   */
-  shared<configuration> configuration_;
-
-  /**
-   * Logger
-   */
-  shared<logger> logger_;
-
-  /**
    * Router
    */
   shared<router> router_;
-
-  /**
-   * Cache
-   */
-  shared<cache> cache_;
 
   /**
    * Database
@@ -82,13 +67,6 @@ class state : public shared_enabled<state> {
    * @return shared<router>
    */
   shared<router> get_router();
-
-  /**
-   * Get cache
-   *
-   * @return shared<cache>
-   */
-  shared<cache> get_cache();
 
   /**
    * Get database
