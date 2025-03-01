@@ -3,6 +3,11 @@
 
 #pragma once
 
+//          Copyright Ian Torres 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <string>
 
 namespace copper::components {
@@ -10,7 +15,7 @@ namespace copper::components {
 /**
  * Generate SHA256 key
  *
- * @return std::string Output
+ * @return string Output
  */
 std::string cipher_generate_sha_256();
 
@@ -19,7 +24,7 @@ std::string cipher_generate_sha_256();
  *
  * @param input
  * @param app_key
- * @return std::string Output
+ * @return string Output
  */
 std::string cipher_hmac(const std::string &input, const std::string &app_key);
 
@@ -38,7 +43,7 @@ std::pair<std::string, std::string> cipher_generate_aes_key_iv();
  * @param key
  * @param iv
  *
- * @return std::string Output
+ * @return string Output
  */
 std::string cipher_encrypt(const std::string &input, const std::string &key,
                            const std::string &iv);
@@ -49,7 +54,7 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
  * @param input
  * @param key
  * @param iv
- * @return std::string Output
+ * @return string Output
  */
 std::string cipher_decrypt(const std::string &input, const std::string &key,
                            const std::string &iv);
