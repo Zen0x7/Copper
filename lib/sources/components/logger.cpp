@@ -24,7 +24,7 @@ typename boost::shared_ptr<T> logger_to_shared(
 }
 
 logger::logger() {
-    const auto configuration_ = configuration::instance();
+  const auto configuration_ = configuration::instance();
   const auto _max_size = configuration_->get()->logging_max_size_;
   const auto _max_files = configuration_->get()->logging_max_files_;
   auto _generator = boost::uuids::random_generator();
@@ -50,15 +50,14 @@ void logger::on_database_error(
                 error.get_diagnostics().server_message());
 }
 
-    shared<logger> logger::instance_ = nullptr;
+shared<logger> logger::instance_ = nullptr;
 
-    std::once_flag logger::initialization_flag_;
+std::once_flag logger::initialization_flag_;
 
 shared<logger> logger::instance() {
-    std::call_once(initialization_flag_, [] {
-    instance_ = boost::make_shared<logger>();
-});
+  std::call_once(initialization_flag_,
+                 [] { instance_ = boost::make_shared<logger>(); });
 
-    return instance_->shared_from_this();
+  return instance_->shared_from_this();
 }
 }  // namespace copper::components

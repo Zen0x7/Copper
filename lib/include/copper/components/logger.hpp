@@ -63,9 +63,14 @@ class logger : public shared_enabled<logger> {
       std::string_view where,
       const boost::mysql::error_with_diagnostics& error) const;
 
+  /**
+   * Get instance
+   *
+   * @return shared<logger>
+   */
+  static shared<logger> instance();
 
-    static shared<logger> instance();
-private:
+ private:
   /**
    * Instance
    */

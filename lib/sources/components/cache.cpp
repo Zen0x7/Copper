@@ -86,10 +86,9 @@ containers::async_of<std::tuple<bool, int>> cache::can_invoke(
   co_return std::tuple{true, 0};
 }
 
-cache::cache() :
-      redis_configuration_(boost::make_shared<boost::redis::config>()) {
-
-    auto _configuration = configuration::instance();
+cache::cache()
+    : redis_configuration_(boost::make_shared<boost::redis::config>()) {
+  auto _configuration = configuration::instance();
 
   const std::string _redis_port =
       std::to_string(_configuration->get()->redis_port_);

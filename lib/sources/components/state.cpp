@@ -14,8 +14,7 @@ state::state(const shared<boost::mysql::connection_pool>& pool)
       logger_(boost::make_shared<logger>()),
       router_(boost::make_shared<router>()),
       cache_(boost::make_shared<cache>()),
-      database_(
-          boost::make_shared<database>(pool)),
+      database_(boost::make_shared<database>(pool)),
       views_(boost::make_shared<views>()) {
   this->get_views()->push("404", "404");
 }

@@ -37,7 +37,6 @@ class database : public shared_enabled<database> {
    * Constructor
    *
    * @param pool
-   * @param logger
    */
   database(const shared<boost::mysql::connection_pool> &pool);
 

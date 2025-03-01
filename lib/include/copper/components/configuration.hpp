@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <mutex>
 #include <copper/components/dotenv.hpp>
 #include <copper/components/shared.hpp>
+#include <mutex>
 
 namespace copper::components {
 /**
@@ -183,7 +183,7 @@ class configuration : public shared_enabled<configuration> {
    */
   static shared<configuration> instance();
 
-private:
+ private:
   /**
    * Instance
    */
