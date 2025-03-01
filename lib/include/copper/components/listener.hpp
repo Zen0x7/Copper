@@ -25,7 +25,6 @@ class state;
  * @return async_of<void>
  */
 containers::async_of<void> listener(boost::uuids::uuid server_id,
-                                    shared<state> state,
                                     shared<task_group> task_group,
                                     boost::asio::ip::tcp::endpoint endpoint,
                                     boost::beast::string_view doc_root);

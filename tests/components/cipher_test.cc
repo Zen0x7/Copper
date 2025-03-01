@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <copper/components/base64.hpp>
 #include <copper/components/cipher.hpp>
 
 using namespace copper::components;

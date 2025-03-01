@@ -4,6 +4,7 @@
 #include <boost/mysql/results.hpp>
 #include <boost/mysql/with_params.hpp>
 #include <copper/components/chronos.hpp>
+#include <copper/components/configuration.hpp>
 #include <copper/components/database.hpp>
 #include <copper/components/logger.hpp>
 
@@ -178,5 +179,33 @@ containers::async_of<void> database::create_invocation(
   } catch (boost::mysql::error_with_diagnostics &error) {
     logger::instance()->on_database_error("create_invocation", error);
   }
+}
+
+shared<database> database::instance_ = nullptr;
+
+shared<database> database::instance() { return instance_->shared_from_this(); }
+
+void database::setup(boost::asio::io_context &context) {
+  const auto _configuration = configuration::instance();
+
+  boost::mysql::pool_params _database_params;
+  _database_params.server_address.emplace_host_and_port(
+      _configuration->get()->database_host_,
+      _configuration->get()->database_port_);
+
+  _database_params.username = _configuration->get()->database_user_;
+  _database_params.password = _configuration->get()->database_password_;
+  _database_params.database = _configuration->get()->database_name_;
+  _database_params.thread_safe =
+      _configuration->get()->database_pool_thread_safe_;
+  _database_params.initial_size =
+      _configuration->get()->database_pool_initial_size_;
+  _database_params.max_size = _configuration->get()->database_pool_max_size_;
+
+  instance_ = boost::make_shared<database>(
+      boost::make_shared<boost::mysql::connection_pool>(
+          make_strand(context), std::move(_database_params)));
+
+  instance_->start();
 }
 }  // namespace copper::components

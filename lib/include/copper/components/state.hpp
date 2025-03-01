@@ -3,99 +3,38 @@
 
 #pragma once
 
-#include <boost/mysql/connection_pool.hpp>
-#include <copper/components/containers.hpp>
 #include <copper/components/shared.hpp>
+#include <mutex>
 
 namespace copper::components {
-
-/**
- * Forward cache
- */
-class cache;
-
-/**
- * Forward Router
- */
-class router;
-
-/**
- * Forward configuration
- */
-class configuration;
-
-/**
- * Forward database
- */
-class database;
-
-/**
- * Forward views
- */
-class views;
-
-/**
- * Forward logger
- */
-class logger;
 
 /**
  * State
  */
 class state : public shared_enabled<state> {
-  /**
-   * Configuration
-   */
-  shared<configuration> configuration_;
-
-  /**
-   * Logger
-   */
-  shared<logger> logger_;
-
-  /**
-   * Router
-   */
-  shared<router> router_;
-
-  /**
-   * Cache
-   */
-  shared<cache> cache_;
-
-  /**
-   * Database
-   */
-  shared<database> database_;
-
  public:
   /**
    * Constructor
-   *
-   * @param pool
    */
-  state(const shared<boost::mysql::connection_pool>& pool);
+  state();
 
   /**
-   * Get Router
+   * Get instance
    *
-   * @return shared<router>
+   * @return shared<state>
    */
-  shared<router> get_router();
+  static shared<state> instance();
+
+ private:
+  /**
+   * Instance
+   */
+  static shared<state> instance_;
 
   /**
-   * Get cache
-   *
-   * @return shared<cache>
+   * Initialization flag
    */
-  shared<cache> get_cache();
-
-  /**
-   * Get database
-   *
-   * @return shared<database>
-   */
-  shared<database> get_database();
+  static std::once_flag initialization_flag_;
 };
 
 }  // namespace copper::components

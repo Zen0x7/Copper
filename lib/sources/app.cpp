@@ -22,7 +22,6 @@
 #include <thread>
 
 namespace copper {
-
 std::string get_version() { return "6.0.0"; }
 
 // LCOV_EXCL_START
@@ -72,7 +71,7 @@ int run(int argc, const char *argv[]) {
     return EXIT_SUCCESS;
   }
 
-  auto _configuration = boost::make_shared<configuration>();
+  auto _configuration = configuration::instance();
 
   sentry_options_t *_options = sentry_options_new();
   sentry_options_set_dsn(_options, _configuration->get()->sentry_dsn_.c_str());
@@ -97,60 +96,32 @@ int run(int argc, const char *argv[]) {
 
   boost::asio::io_context _ioc{_threads};
 
-  boost::asio::ssl::context _ctx{boost::asio::ssl::context::tlsv12};
-
-  _ctx.set_options(boost::asio::ssl::context::default_workarounds |
-                   boost::asio::ssl::context::single_dh_use);
-  _ctx.use_certificate_chain_file(_configuration->get()->app_public_key_);
-  _ctx.use_private_key_file(_configuration->get()->app_private_key_,
-                            boost::asio::ssl::context::pem);
-  _ctx.use_tmp_dh_file(_configuration->get()->app_dh_params_);
-
   auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
 
-  boost::mysql::pool_params _database_params;
-  _database_params.server_address.emplace_host_and_port(
-      _configuration->get()->database_host_,
-      _configuration->get()->database_port_);
-
-  _database_params.username = _configuration->get()->database_user_;
-  _database_params.password = _configuration->get()->database_password_;
-  _database_params.database = _configuration->get()->database_name_;
-  _database_params.thread_safe =
-      _configuration->get()->database_pool_thread_safe_;
-  _database_params.initial_size =
-      _configuration->get()->database_pool_initial_size_;
-  _database_params.max_size = _configuration->get()->database_pool_max_size_;
-
-  auto _database_pool = boost::make_shared<boost::mysql::connection_pool>(
-      _ioc, std::move(_database_params));
-
-  auto _state = boost::make_shared<state>(_database_pool);
+  database::setup(_ioc);
 
   if (_as == "service") {
     logger::instance()->system_->info(
         "[{}] Server is running on [{}:{}]", to_string(_server_id),
         _configuration->get()->app_host_, _configuration->get()->app_port_);
-
-    _state->get_database()->start();
   }
 
-  _state->get_router()
+  router::instance()
       ->push(method::get, "/api/user",
-             boost::make_shared<controllers::api::user_controller>(_state),
+             boost::make_shared<controllers::api::user_controller>(),
              {
                  .use_auth_ = true,
                  .use_throttler_ = true,
                  .rpm_ = 5,
              })
       ->push(method::get, "/api/up",
-             boost::make_shared<controllers::api::up_controller>(_state),
+             boost::make_shared<controllers::api::up_controller>(),
              {
                  .use_throttler_ = true,
                  .rpm_ = 5,
              })
       ->push(method::post, "/api/auth",
-             boost::make_shared<controllers::api::auth_controller>(_state),
+             boost::make_shared<controllers::api::auth_controller>(),
              {
                  .use_throttler_ = true,
                  .use_validator_ = true,
@@ -158,34 +129,32 @@ int run(int argc, const char *argv[]) {
              });
 
   if (_as == "service") {
-    co_spawn(
-        make_strand(_ioc),
-        listener(_server_id, _state, _task_group, _endpoint, _doc_root),
-        _task_group->adapt([_state, _server_id](const std::exception_ptr &e) {
-          if (e) {
-            try {
-              std::rethrow_exception(e);
-            } catch (std::exception &exception) {
-              logger::instance()->system_->info(
-                  "[{}] Something went wrong: [{}] on [{}]",
-                  to_string(_server_id), exception.what(), "listener");
-            }
-          }
-        }));
+    co_spawn(make_strand(_ioc),
+             listener(_server_id, _task_group, _endpoint, _doc_root),
+             _task_group->adapt([_server_id](const std::exception_ptr &e) {
+               if (e) {
+                 try {
+                   std::rethrow_exception(e);
+                 } catch (std::exception &exception) {
+                   logger::instance()->system_->info(
+                       "[{}] Something went wrong: [{}] on [{}]",
+                       to_string(_server_id), exception.what(), "listener");
+                 }
+               }
+             }));
 
-    co_spawn(
-        make_strand(_ioc), subscriber(_state),
-        _task_group->adapt([_state, _server_id](const std::exception_ptr &e) {
-          if (e) {
-            try {
-              std::rethrow_exception(e);
-            } catch (std::exception &exception) {
-              logger::instance()->system_->info(
-                  "[{}] Something went wrong: [{}] on [{}]",
-                  to_string(_server_id), exception.what(), "subscriber");
-            }
-          }
-        }));
+    co_spawn(make_strand(_ioc), subscriber(),
+             _task_group->adapt([_server_id](const std::exception_ptr &e) {
+               if (e) {
+                 try {
+                   std::rethrow_exception(e);
+                 } catch (std::exception &exception) {
+                   logger::instance()->system_->info(
+                       "[{}] Something went wrong: [{}] on [{}]",
+                       to_string(_server_id), exception.what(), "subscriber");
+                 }
+               }
+             }));
 
     co_spawn(make_strand(_ioc), signal_handler(_task_group),
              boost::asio::detached);
@@ -224,7 +193,6 @@ int run(int argc, const char *argv[]) {
                             std::to_string(_configuration->get()->app_port_));
 
       _stream.connect(_results);
-
       {
         boost::beast::flat_buffer _buffer;
         boost::beast::http::response<boost::beast::http::string_body> _response;
@@ -254,7 +222,9 @@ int run(int argc, const char *argv[]) {
   }
 
   sentry_close();
+  database::instance_.reset();
   return EXIT_SUCCESS;
 }
+
 // LCOV_EXCL_STOP
 }  // namespace copper

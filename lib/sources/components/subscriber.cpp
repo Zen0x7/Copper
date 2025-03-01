@@ -1,12 +1,12 @@
 #include <copper/components/subscriber.hpp>
 
 namespace copper::components {
-containers::async_of<void> subscriber(const shared<state>& state) {
+containers::async_of<void> subscriber() {
   boost::redis::request _request;
 
   _request.push("SUBSCRIBE", "Copper_Events");
 
-  const auto _connection = co_await state->get_cache()->get_connection();
+  const auto _connection = co_await cache::instance()->get_connection();
 
   boost::redis::generic_response _response;
   _connection->set_receive_response(_response);

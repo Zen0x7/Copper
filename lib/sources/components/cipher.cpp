@@ -1,7 +1,15 @@
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+
 #include <bcrypt/BCrypt.hpp>
+#include <copper/components/base64.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/report.hpp>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #ifndef CIPHER_KEY_LENGTH
 #define CIPHER_KEY_LENGTH 32

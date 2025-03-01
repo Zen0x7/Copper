@@ -33,8 +33,6 @@ containers::async_of<void> cancel_http_sessions() {
 
 class templated_controller final : public controller {
  public:
-  using controller::controller;
-
   containers::async_of<response> invoke(
       const shared<controller_parameters> &parameters) override {
     const json::json _data;
@@ -45,8 +43,6 @@ class templated_controller final : public controller {
 
 class exception_controller final : public controller {
  public:
-  using controller::controller;
-
   containers::async_of<response> invoke(
       const shared<controller_parameters> &parameters) override {
     throw std::runtime_error("Something went wrong");
@@ -62,8 +58,6 @@ class exception_controller final : public controller {
 
 class params_controller final : public controller {
  public:
-  using controller::controller;
-
   containers::async_of<response> invoke(
       const shared<controller_parameters> &parameters) override {
     auto _now = chronos::now();
@@ -79,7 +73,6 @@ class params_controller final : public controller {
 TEST(Components_HTTP_Session, Implementation) {
   try {
     auto _server_id = boost::uuids::random_generator()();
-    auto _configuration = configuration::instance();
 
     auto const _address = boost::asio::ip::make_address("0.0.0.0");
     constexpr auto _port = 9001;
@@ -91,44 +84,25 @@ TEST(Components_HTTP_Session, Implementation) {
 
     auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
 
-    boost::mysql::pool_params _database_params;
-    _database_params.server_address.emplace_host_and_port(
-        _configuration->get()->database_host_,
-        _configuration->get()->database_port_);
+    const auto _configuration = configuration::instance();
 
-    _database_params.username = _configuration->get()->database_user_;
-    _database_params.password = _configuration->get()->database_password_;
-    _database_params.database = _configuration->get()->database_name_;
-    _database_params.thread_safe =
-        _configuration->get()->database_pool_thread_safe_;
-    _database_params.initial_size =
-        _configuration->get()->database_pool_initial_size_;
-    _database_params.max_size = _configuration->get()->database_pool_max_size_;
+    database::setup(_ioc);
 
-    auto _database_pool = boost::make_shared<boost::mysql::connection_pool>(
-        _ioc, std::move(_database_params));
-
-    auto _state = boost::make_shared<state>(_database_pool);
-
-    _state->get_database()->start();
-
-    _state->get_router()
-        ->push(
-            method::get, "/api/up",
-            boost::make_shared<copper::controllers::api::up_controller>(_state),
-            {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
+    router::instance()
+        ->push(method::get, "/api/up",
+               boost::make_shared<copper::controllers::api::up_controller>(),
+               {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(method::get, "/api/templated",
-               boost::make_shared<templated_controller>(_state),
+               boost::make_shared<templated_controller>(),
                {.use_throttler_ = false, .use_protector_ = false})
         ->push(method::get, "/api/params/{name}",
-               boost::make_shared<params_controller>(_state),
+               boost::make_shared<params_controller>(),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(method::get, "/api/exception",
-               boost::make_shared<exception_controller>(_state),
+               boost::make_shared<exception_controller>(),
                {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
         ->push(method::get, "/api/user",
-               boost::make_shared<copper::controllers::api::user_controller>(
-                   _state),
+               boost::make_shared<copper::controllers::api::user_controller>(),
                {
                    .use_auth_ = true,
                    .use_throttler_ = true,
@@ -136,8 +110,7 @@ TEST(Components_HTTP_Session, Implementation) {
                    .rpm_ = 5,
                })
         ->push(method::post, "/api/auth",
-               boost::make_shared<copper::controllers::api::auth_controller>(
-                   _state),
+               boost::make_shared<copper::controllers::api::auth_controller>(),
                {
                    .use_throttler_ = true,
                    .use_validator_ = true,
@@ -146,7 +119,7 @@ TEST(Components_HTTP_Session, Implementation) {
                });
 
     co_spawn(make_strand(_ioc),
-             listener(_server_id, _state, _task_group, _endpoint, _doc_root),
+             listener(_server_id, _task_group, _endpoint, _doc_root),
              _task_group->adapt([](const std::exception_ptr &e) {
                if (e) {
                  try {
@@ -156,7 +129,7 @@ TEST(Components_HTTP_Session, Implementation) {
                }
              }));
 
-    co_spawn(make_strand(_ioc), subscriber(_state),
+    co_spawn(make_strand(_ioc), subscriber(),
              _task_group->adapt([](const std::exception_ptr &e) {
                if (e) {
                  try {
@@ -1044,6 +1017,8 @@ TEST(Components_HTTP_Session, Implementation) {
     for (auto &t : _v) t.join();
 
     ASSERT_TRUE(true);
+
+    database::instance_.reset();
 
   } catch (std::runtime_error &e) {
     std::cout << e.what() << std::endl;

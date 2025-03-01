@@ -6,8 +6,6 @@
 #include <copper/components/views.hpp>
 
 namespace copper::components {
-controller::controller(const shared<state> &state) : state_(state) {}
-
 // LCOV_EXCL_START
 void controller::set_configuration(
     const controller_configuration configuration) {

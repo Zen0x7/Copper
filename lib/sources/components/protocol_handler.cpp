@@ -6,8 +6,8 @@
 namespace copper::components {
 
 containers::async_of<void> protocol_handler(
-    shared<state> state, uuid server_id, uuid session_id,
-    boost::beast::tcp_stream stream, boost::beast::string_view doc_root) {
+    uuid server_id, uuid session_id, boost::beast::tcp_stream stream,
+    boost::beast::string_view doc_root) {
   auto _executor = co_await boost::asio::this_coro::executor;
 
   boost::beast::flat_buffer _buffer;
@@ -25,13 +25,12 @@ containers::async_of<void> protocol_handler(
     co_return;
   }
 
-  co_await session_handler(state, server_id, session_id, stream, _buffer,
-                           doc_root);
+  co_await session_handler(server_id, session_id, stream, _buffer, doc_root);
 
-  co_spawn(_executor,
-           state->get_database()->session_closed(session_id,
-                                                 "The socket was closed"),
-           boost::asio::detached);
+  co_spawn(
+      _executor,
+      database::instance()->session_closed(session_id, "The socket was closed"),
+      boost::asio::detached);
 
   logger::instance()->sessions_->info("[{}] Connection [{}] closed",
                                       to_string(server_id),

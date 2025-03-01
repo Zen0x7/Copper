@@ -4,17 +4,13 @@
 #pragma once
 
 #include <boost/asio/awaitable.hpp>
-#include <boost/asio/strand.hpp>
 #include <boost/asio/thread_pool.hpp>
 #include <boost/mysql/connection_pool.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/dotenv.hpp>
-#include <copper/components/report.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
-#include <copper/models/session.hpp>
 #include <copper/models/user.hpp>
 
 namespace copper::components {
@@ -102,6 +98,23 @@ class database : public shared_enabled<database> {
    */
   containers::async_of<void> create_invocation(
       shared<models::request> request, shared<models::response> response);
+
+  /**
+   * Get instance
+   *
+   * @return shared<cache>
+   */
+  static shared<database> instance();
+
+  /**
+   * Instance
+   */
+  static shared<database> instance_;
+
+  /**
+   * Setup
+   */
+  static void setup(boost::asio::io_context &context);
 };
 
 }  // namespace copper::components

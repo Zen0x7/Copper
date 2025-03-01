@@ -16,8 +16,6 @@ using namespace copper::components;
  */
 class user_controller final : public controller {
  public:
-  using controller::controller;
-
   /**
    * Invoke
    *
@@ -26,7 +24,7 @@ class user_controller final : public controller {
    */
   containers::async_of<response> invoke(
       const shared<controller_parameters> &parameters) override {
-    const auto _user = co_await state_->get_database()->get_user_by_id(
+    const auto _user = co_await database::instance()->get_user_by_id(
         parameters->get_auth().value().id_);
 
     const json::object _data = {

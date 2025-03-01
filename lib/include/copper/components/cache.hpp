@@ -5,10 +5,8 @@
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/detached.hpp>
-#include <boost/asio/strand.hpp>
 #include <boost/redis/connection.hpp>
 #include <copper/components/containers.hpp>
-#include <copper/components/dotenv.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/shared.hpp>
 
@@ -62,7 +60,24 @@ class cache : public shared_enabled<cache> {
   containers::async_of<void> publish(const std::string &channel,
                                      const std::string &data) const;
 
+  /**
+   * Get instance
+   *
+   * @return shared<cache>
+   */
+  static shared<cache> instance();
+
  private:
+  /**
+   * Instance
+   */
+  static shared<cache> instance_;
+
+  /**
+   * Initialization flag
+   */
+  static std::once_flag initialization_flag_;
+
   /**
    * Determines if cache has key
    *

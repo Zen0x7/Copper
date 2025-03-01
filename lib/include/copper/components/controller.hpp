@@ -30,9 +30,9 @@ class state;
 class controller : public shared_enabled<controller> {
  public:
   /**
-   * State
+   * Destructor
    */
-  shared<state> state_;
+  virtual ~controller() = default;
 
   /**
    * Auth ID
@@ -55,12 +55,6 @@ class controller : public shared_enabled<controller> {
   controller_configuration configuration_;
 
   // LCOV_EXCL_START
-  explicit controller(const shared<state> &state);
-
-  /**
-   * Constructor
-   */
-  virtual ~controller() = default;
 
   /**
    * Invoke

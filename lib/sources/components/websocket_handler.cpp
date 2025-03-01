@@ -2,7 +2,7 @@
 #include <copper/components/websocket_handler.hpp>
 
 namespace copper::components {
-containers::async_of<void> websocket_handler(shared<state> &, uuid, uuid,
+containers::async_of<void> websocket_handler(uuid, uuid,
                                              boost::beast::tcp_stream &stream,
                                              boost::beast::flat_buffer &buffer,
                                              request req,

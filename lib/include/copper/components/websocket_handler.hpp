@@ -31,7 +31,7 @@ namespace copper::components {
  * @return
  */
 containers::async_of<void> websocket_handler(
-    shared<state> & /*state*/, uuid /* server_id */, uuid /* session_id */,
+    uuid /* server_id */, uuid /* session_id */,
     boost::beast::tcp_stream &stream, boost::beast::flat_buffer &buffer,
     request req, boost::beast::string_view /*doc_root*/);
 

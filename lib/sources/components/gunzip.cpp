@@ -1,4 +1,8 @@
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 #include <copper/components/gunzip.hpp>
+#include <sstream>
 
 namespace copper::components {
 
