@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <copper/components/expression.hpp>
-#include <iostream>
 
 TEST(Components_Expression, Assertions) {
   using namespace copper::components;
