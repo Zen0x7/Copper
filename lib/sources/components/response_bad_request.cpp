@@ -5,7 +5,6 @@
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
 #include <copper/components/response_bad_request.hpp>
-#include <copper/components/state.hpp>
 #include <copper/components/status_code.hpp>
 
 namespace copper::components {
