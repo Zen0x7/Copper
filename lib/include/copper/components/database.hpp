@@ -45,7 +45,7 @@ class database : public shared_enabled<database> {
    * @return optional_of<shared<models::user>>
    */
   containers::async_of<containers::optional_of<shared<models::user>>>
-  get_user_by_email(const std::string &email);
+  get_user_by_email(std::string email);
 
   /**
    * Retrieves user by id

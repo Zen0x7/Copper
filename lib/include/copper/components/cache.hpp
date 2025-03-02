@@ -28,7 +28,8 @@ class cache : public shared_enabled<cache> {
   /**
    * Configuration
    */
-  shared<boost::redis::config> redis_configuration_;
+  shared<boost::redis::config> redis_configuration_ =
+      boost::make_shared<boost::redis::config>();
 
  public:
   /**
@@ -61,8 +62,8 @@ class cache : public shared_enabled<cache> {
    * @param data
    * @return async_of<void>
    */
-  containers::async_of<void> publish(const std::string &channel,
-                                     const std::string &data) const;
+  containers::async_of<void> publish(std::string channel,
+                                     std::string data) const;
 
   /**
    * Get instance

@@ -13,7 +13,7 @@ namespace copper::components {
 void database::start() const { pool_->async_run(boost::asio::detached); }
 
 containers::async_of<containers::optional_of<shared<models::user>>>
-database::get_user_by_email(const std::string &email) {
+database::get_user_by_email(const std::string email) {
   try {
     auto _connection = co_await pool_->async_get_connection(
         boost::asio::cancel_after(std::chrono::seconds(10)));

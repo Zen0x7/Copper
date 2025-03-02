@@ -15,7 +15,7 @@ namespace copper::components {
 /**
  * Fields
  */
-typedef boost::beast::http::field fields;
+using fields = boost::beast::http::field;
 
 }  // namespace copper::components
 
