@@ -9,4 +9,4 @@
 
 using namespace copper;
 
-TEST(App, Version) { ASSERT_EQ(get_version(), "6.0.0"); }
+TEST(App, Version) { ASSERT_EQ(get_version(), "7.0.0"); }
