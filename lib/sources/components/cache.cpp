@@ -87,8 +87,7 @@ containers::async_of<std::tuple<bool, int>> cache::can_invoke(
   co_return std::tuple{true, 0};
 }
 
-cache::cache()
-    : redis_configuration_(boost::make_shared<boost::redis::config>()) {
+cache::cache() {
   auto _configuration = configuration::instance();
 
   const std::string _redis_port =
@@ -118,8 +117,8 @@ containers::async_of<shared<boost::redis::connection>> cache::get_connection()
   co_return _connection;
 }
 
-containers::async_of<void> cache::publish(const std::string &channel,
-                                          const std::string &data) const {
+containers::async_of<void> cache::publish(const std::string channel,
+                                          const std::string data) const {
   const auto _connection = co_await this->get_connection();
   boost::redis::request _request;
   _request.push("PUBLISH", channel, data);
