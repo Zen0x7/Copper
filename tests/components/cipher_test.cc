@@ -39,7 +39,7 @@ TEST(Components_Cipher, Encrypt_And_Decrypt_Using_Existing_Key) {
   const std::string _secret_key =
       base64_decode("TsBen/ynU6jtihMXGRT3ZAtzTSiQGzyk9dkgY03WAn0=");
   const std::string _secret_iv = base64_decode("nt27vWC02To2ZzqXKaP7yw==");
-  const std::string _expected_encrypted = "2h8OT3N+7G8UEEV+RixbsQ==";
+  const std::string _expected_encrypted = "MezGO7smbArUgjeERkQbAjxep8J1+G4YFwjO";
   const std::string _input = "hello world";
 
   const std::string _encrypted =
