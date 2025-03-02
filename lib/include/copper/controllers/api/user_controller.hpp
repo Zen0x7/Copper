@@ -25,7 +25,7 @@ class user_controller final : public components::controller {
    * @return async_of<response>
    */
   components::containers::async_of<components::response> invoke(
-      const components::shared<components::controller_parameters> &parameters)
+      const components::shared<components::controller_parameters> parameters)
       override {
     const auto _user =
         co_await components::database::instance()->get_user_by_id(

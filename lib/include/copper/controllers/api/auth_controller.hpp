@@ -44,7 +44,7 @@ class auth_controller final : public components::controller {
    * @return async_of<response>
    */
   components::containers::async_of<components::response> invoke(
-      const components::shared<components::controller_parameters>& parameters)
+      const components::shared<components::controller_parameters> parameters)
       override {
     const std::string _email{
         parameters->get_body().as_object().at("email").as_string()};

@@ -58,7 +58,8 @@ containers::async_of<void> cache::set(
   co_await connection->async_exec(_request, _response, boost::asio::deferred);
 }
 
-std::string cache::get_key_for(const request &request, const std::string &ip) {
+std::string cache::get_key_for(const request &request,
+                               const std::string_view &ip) {
   const auto _url = url_from_request(request);
   std::string _key = request.method_string();
   _key.append(":");

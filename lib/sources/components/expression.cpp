@@ -68,8 +68,7 @@ shared<expression> expression_make(const std::string &input) {
     std::string _value{input.substr(_open + 1, _close - _open - 1)};
 
     // LCOV_EXCL_START
-    if (std::find(_arguments.begin(), _arguments.end(), _value) !=
-        _arguments.end()) {
+    if (std::ranges::find(_arguments, _value) != _arguments.end()) {
       std::string error_output = "Expression error: Argument ";
       error_output.append(_value);
       error_output.append(" already has.");
