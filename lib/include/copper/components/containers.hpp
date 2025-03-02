@@ -39,7 +39,7 @@ typedef std::unordered_map<std::string, std::string,
 /**
  * Map of strings
  */
-typedef std::map<std::string, std::string> map_of_strings;
+typedef std::map<std::string, std::string, std::less<>> map_of_strings;
 
 /**
  * Vector of shared pairs

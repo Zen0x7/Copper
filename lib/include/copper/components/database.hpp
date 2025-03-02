@@ -31,7 +31,7 @@ class database : public shared_enabled<database> {
    *
    * @param pool
    */
-  database(const shared<boost::mysql::connection_pool> &pool);
+  explicit database(const shared<boost::mysql::connection_pool> &pool);
 
   /**
    * Start
