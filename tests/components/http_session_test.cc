@@ -39,7 +39,7 @@ containers::async_of<void> cancel_http_sessions() {
 class templated_controller final : public controller {
  public:
   containers::async_of<response> invoke(
-      const shared<controller_parameters> &parameters) override {
+      const shared<controller_parameters> parameters) override {
     const json::json _data;
     co_return make_view(parameters, status_code::ok, "template", _data,
                         "text/html");
@@ -49,7 +49,7 @@ class templated_controller final : public controller {
 class exception_controller final : public controller {
  public:
   containers::async_of<response> invoke(
-      const shared<controller_parameters> &parameters) override {
+      const shared<controller_parameters> parameters) override {
     throw std::runtime_error("Something went wrong");
     auto _now = chronos::now();
     const json::object _data = {{"message", "Request has been processed."},
@@ -64,7 +64,7 @@ class exception_controller final : public controller {
 class params_controller final : public controller {
  public:
   containers::async_of<response> invoke(
-      const shared<controller_parameters> &parameters) override {
+      const shared<controller_parameters> parameters) override {
     auto _now = chronos::now();
     const json::object _data = {{"message", "Request has been processed."},
                                 {"data", parameters->get_bindings().at("name")},

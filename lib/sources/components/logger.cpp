@@ -19,7 +19,9 @@
 namespace copper::components {
 
 template <typename T>
-void logger_do_release(typename std::shared_ptr<T> const&, T*) {}
+void logger_do_release(typename std::shared_ptr<T> const&, T*) {
+  // Release triggered
+}
 
 template <typename T>
 typename boost::shared_ptr<T> logger_to_shared(

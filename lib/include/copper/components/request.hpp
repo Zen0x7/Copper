@@ -15,7 +15,7 @@ namespace copper::components {
 /**
  * Request
  */
-typedef boost::beast::http::request<boost::beast::http::string_body> request;
+using request = boost::beast::http::request<boost::beast::http::string_body>;
 
 /**
  * Request is illegal

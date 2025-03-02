@@ -10,14 +10,6 @@
 
 #include <boost/beast/core/error.hpp>
 
-#ifndef BOOST_STACKTRACE_USE_ADDR2LINE
-#define BOOST_STACKTRACE_USE_ADDR2LINE
-#endif
-
-#ifndef BOOST_STACKTRACE_ADDR2LINE_LOCATION
-#define BOOST_STACKTRACE_ADDR2LINE_LOCATION "/usr/bin/addr2line"
-#endif
-
 namespace copper::components {
 
 /**

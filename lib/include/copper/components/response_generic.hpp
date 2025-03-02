@@ -15,7 +15,7 @@ namespace copper::components {
 /**
  * Response generic type
  */
-typedef boost::beast::http::message_generator response_generic;
+using response_generic = boost::beast::http::message_generator;
 
 }  // namespace copper::components
 

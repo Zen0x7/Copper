@@ -145,7 +145,8 @@ class cache : public shared_enabled<cache> {
    * @param ip
    * @return async_of<void>
    */
-  static std::string get_key_for(const request &request, const std::string &ip);
+  static std::string get_key_for(const request &request,
+                                 const std::string_view &ip);
 };
 }  // namespace copper::components
 

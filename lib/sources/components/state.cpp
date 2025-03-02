@@ -8,7 +8,7 @@
 namespace copper::components {
 
 // LCOV_EXCL_START
-state::state() {}
+state::state() = default;
 
 shared<state> state::instance_ = nullptr;
 

@@ -18,10 +18,6 @@
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
 
-#ifndef HTTP_SERVER_HEADER_CONTENT
-#define HTTP_SERVER_HEADER_CONTENT "Copper"
-#endif
-
 namespace copper::components {
 
 /**
@@ -46,7 +42,7 @@ class kernel : public shared_enabled<kernel> {
   /**
    * Constructor
    */
-  explicit kernel() {}
+  explicit kernel() = default;
 
   /**
    * Find on routes

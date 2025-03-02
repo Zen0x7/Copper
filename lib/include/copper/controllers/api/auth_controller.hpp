@@ -19,19 +19,17 @@
 
 namespace copper::controllers::api {
 
-using namespace copper::components;
-
 /**
  * Auth controller
  */
-class auth_controller final : public controller {
+class auth_controller final : public components::controller {
  public:
   /**
    * Rules
    *
    * @return map_of_strings
    */
-  containers::map_of_strings rules() const override {
+  components::containers::map_of_strings rules() const override {
     return {
         {"*", "is_object"},
         {"email", "is_string"},
@@ -45,39 +43,42 @@ class auth_controller final : public controller {
    * @param parameters
    * @return async_of<response>
    */
-  containers::async_of<response> invoke(
-      const shared<controller_parameters>& parameters) override {
+  components::containers::async_of<components::response> invoke(
+      const components::shared<components::controller_parameters> parameters)
+      override {
     const std::string _email{
         parameters->get_body().as_object().at("email").as_string()};
     const std::string _password{
         parameters->get_body().as_object().at("password").as_string()};
 
-    const auto _user = co_await database::instance()->get_user_by_email(_email);
+    const auto _user =
+        co_await components::database::instance()->get_user_by_email(_email);
 
     if (!_user.has_value()) {
-      const json::object _errors = {
+      const components::json::object _errors = {
           {"message", "Email provided isn't registered."}};
 
-      co_return make_response(parameters, status_code::unauthorized,
+      co_return make_response(parameters, components::status_code::unauthorized,
                               serialize(_errors), "application/json");
     }
 
-    if (cipher_password_validator(_password, _user.value()->password_)) {
-      std::string _token = authentication_to_bearer(
-          boost::lexical_cast<uuid>(_user.value()->id_),
-          configuration::instance()->get()->app_key_);
+    if (components::cipher_password_validator(_password,
+                                              _user.value()->password_)) {
+      std::string _token = components::authentication_to_bearer(
+          boost::lexical_cast<components::uuid>(_user.value()->id_),
+          components::configuration::instance()->get()->app_key_);
 
-      const json::object _data = {{"token", _token}};
+      const components::json::object _data = {{"token", _token}};
 
       auto _shared_token = std::make_shared<std::string>(_token.data());
-      co_return make_response(parameters, status_code::ok, serialize(_data),
-                              "application/json");
+      co_return make_response(parameters, components::status_code::ok,
+                              serialize(_data), "application/json");
     }
 
-    const json::object _errors = {
+    const components::json::object _errors = {
         {"message", "Password provided doesn't match."}};
 
-    co_return make_response(parameters, status_code::unauthorized,
+    co_return make_response(parameters, components::status_code::unauthorized,
                             serialize(_errors), "application/json");
   }
 };

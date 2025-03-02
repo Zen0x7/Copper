@@ -15,7 +15,7 @@ namespace copper::components {
 /**
  * Routes
  */
-typedef containers::vector_of_shared_pairs<route, controller> routes;
+using routes = containers::vector_of_shared_pairs<route, controller>;
 
 }  // namespace copper::components
 

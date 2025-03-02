@@ -15,7 +15,7 @@ namespace copper::components {
 /**
  * Status codes
  */
-typedef boost::beast::http::status status_code;
+using status_code = boost::beast::http::status;
 
 }  // namespace copper::components
 
