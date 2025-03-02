@@ -130,8 +130,6 @@ std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
 
 std::string cipher_encrypt(const std::string &input, const std::string &key,
                            const std::string &iv) {
-  std::string _output;
-
   // LCOV_EXCL_START
   EVP_CIPHER_CTX *_openssl_context = EVP_CIPHER_CTX_new();
   if (!_openssl_context) {
@@ -146,34 +144,30 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
     report_for_openssl();
   }
 
-  int _length;
-  int _output_length;
+  std::string _output(input.size() + EVP_CIPHER_block_size(EVP_aes_256_cbc()),
+                      '\0');
+  int _out_length_1 = 0, _out_length_2 = 0;
 
-  auto *_output_buffer =
-      new unsigned char[input.size() +
-                        EVP_CIPHER_block_size(EVP_aes_256_cbc())];
-
-  if (EVP_EncryptUpdate(_openssl_context, _output_buffer, &_length,
+  if (EVP_EncryptUpdate(_openssl_context,
+                        reinterpret_cast<unsigned char *>(&_output[0]),
+                        &_out_length_1,
                         reinterpret_cast<const unsigned char *>(input.c_str()),
                         static_cast<int>(input.size())) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  _output_length = _length;
-
-  if (EVP_EncryptFinal_ex(_openssl_context, _output_buffer + _length,
-                          &_length) != 1) {
+  if (EVP_EncryptFinal_ex(
+          _openssl_context,
+          reinterpret_cast<unsigned char *>(&_output[0]) + _out_length_1,
+          &_out_length_2) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
   // LCOV_EXCL_STOP
 
-  _output_length += _length;
+  _output.resize(_out_length_1 + _out_length_2);
 
-  _output.assign(reinterpret_cast<char *>(_output_buffer), _output_length);
-
-  delete[] _output_buffer;
   EVP_CIPHER_CTX_free(_openssl_context);
 
   return _output;
@@ -183,8 +177,6 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
 
 std::string cipher_decrypt(const std::string &input, const std::string &key,
                            const std::string &iv) {
-  std::string _output;
-
   // LCOV_EXCL_START
 
   EVP_CIPHER_CTX *_openssl_context = EVP_CIPHER_CTX_new();
@@ -200,32 +192,28 @@ std::string cipher_decrypt(const std::string &input, const std::string &key,
     report_for_openssl();
   }
 
-  int _length;
-  int _input_length;
-  auto *_input_buffer =
-      new unsigned char[input.size() +
-                        EVP_CIPHER_block_size(EVP_aes_256_cbc())];
+  std::string _output(input.size(), '\0');
+  int _out_length_1 = 0, _out_length_2 = 0;
 
-  if (EVP_DecryptUpdate(_openssl_context, _input_buffer, &_length,
+  if (EVP_DecryptUpdate(_openssl_context,
+                        reinterpret_cast<unsigned char *>(&_output[0]),
+                        &_out_length_1,
                         reinterpret_cast<const unsigned char *>(input.c_str()),
                         static_cast<int>(input.size())) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  _input_length = _length;
-
-  if (EVP_DecryptFinal_ex(_openssl_context, _input_buffer + _length,
-                          &_length) != 1) {
+  if (EVP_DecryptFinal_ex(
+          _openssl_context,
+          reinterpret_cast<unsigned char *>(&_output[0]) + _out_length_1,
+          &_out_length_2) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  _input_length += _length;
+  _output.resize(_out_length_1 + _out_length_2);
 
-  _output.assign(reinterpret_cast<char *>(_input_buffer), _input_length);
-
-  delete[] _input_buffer;
   EVP_CIPHER_CTX_free(_openssl_context);
   // LCOV_EXCL_STOP
 
