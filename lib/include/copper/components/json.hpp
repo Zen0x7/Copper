@@ -18,27 +18,27 @@ namespace copper::components::json {
 /**
  * JSON
  */
-using nlohmann::json;
+using json = nlohmann::json;
 
 /**
  * JSON value
  */
-typedef boost::json::value value;
+using value = boost::json::value;
 
 /**
  * JSON object
  */
-typedef boost::json::object object;
+using object = boost::json::object;
 
 /**
  * JSON array
  */
-typedef boost::json::array array;
+using array = boost::json::array;
 
 /**
  * JSON string
  */
-typedef boost::json::string string;
+using string = boost::json::string;
 
 }  // namespace copper::components::json
 
