@@ -12,12 +12,11 @@
 #include <copper/components/json.hpp>
 
 namespace copper::controllers::api {
-using namespace copper::components;
 
 /**
  * User controller
  */
-class user_controller final : public controller {
+class user_controller final : public components::controller {
  public:
   /**
    * Invoke
@@ -25,12 +24,14 @@ class user_controller final : public controller {
    * @param parameters
    * @return async_of<response>
    */
-  containers::async_of<response> invoke(
-      const shared<controller_parameters> &parameters) override {
-    const auto _user = co_await database::instance()->get_user_by_id(
-        parameters->get_auth().value().id_);
+  components::containers::async_of<components::response> invoke(
+      const components::shared<components::controller_parameters> &parameters)
+      override {
+    const auto _user =
+        co_await components::database::instance()->get_user_by_id(
+            parameters->get_auth().value().id_);
 
-    const json::object _data = {
+    const components::json::object _data = {
         {"id", _user.value()->id_},
         {"name", _user.value()->name_},
         {"email", _user.value()->email_},
@@ -39,8 +40,8 @@ class user_controller final : public controller {
         {"updated_at", _user.value()->updated_at_},
     };
 
-    co_return make_response(parameters, status_code::ok, serialize(_data),
-                            "application/json");
+    co_return make_response(parameters, components::status_code::ok,
+                            serialize(_data), "application/json");
   }
 };
 

@@ -15,7 +15,7 @@ namespace copper::components {
 /**
  * Method
  */
-typedef boost::beast::http::verb method;
+using method = boost::beast::http::verb;
 
 }  // namespace copper::components
 

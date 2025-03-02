@@ -15,19 +15,11 @@
 #include <string>
 #include <vector>
 
-#ifndef CIPHER_KEY_LENGTH
-#define CIPHER_KEY_LENGTH 32
-#endif
-
-#ifndef CIPHER_IV_LENGTH
-#define CIPHER_IV_LENGTH 16
-#endif
-
-#ifndef CIPHER_DIGEST_LENGTH
-#define CIPHER_DIGEST_LENGTH 64
-#endif
-
 namespace copper::components {
+
+constexpr int CIPHER_KEY_LENGTH = 32;
+constexpr int CIPHER_IV_LENGTH = 16;
+constexpr int CIPHER_DIGEST_LENGTH = 64;
 
 std::string cipher_generate_sha_256() {
   std::string _bytes(CIPHER_KEY_LENGTH, '\0');
@@ -220,8 +212,8 @@ std::string cipher_decrypt(const std::string_view input, const std::string &key,
   }
 
   if (std::string _tag_buffer(_tag);
-      EVP_CIPHER_CTX_ctrl(_openssl_context, EVP_CTRL_GCM_SET_TAG, 16,
-                          _tag_buffer.data()) != 1) {
+      EVP_CIPHER_CTX_ctrl(_openssl_context, EVP_CTRL_GCM_SET_TAG,
+                          CIPHER_IV_LENGTH, _tag_buffer.data()) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }

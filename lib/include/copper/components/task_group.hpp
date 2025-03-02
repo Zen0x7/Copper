@@ -43,9 +43,8 @@ class task_group : public shared_enabled<task_group> {
    * Constructor
    * @param executor
    */
-  explicit task_group(boost::asio::any_io_executor executor)
-      : timer_{std::move(executor),
-               boost::asio::steady_timer::time_point::max()} {}
+  explicit task_group(const boost::asio::any_io_executor &executor)
+      : timer_{executor, boost::asio::steady_timer::time_point::max()} {}
 
   /**
    * Overload Constructor
@@ -66,7 +65,7 @@ class task_group : public shared_enabled<task_group> {
    */
   template <typename CompletionToken>
   auto adapt(CompletionToken &&completion_token) {
-    auto _guard = std::lock_guard{mutex_};
+    auto _guard = std::scoped_lock{mutex_};
     auto _signal = signals_.emplace(signals_.end());
 
     boost::weak_ptr<task_group> _weak_self = shared_from_this();

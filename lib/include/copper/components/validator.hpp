@@ -40,7 +40,7 @@ class validator : public shared_enabled<validator> {
   /**
    * Constructor
    */
-  validator() {}
+  validator() = default;
 };
 
 /**

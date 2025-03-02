@@ -14,10 +14,20 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
+/**
+ * Websocket
+ */
 class websocket : public shared<websocket> {
  public:
+  /**
+   * Stream
+   */
   boost::beast::websocket::stream<boost::beast::tcp_stream> stream_;
-  websocket(boost::asio::ip::tcp::socket&& socket)
+
+  /**
+   * Constructor
+   */
+  explicit websocket(boost::asio::ip::tcp::socket&& socket)
       : stream_(std::move(socket)) {}
 };
 }  // namespace copper::components
