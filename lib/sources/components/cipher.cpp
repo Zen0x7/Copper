@@ -33,7 +33,8 @@ std::string cipher_generate_sha_256() {
   std::string _bytes(CIPHER_KEY_LENGTH, '\0');
 
   // LCOV_EXCL_START
-  if (RAND_bytes(reinterpret_cast<unsigned char *>(&_bytes[0]), CIPHER_KEY_LENGTH) != 1) {
+  if (RAND_bytes(reinterpret_cast<unsigned char *>(&_bytes[0]),
+                 CIPHER_KEY_LENGTH) != 1) {
     report_for_openssl();
   }
   // LCOV_EXCL_STOP
@@ -42,7 +43,8 @@ std::string cipher_generate_sha_256() {
 }
 
 // ReSharper disable once CppDFAConstantFunctionResult
-std::string cipher_hmac(const std::string &input, const std::string_view &app_key) {
+std::string cipher_hmac(const std::string &input,
+                        const std::string_view &app_key) {
   std::string _output;
 
   // LCOV_EXCL_START
@@ -84,7 +86,9 @@ std::string cipher_hmac(const std::string &input, const std::string_view &app_ke
     report_for_openssl();
   }
 
-  if (EVP_DigestSignFinal(_openssl_context, reinterpret_cast<unsigned char *>(&_digest[0]), &_length) != 1) {
+  if (EVP_DigestSignFinal(_openssl_context,
+                          reinterpret_cast<unsigned char *>(&_digest[0]),
+                          &_length) != 1) {
     EVP_MD_CTX_free(_openssl_context);
     EVP_PKEY_free(_public_key);
     report_for_openssl();
@@ -145,11 +149,10 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
   std::string _output(input.size() + EVP_MAX_BLOCK_LENGTH, '\0');
   int _out_length = 0;
 
-  if (EVP_EncryptUpdate(_openssl_context,
-                        reinterpret_cast<unsigned char *>(&_output[0]),
-                        &_out_length,
-                        reinterpret_cast<const unsigned char *>(input.c_str()),
-                        static_cast<int>(input.size())) != 1) {
+  if (EVP_EncryptUpdate(
+          _openssl_context, reinterpret_cast<unsigned char *>(&_output[0]),
+          &_out_length, reinterpret_cast<const unsigned char *>(input.c_str()),
+          static_cast<int>(input.size())) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
@@ -163,16 +166,17 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
     report_for_openssl();
   }
 
-
   _output.resize(_out_length + _final_length);
 
   std::string _tag(CIPHER_IV_LENGTH, '\0');
 
-  if (RAND_bytes(reinterpret_cast<unsigned char *>(&_tag[0]), CIPHER_IV_LENGTH) != 1) {
+  if (RAND_bytes(reinterpret_cast<unsigned char *>(&_tag[0]),
+                 CIPHER_IV_LENGTH) != 1) {
     report_for_openssl();
   }
 
-  if (EVP_CIPHER_CTX_ctrl(_openssl_context, EVP_CTRL_GCM_GET_TAG, CIPHER_IV_LENGTH, &_tag[0]) != 1) {
+  if (EVP_CIPHER_CTX_ctrl(_openssl_context, EVP_CTRL_GCM_GET_TAG,
+                          CIPHER_IV_LENGTH, &_tag[0]) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
@@ -183,10 +187,11 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
 }
 // LCOV_EXCL_STOP
 
-std::string cipher_decrypt(const std::string &input, const std::string &key,
+std::string cipher_decrypt(const std::string_view input, const std::string &key,
                            const std::string &iv) {
-  std::string _ciphertext = input.substr(0, input.size() - CIPHER_IV_LENGTH);
-  std::string _tag = input.substr(input.size() - CIPHER_IV_LENGTH);
+  std::string_view _ciphertext =
+      input.substr(0, input.size() - CIPHER_IV_LENGTH);
+  std::string_view _tag = input.substr(input.size() - CIPHER_IV_LENGTH);
 
   // LCOV_EXCL_START
   EVP_CIPHER_CTX *_openssl_context = EVP_CIPHER_CTX_new();
@@ -205,20 +210,21 @@ std::string cipher_decrypt(const std::string &input, const std::string &key,
   std::string _output(_ciphertext.size(), '\0');
   int _out_length = 0;
 
-  if (EVP_DecryptUpdate(_openssl_context,
-                        reinterpret_cast<unsigned char *>(&_output[0]),
-                        &_out_length,
-                        reinterpret_cast<const unsigned char *>(_ciphertext.c_str()),
-                        static_cast<int>(_ciphertext.size())) != 1) {
+  if (EVP_DecryptUpdate(
+          _openssl_context, reinterpret_cast<unsigned char *>(&_output[0]),
+          &_out_length,
+          reinterpret_cast<const unsigned char *>(_ciphertext.data()),
+          static_cast<int>(_ciphertext.size())) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
 
-  if (EVP_CIPHER_CTX_ctrl(_openssl_context, EVP_CTRL_GCM_SET_TAG, 16, _tag.data()) != 1) {
+  if (std::string _tag_buffer(_tag);
+      EVP_CIPHER_CTX_ctrl(_openssl_context, EVP_CTRL_GCM_SET_TAG, 16,
+                          _tag_buffer.data()) != 1) {
     EVP_CIPHER_CTX_free(_openssl_context);
     report_for_openssl();
   }
-
 
   int _final_length = 0;
   if (EVP_DecryptFinal_ex(
