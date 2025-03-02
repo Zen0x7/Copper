@@ -52,8 +52,7 @@ class cache : public shared_enabled<cache> {
    * @return async_of<tuple_of<bool, int>>
    */
   containers::async_of<containers::tuple_of<bool, int>> can_invoke(
-      const request &request, const std::string &ip,
-      const int &max_requests) const;
+      request request, std::string ip, int max_requests) const;
 
   /**
    * Publish

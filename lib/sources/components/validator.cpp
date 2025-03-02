@@ -3,6 +3,8 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include <fmt/format.h>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -49,7 +51,7 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
         }
         _scoped_rules.push_back(_rule.substr(_start));
 
-        for (auto &_scoped_rule : _scoped_rules) {
+        for (const std::string &_scoped_rule : _scoped_rules) {
           if (_scoped_rule == "is_string") {
             if (!value.as_object().at(_attribute).is_string()) {
               std::string _error_message =
@@ -127,9 +129,9 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
                 size_t _i = 0;
                 for (const auto &_element : _elements) {
                   if (!_element.is_string()) {
-                    std::string _error_message =
-                        "Attribute " + _attribute + " at position " +
-                        std::to_string(_i) + " must be string.";
+                    std::string _error_message = fmt::format(
+                        "Attribute {} at position {} must be string.",
+                        _attribute, _i);
                     _response->insert_or_push(_attribute, _error_message);
                   }
                   _i++;

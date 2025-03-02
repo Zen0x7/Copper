@@ -23,7 +23,7 @@ class router : public shared_enabled<router> {
   /**
    * Routes
    */
-  shared<routes> routes_;
+  shared<routes> routes_ = boost::make_shared<routes>();
 
  public:
   /**
