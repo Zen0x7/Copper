@@ -21,10 +21,20 @@
 
 namespace copper::components::containers {
 
+struct unordered_map_transparent_hasher {
+  using is_transparent = void;
+
+  size_t operator()(std::string_view sv) const {
+    return std::hash<std::string_view>{}(sv);
+  }
+};
+
 /**
  * Unordered maps of strings
  */
-typedef std::unordered_map<std::string, std::string> unordered_map_of_strings;
+typedef std::unordered_map<std::string, std::string,
+                           unordered_map_transparent_hasher, std::equal_to<>>
+    unordered_map_of_strings;
 
 /**
  * Map of strings
