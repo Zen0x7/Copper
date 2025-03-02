@@ -26,7 +26,8 @@ std::string cipher_generate_sha_256();
  * @param app_key
  * @return string Output
  */
-std::string cipher_hmac(const std::string &input, const std::string_view &app_key);
+std::string cipher_hmac(const std::string &input,
+                        const std::string_view &app_key);
 
 /**
  * Generate AES Initialization Vector
@@ -56,7 +57,7 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
  * @param iv
  * @return string Output
  */
-std::string cipher_decrypt(const std::string &input, const std::string &key,
+std::string cipher_decrypt(std::string_view input, const std::string &key,
                            const std::string &iv);
 
 bool cipher_password_validator(const std::string &input,
