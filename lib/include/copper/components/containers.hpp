@@ -32,14 +32,14 @@ struct unordered_map_transparent_hasher {
 /**
  * Unordered maps of strings
  */
-typedef std::unordered_map<std::string, std::string,
-                           unordered_map_transparent_hasher, std::equal_to<>>
-    unordered_map_of_strings;
+using unordered_map_of_strings =
+    std::unordered_map<std::string, std::string,
+                       unordered_map_transparent_hasher, std::equal_to<>>;
 
 /**
  * Map of strings
  */
-typedef std::map<std::string, std::string, std::less<>> map_of_strings;
+using map_of_strings = std::map<std::string, std::string, std::less<>>;
 
 /**
  * Vector of shared pairs
