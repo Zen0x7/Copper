@@ -18,7 +18,7 @@ namespace copper::components::json {
 /**
  * JSON
  */
-typedef nlohmann::json json;
+using nlohmann::json;
 
 /**
  * JSON value
