@@ -10,6 +10,7 @@
 #include <copper/components/controller.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
+#include <copper/components/response_shared_handler.hpp>
 #include <copper/components/views.hpp>
 
 namespace copper::components {
