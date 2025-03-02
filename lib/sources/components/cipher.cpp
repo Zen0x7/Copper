@@ -30,21 +30,19 @@
 namespace copper::components {
 
 std::string cipher_generate_sha_256() {
-  unsigned char _bytes[CIPHER_KEY_LENGTH];
+  std::string _bytes(CIPHER_KEY_LENGTH, '\0');
 
   // LCOV_EXCL_START
-  if (RAND_bytes(_bytes, CIPHER_KEY_LENGTH) != 1) {
+  if (RAND_bytes(reinterpret_cast<unsigned char *>(&_bytes[0]), CIPHER_KEY_LENGTH) != 1) {
     report_for_openssl();
   }
   // LCOV_EXCL_STOP
 
-  const std::string _result(reinterpret_cast<const char *>(_bytes),
-                            CIPHER_KEY_LENGTH);
-
-  return base64_encode(_result);
+  return base64_encode(_bytes);
 }
 
-std::string cipher_hmac(const std::string &input, const std::string &app_key) {
+// ReSharper disable once CppDFAConstantFunctionResult
+std::string cipher_hmac(const std::string &input, const std::string_view &app_key) {
   std::string _output;
 
   // LCOV_EXCL_START
@@ -64,7 +62,7 @@ std::string cipher_hmac(const std::string &input, const std::string &app_key) {
   }
 
   std::size_t _length;
-  unsigned char _digest[CIPHER_DIGEST_LENGTH];
+  std::string _digest(CIPHER_DIGEST_LENGTH, '\0');
 
   if (EVP_DigestSignInit(_openssl_context, nullptr, EVP_sha256(), nullptr,
                          _public_key) != 1) {
@@ -86,7 +84,7 @@ std::string cipher_hmac(const std::string &input, const std::string &app_key) {
     report_for_openssl();
   }
 
-  if (EVP_DigestSignFinal(_openssl_context, _digest, &_length) != 1) {
+  if (EVP_DigestSignFinal(_openssl_context, reinterpret_cast<unsigned char *>(&_digest[0]), &_length) != 1) {
     EVP_MD_CTX_free(_openssl_context);
     EVP_PKEY_free(_public_key);
     report_for_openssl();
@@ -96,9 +94,9 @@ std::string cipher_hmac(const std::string &input, const std::string &app_key) {
   EVP_PKEY_free(_public_key);
   // LCOV_EXCL_STOP
 
-  _output.assign(reinterpret_cast<char *>(_digest), _length);
+  _digest.resize(_length);
 
-  return _output;
+  return _digest;
   // LCOV_EXCL_START
 }
 // LCOV_EXCL_STOP

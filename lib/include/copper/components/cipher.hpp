@@ -26,7 +26,7 @@ std::string cipher_generate_sha_256();
  * @param app_key
  * @return string Output
  */
-std::string cipher_hmac(const std::string &input, const std::string &app_key);
+std::string cipher_hmac(const std::string &input, const std::string_view &app_key);
 
 /**
  * Generate AES Initialization Vector
