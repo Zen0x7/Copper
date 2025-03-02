@@ -34,7 +34,7 @@ class views : public shared_enabled<views> {
   /**
    * Constructor
    */
-  views() : environment_(boost::make_shared<inja::Environment>()), items_() {}
+  views() : environment_(boost::make_shared<inja::Environment>()) {}
 
   shared<views> push(std::string name, std::string path) {
     items_.insert(
@@ -51,9 +51,9 @@ class views : public shared_enabled<views> {
    * @return string
    */
   std::string render(std::string name, json::json data = {}) const {
-    for (auto& item : items_) {
-      if (item.first == name) {
-        return environment_->render(item.second->template_, data);
+    for (auto& [_name, _view] : items_) {
+      if (_name == name) {
+        return environment_->render(_view->template_, data);
       }
     }
 

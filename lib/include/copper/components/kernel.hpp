@@ -75,9 +75,8 @@ class kernel : public shared_enabled<kernel> {
    */
   containers::async_of<containers::tuple_of<
       shared<models::request>, shared<models::response>, response_generic>>
-  call(uuid session_id, boost::beast::string_view /* root */,
-       const request &request, const std::string &ip, const uuid &request_id,
-       long start_at) const;
+  call(uuid session_id, boost::beast::string_view /* root */, request request,
+       std::string ip, uuid request_id, long start_at) const;
 };
 
 }  // namespace copper::components

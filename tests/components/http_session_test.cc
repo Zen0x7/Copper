@@ -28,6 +28,7 @@
 #include <copper/controllers/api/up_controller.hpp>
 #include <copper/controllers/api/user_controller.hpp>
 #include <nlohmann/json.hpp>
+#include <thread>
 
 using namespace copper::components;
 
@@ -152,7 +153,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     boost::asio::io_context _client_ioc;
 
-    std::vector<std::thread> _v;
+    std::vector<std::jthread> _v;
     _v.reserve(_threads);
     for (auto _i = _threads; _i > 0; --_i)
       _v.emplace_back([&_ioc] { _ioc.run(); });

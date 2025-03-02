@@ -11,8 +11,7 @@
 namespace copper::components {
 
 containers::async_of<int> cache::has(
-    const std::string &key,
-    const shared<boost::redis::connection> &connection) {
+    const std::string key, const shared<boost::redis::connection> connection) {
   boost::redis::request _request;
   boost::redis::response<int> _response;
   _request.push("EXISTS", key);
@@ -21,8 +20,7 @@ containers::async_of<int> cache::has(
 }
 
 containers::async_of<int64_t> cache::counter_of(
-    const std::string &key,
-    const shared<boost::redis::connection> &connection) {
+    const std::string key, const shared<boost::redis::connection> connection) {
   boost::redis::request _request;
   boost::redis::response<int64_t> _response;
   _request.push("GET", key);
@@ -30,9 +28,9 @@ containers::async_of<int64_t> cache::counter_of(
   co_return std::get<0>(_response).value();
 }
 
-containers::async_of<int64_t> cache::get_expiration_of(
-    const std::string &key,
-    const shared<boost::redis::connection> &connection) {
+auto cache::get_expiration_of(const std::string key,
+                              shared<boost::redis::connection> connection)
+    -> containers::async_of<int64_t> {
   boost::redis::request _request;
   boost::redis::response<int64_t> _response;
   _request.push("TTL", key);
@@ -41,8 +39,7 @@ containers::async_of<int64_t> cache::get_expiration_of(
 }
 
 containers::async_of<void> cache::increase(
-    const std::string &key,
-    const shared<boost::redis::connection> &connection) {
+    const std::string key, const shared<boost::redis::connection> connection) {
   boost::redis::request _request;
   boost::redis::response<std::string> _response;
   _request.push("INCR", key);
@@ -50,8 +47,7 @@ containers::async_of<void> cache::increase(
 }
 
 containers::async_of<void> cache::set(
-    const std::string &key,
-    const shared<boost::redis::connection> &connection) {
+    const std::string key, const shared<boost::redis::connection> connection) {
   boost::redis::request _request;
   boost::redis::response<std::string> _response;
   _request.push("SET", key, 1, "EX", 60);

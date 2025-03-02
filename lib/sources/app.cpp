@@ -165,7 +165,7 @@ int run(int argc, const char *argv[]) {
     co_spawn(make_strand(_ioc), signal_handler(_task_group),
              boost::asio::detached);
 
-    containers::vector_of<std::thread> _threads_container;
+    containers::vector_of<std::jthread> _threads_container;
     _threads_container.reserve(_threads - 1);
     for (auto _i = _threads - 1; _i > 0; --_i)
       _threads_container.emplace_back([&_ioc] { _ioc.run(); });
@@ -221,6 +221,7 @@ int run(int argc, const char *argv[]) {
       _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both,
                                 _ec);
       if (_ec && _ec != boost::system::errc::not_connected) {
+        std::cout << "Socket error: " << _ec.message() << std::endl;
       }
       _stream.close();
       _client_ioc.run();
