@@ -91,8 +91,7 @@ class cache : public shared_enabled<cache> {
    * @return async_of<int>
    */
   static containers::async_of<int> has(
-      const std::string &key,
-      const shared<boost::redis::connection> &connection);
+      std::string key, shared<boost::redis::connection> connection);
 
   /**
    * Retrieves key's invoked times
@@ -102,8 +101,7 @@ class cache : public shared_enabled<cache> {
    * @return async_of<int64_t>
    */
   static containers::async_of<int64_t> counter_of(
-      const std::string &key,
-      const shared<boost::redis::connection> &connection);
+      std::string key, shared<boost::redis::connection> connection);
 
   /**
    * Retrieve key's expiration at
@@ -113,8 +111,7 @@ class cache : public shared_enabled<cache> {
    * @return async_of<void>
    */
   static containers::async_of<int64_t> get_expiration_of(
-      const std::string &key,
-      const shared<boost::redis::connection> &connection);
+      std::string key, shared<boost::redis::connection> connection);
 
   /**
    * Increase key
@@ -124,8 +121,7 @@ class cache : public shared_enabled<cache> {
    * @return async_of<void>
    */
   static containers::async_of<void> increase(
-      const std::string &key,
-      const shared<boost::redis::connection> &connection);
+      std::string key, shared<boost::redis::connection> connection);
 
   /**
    * Set key
@@ -135,8 +131,7 @@ class cache : public shared_enabled<cache> {
    * @return async_of<void>
    */
   static containers::async_of<void> set(
-      const std::string &key,
-      const shared<boost::redis::connection> &connection);
+      std::string key, shared<boost::redis::connection> connection);
 
   /**
    * Generate request based key

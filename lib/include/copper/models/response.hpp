@@ -53,7 +53,7 @@ class response : public components::shared_enabled<response> {
   /**
    * Protected
    */
-  bool protected_;
+  bool protected_ = false;
 
   /**
    * Constructor
@@ -72,8 +72,7 @@ class response : public components::shared_enabled<response> {
         request_id_(std::move(request_id)),
         status_code_(status_code),
         headers_(std::move(headers)),
-        body_(std::move(body)),
-        protected_(false) {}
+        body_(std::move(body)) {}
 };
 
 /**

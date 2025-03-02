@@ -34,8 +34,8 @@ class view : public shared_enabled<view> {
    * @param path
    * @param environment
    */
-  view(const std::string &path, const shared<inja::Environment> &environment) {
-    path_ = path;
+  view(const std::string &path, const shared<inja::Environment> &environment)
+      : path_(path) {
     template_ = environment->parse_template("views/" + path_ + ".html");
   }
 };

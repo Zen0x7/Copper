@@ -17,6 +17,7 @@
 #include <copper/components/subscriber.hpp>
 #include <copper/components/task_group.hpp>
 #include <iostream>
+#include <thread>
 
 copper::components::containers::async_of<void> cancel_websocket_session() {
   const auto executor = co_await boost::asio::this_coro::executor;
@@ -72,7 +73,7 @@ TEST(Components_WebSocket_Session, Implementation) {
 
     boost::asio::io_context _client_ioc;
 
-    std::vector<std::thread> _v;
+    std::vector<std::jthread> _v;
     _v.reserve(_threads);
     for (auto i = _threads; i > 0; --i)
       _v.emplace_back([&_ioc] { _ioc.run(); });
