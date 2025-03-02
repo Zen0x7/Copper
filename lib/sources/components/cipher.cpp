@@ -131,9 +131,6 @@ std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
 std::string cipher_encrypt(const std::string &input, const std::string &key,
                            const std::string &iv) {
   // LCOV_EXCL_START
-  if (key.size() != 32 || iv.size() != 16)
-    throw std::runtime_error("Key must be 256 bits and IV must be 128 bits");
-
   EVP_CIPHER_CTX *_openssl_context = EVP_CIPHER_CTX_new();
   if (!_openssl_context) {
     report_for_openssl();
@@ -147,9 +144,9 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
     report_for_openssl();
   }
 
-  std::string _output(input.size() + EVP_CIPHER_block_size(EVP_aes_256_cbc()),
-                      '\0');
-  int _out_length_1 = 0, _out_length_2 = 0;
+  std::string _output(input.size() + EVP_MAX_BLOCK_LENGTH, '\0');
+  int _out_length_1 = 0;
+  int _out_length_2 = 0;
 
   if (EVP_EncryptUpdate(_openssl_context,
                         reinterpret_cast<unsigned char *>(&_output[0]),
@@ -181,9 +178,6 @@ std::string cipher_encrypt(const std::string &input, const std::string &key,
 std::string cipher_decrypt(const std::string &input, const std::string &key,
                            const std::string &iv) {
   // LCOV_EXCL_START
-  if (key.size() != 32 || iv.size() != 16)
-    throw std::runtime_error("Key must be 256 bits and IV must be 128 bits");
-
   EVP_CIPHER_CTX *_openssl_context = EVP_CIPHER_CTX_new();
   if (!_openssl_context) {
     report_for_openssl();
@@ -198,7 +192,8 @@ std::string cipher_decrypt(const std::string &input, const std::string &key,
   }
 
   std::string _output(input.size(), '\0');
-  int _out_length_1 = 0, _out_length_2 = 0;
+  int _out_length_1 = 0;
+  int _out_length_2 = 0;
 
   if (EVP_DecryptUpdate(_openssl_context,
                         reinterpret_cast<unsigned char *>(&_output[0]),
