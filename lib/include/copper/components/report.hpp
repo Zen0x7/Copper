@@ -23,7 +23,7 @@ void report(const boost::beast::error_code &ec, char const *what);
 /**
  * Report for OpenSSL
  */
-void report_for_openssl();
+[[noreturn]] void report_for_openssl();
 
 }  // namespace copper::components
 

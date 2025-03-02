@@ -49,5 +49,5 @@ shared<router> router::push(const method method, const char *path,
 
 shared<routes> router::get_routes() { return routes_; }
 
-router::router() : routes_(boost::make_shared<routes>()) {}
+router::router() = default;
 }  // namespace copper::components

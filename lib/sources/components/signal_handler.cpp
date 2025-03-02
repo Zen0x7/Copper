@@ -9,8 +9,7 @@
 
 namespace copper::components {
 
-containers::async_of<void> signal_handler(
-    const shared<task_group>& task_group) {
+containers::async_of<void> signal_handler(const shared<task_group> task_group) {
   const auto _executor = co_await boost::asio::this_coro::executor;
   auto _signal_set = boost::asio::signal_set{_executor, SIGINT, SIGTERM};
 
@@ -24,12 +23,10 @@ containers::async_of<void> signal_handler(
         boost::asio::cancel_after(std::chrono::seconds{10})));
 
     if (_ec == boost::asio::error::operation_aborted) {
-      //      std::cout << "Sending a terminal cancellation signal...\n";
       task_group->emit(boost::asio::cancellation_type::terminal);
       co_await task_group->async_wait();
     }
 
-    //    std::cout << "Child tasks completed.\n";
   } else  // SIGTERM
   {
     _executor.get_inner_executor().context().stop();

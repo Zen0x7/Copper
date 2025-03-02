@@ -32,7 +32,7 @@ std::string query_from_request(const request &request) {
     std::string _key = _pair.substr(0, _pos);
     std::string _value = _pair.substr(_pos + 1);
 
-    if (_key.size() > 2 && _key.substr(_key.size() - 2) == "[]") {
+    if (_key.size() > 2 && _key.ends_with("[]")) {
       _key = _key.substr(0, _key.size() - 2);
       _map[_key].push_back(_value);
     } else {
