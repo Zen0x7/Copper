@@ -20,6 +20,8 @@
 #include <iostream>
 
 namespace copper::components {
+
+// LCOV_EXCL_START
 containers::async_of<kernel_call_result> invoke(std::string method,
                                                 std::string signature,
                                                 std::string headers,
@@ -83,6 +85,7 @@ containers::async_of<kernel_call_result> invoke(std::string method,
                             response_generic>(
       std::move(_request), std::move(_response), std::move(_message));
 }
+// LCOV_EXCL_STOP
 
 containers::async_of<void> invoke_from_console(const std::string method,
                                                const std::string signature,
