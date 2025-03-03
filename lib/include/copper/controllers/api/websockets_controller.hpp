@@ -16,7 +16,7 @@
 namespace copper::controllers::api {
 
 /**
- * User controller
+ * Websockets controller
  */
 class websockets_controller final : public components::controller {
  public:
