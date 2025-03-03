@@ -7,6 +7,7 @@
 #include <boost/asio/detached.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/json/parse.hpp>
+#include <boost/json/serialize.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <copper/components/chronos.hpp>
 #include <copper/components/configuration.hpp>
@@ -49,7 +50,7 @@ containers::async_of<kernel_call_result> invoke(std::string method,
     std::cout << "Headers must be an object" << std::endl;
   }
 
-  for (auto& [key, value] : _headers.as_object()) {
+  for (auto &[key, value] : _headers.as_object()) {
     if (value.is_string()) {
       _request_.set(key, value.as_string());
     } else if (value.is_int64()) {
@@ -100,7 +101,19 @@ containers::async_of<void> invoke_from_console(const std::string method,
             << std::endl;
 
   std::cout << "ID: " << _request->id_ << std::endl;
-  std::cout << "Headers: " << _request->headers_ << std::endl;
+  std::cout << "Headers: " << std::endl;
+
+  {
+    boost::system::error_code ec;
+    auto _headers = boost::json::parse(_request->headers_, ec);
+
+    if (!ec) {
+      for (auto const &[key, value] : _headers.as_object()) {
+        std::cout << "- " << key << ": " << serialize(value) << std::endl;
+      }
+    }
+  }
+
   std::cout << "Body: " << _request->body_ << std::endl << std::endl;
 
   std::cout << "Response: " << std::endl
@@ -111,7 +124,19 @@ containers::async_of<void> invoke_from_console(const std::string method,
   std::cout << "Status Code: " << _response->status_code_ << std::endl;
   std::cout << "Protected: " << (_response->protected_ ? "ON" : "OFF")
             << std::endl;
-  std::cout << "Headers: " << _response->headers_ << std::endl;
+  std::cout << "Headers: " << std::endl;
+
+  {
+    boost::system::error_code ec;
+    auto _headers = boost::json::parse(_response->headers_, ec);
+
+    if (!ec) {
+      for (auto const &[key, value] : _headers.as_object()) {
+        std::cout << "- " << key << ": " << serialize(value) << std::endl;
+      }
+    }
+  }
+
   std::cout << "Body: " << _response->body_ << std::endl << std::endl;
 
   database::instance()->stop();
