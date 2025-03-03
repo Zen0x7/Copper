@@ -39,6 +39,11 @@ class database : public shared_enabled<database> {
   void start() const;
 
   /**
+   * Stop
+   */
+  void stop() const;
+
+  /**
    * Retrieves user by email
    *
    * @param email

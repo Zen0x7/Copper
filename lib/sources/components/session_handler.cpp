@@ -57,20 +57,20 @@ containers::async_of<void> session_handler(uuid server_id, uuid session_id,
 
     auto _request_id = _generator();
 
-    std::string _ip = get_lowest_layer(stream)
-                          .socket()
-                          .remote_endpoint()
-                          .address()
-                          .to_string();
+    const std::string _ip = get_lowest_layer(stream)
+                                .socket()
+                                .remote_endpoint()
+                                .address()
+                                .to_string();
 
-    auto [_request, _response, _generic_response] = co_await _kernel->call(
+    auto [_request, _response, _message] = co_await _kernel->call(
         session_id, doc_root, _parser.release(), _ip, _request_id, _start_at);
 
     _request->finished_at_ = chronos::now();
     _request->duration_ = _request->finished_at_ - _start_at;
 
-    if (!_generic_response.keep_alive()) {
-      co_await boost::beast::async_write(stream, std::move(_generic_response));
+    if (!_message.keep_alive()) {
+      co_await boost::beast::async_write(stream, std::move(_message));
 
       co_spawn(_executor,
                database::instance()->create_invocation(_request, _response),
@@ -84,7 +84,7 @@ containers::async_of<void> session_handler(uuid server_id, uuid session_id,
       co_return;
     }
 
-    co_await boost::beast::async_write(stream, std::move(_generic_response));
+    co_await boost::beast::async_write(stream, std::move(_message));
     co_spawn(_executor,
              database::instance()->create_invocation(_request, _response),
              boost::asio::detached);

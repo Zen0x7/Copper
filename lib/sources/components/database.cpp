@@ -1,4 +1,10 @@
+//          Copyright Ian Torres 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <boost/asio/cancel_after.hpp>
+#include <boost/asio/co_spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/mysql/pool_params.hpp>
 #include <boost/mysql/results.hpp>
@@ -11,6 +17,16 @@
 namespace copper::components {
 
 void database::start() const { pool_->async_run(boost::asio::detached); }
+
+void database::stop() const {
+  co_spawn(
+      make_strand(pool_->get_executor()),
+      [&]() -> boost::asio::awaitable<void> {
+        pool_->cancel();
+        co_return;
+      },
+      boost::asio::detached);
+}
 
 containers::async_of<containers::optional_of<shared<models::user>>>
 database::get_user_by_email(const std::string email) {
