@@ -214,6 +214,42 @@ kernel::call(uuid session_id, boost::beast::string_view, const request request,
   co_return std::make_tuple(_request, _response, _service_response);
 }
 
-containers::async_of<void> kernel::handle(uuid session_id, uuid websocket_id, std::string message) {
+containers::async_of<shared<event>> kernel::handle(uuid session_id, uuid websocket_id, std::string message) {
+
+    const auto _event = boost::make_shared<event>();
+
+    boost::system::error_code _ec;
+
+    const auto _value = boost::json::parse(message, _ec);
+
+    if (_ec) {
+        _event->status_code_ = status_code::unprocessable_entity;
+        _event->data_ = {
+            {"command", "ack"},
+            {"message", "The given data be a valid JSON."},
+            {"status", _event->status_code_},
+        };
+        co_return _event;
+    }
+
+    containers::map_of_strings _rules = {
+        {"*", "is_object"},
+        {"id", "is_uuid"},
+        {"command", "is_string"},
+    };
+
+    if (const auto _validator = validator_make(_rules, _value); !_validator->success_) {
+        _event->status_code_ = status_code::unprocessable_entity;
+        _event->data_ = {
+            {"command", "ack"},
+            {"message", "The given data was invalid."},
+            {"errors", _validator->errors_},
+            {"status", _event->status_code_},
+        };
+
+        co_return _event;
+    }
+
+    co_return _event;
 }
 }  // namespace copper::components
