@@ -21,8 +21,8 @@ void database::start() const { pool_->async_run(boost::asio::detached); }
 void database::stop() const {
   co_spawn(
       make_strand(pool_->get_executor()),
-      [&]() -> boost::asio::awaitable<void> {
-        pool_->cancel();
+      [this]() -> boost::asio::awaitable<void> {
+        this->pool_->cancel();
         co_return;
       },
       boost::asio::detached);
