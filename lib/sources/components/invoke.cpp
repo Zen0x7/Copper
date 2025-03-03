@@ -3,6 +3,8 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/json/parse.hpp>
 #include <boost/uuid/random_generator.hpp>
@@ -12,6 +14,7 @@
 #include <copper/components/fields.hpp>
 #include <copper/components/invoke.hpp>
 #include <copper/components/kernel.hpp>
+#include <copper/components/logger.hpp>
 #include <copper/components/shared.hpp>
 #include <iostream>
 
@@ -22,6 +25,7 @@ containers::async_of<kernel_call_result> invoke(std::string method,
                                                 std::string body) {
   auto _generator = boost::uuids::random_generator();
   auto _configuration = configuration::instance();
+  auto _executor = co_await boost::asio::this_coro::executor;
 
   const auto _kernel = boost::make_shared<kernel>();
 
@@ -55,16 +59,28 @@ containers::async_of<kernel_call_result> invoke(std::string method,
     }
   }
 
-  auto _request_id = _generator();
   auto _session_id = _generator();
+  auto _request_id = _generator();
 
   const std::string _ip = "127.0.0.1";
   auto _start_at = chronos::now();
 
-  auto response = co_await _kernel->call(_session_id, "", std::move(_request_),
-                                         _ip, _request_id, _start_at);
+  auto [_request, _response, _message] = co_await _kernel->call(
+      _session_id, "", std::move(_request_), _ip, _request_id, _start_at);
 
-  co_return response;
+  _request->finished_at_ = chronos::now();
+  _request->duration_ = _request->finished_at_ - _start_at;
+
+  co_await database::instance()->create_invocation(_request, _response);
+
+  logger::instance()->requests_->info(
+      "[{}] [{}] [{}] {} {} {} {}", "CLI", to_string(_session_id),
+      to_string(_request_id), _request->version_, _request->method_,
+      _request->path_, _response->status_code_);
+
+  co_return std::make_tuple<shared<models::request>, shared<models::response>,
+                            response_generic>(
+      std::move(_request), std::move(_response), std::move(_message));
 }
 
 containers::async_of<void> invoke_from_console(const std::string method,
@@ -97,5 +113,7 @@ containers::async_of<void> invoke_from_console(const std::string method,
             << std::endl;
   std::cout << "Headers: " << _response->headers_ << std::endl;
   std::cout << "Body: " << _response->body_ << std::endl << std::endl;
+
+  database::instance()->stop();
 }
 }  // namespace copper::components

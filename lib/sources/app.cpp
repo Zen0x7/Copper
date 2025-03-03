@@ -194,8 +194,6 @@ int run(int argc, const char *argv[]) {
                invoke_from_console(_method, _signature, _headers, _body),
                boost::asio::detached);
 
-      database::instance()->stop();
-
       _ioc.run();
     }
   }

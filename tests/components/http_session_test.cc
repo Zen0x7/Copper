@@ -1018,7 +1018,7 @@ TEST(Components_HTTP_Session, Implementation) {
 
     _client_ioc.run();
 
-    std::string _method = "get";
+    std::string _method = "GET";
     std::string _signature = "/";
     std::string _headers = "{}";
     std::string _body = "{}";
@@ -1026,8 +1026,6 @@ TEST(Components_HTTP_Session, Implementation) {
     co_spawn(make_strand(_ioc),
              invoke_from_console(_method, _signature, _headers, _body),
              boost::asio::detached);
-
-    database::instance()->stop();
 
     co_spawn(make_strand(_ioc), cancel_http_sessions(), boost::asio::detached);
     _ioc.stop();
