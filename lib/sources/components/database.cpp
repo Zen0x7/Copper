@@ -18,17 +18,17 @@ namespace copper::components {
 
 void database::start() const { pool_->async_run(boost::asio::detached); }
 
+// LCOV_EXCL_START
 void database::stop() const {
   co_spawn(
       make_strand(pool_->get_executor()),
       [this]() -> boost::asio::awaitable<void> {
         this->pool_->cancel();
-        // LCOV_EXCL_START
         co_return;
       },
       boost::asio::detached);
-  // LCOV_EXCL_STOP
 }
+// LCOV_EXCL_STOP
 
 containers::async_of<containers::optional_of<shared<models::user>>>
 database::get_user_by_email(const std::string email) {
