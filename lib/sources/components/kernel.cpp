@@ -213,4 +213,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request request,
 
   co_return std::make_tuple(_request, _response, _service_response);
 }
+
+containers::async_of<void> kernel::handle(uuid session_id, uuid websocket_id, std::string message) {
+}
 }  // namespace copper::components
