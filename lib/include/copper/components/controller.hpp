@@ -9,6 +9,7 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/atomic.hpp>
+#include <boost/json/serialize.hpp>
 #include <copper/components/containers.hpp>
 #include <copper/components/controller_configuration.hpp>
 #include <copper/components/controller_parameters.hpp>
