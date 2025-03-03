@@ -26,6 +26,13 @@ namespace copper::components {
 class controller;
 
 /**
+ * Kernel call result
+ */
+using kernel_call_result =
+    std::tuple<shared<models::request>, shared<models::response>,
+               response_generic>;
+
+/**
  * Kernel result
  */
 struct kernel_result {
@@ -70,13 +77,11 @@ class kernel : public shared_enabled<kernel> {
    * @param ip
    * @param request_id
    * @param start_at
-   * @return async_of<tuple_of<shared<models::request>,
-   * shared<models::response>, response_generic>>
+   * @return async_of<kernel_call_result>
    */
-  containers::async_of<containers::tuple_of<
-      shared<models::request>, shared<models::response>, response_generic>>
-  call(uuid session_id, boost::beast::string_view /* root */, request request,
-       std::string ip, uuid request_id, long start_at) const;
+  containers::async_of<kernel_call_result> call(
+      uuid session_id, boost::beast::string_view /* root */, request request,
+      std::string ip, uuid request_id, long start_at) const;
 };
 
 }  // namespace copper::components

@@ -16,6 +16,7 @@
 #include <copper/components/controller.hpp>
 #include <copper/components/fields.hpp>
 #include <copper/components/gunzip.hpp>
+#include <copper/components/invoke.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/response.hpp>
@@ -1016,6 +1017,17 @@ TEST(Components_HTTP_Session, Implementation) {
     _stream.close();
 
     _client_ioc.run();
+
+    std::string _method = "get";
+    std::string _signature = "/";
+    std::string _headers = "{}";
+    std::string _body = "{}";
+
+    co_spawn(make_strand(_ioc),
+             invoke_from_console(_method, _signature, _headers, _body),
+             boost::asio::detached);
+
+    database::instance()->stop();
 
     co_spawn(make_strand(_ioc), cancel_http_sessions(), boost::asio::detached);
     _ioc.stop();

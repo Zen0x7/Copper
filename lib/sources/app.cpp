@@ -7,6 +7,7 @@
 
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/detached.hpp>
+#include <boost/asio/use_future.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <copper/app.hpp>
@@ -14,6 +15,7 @@
 #include <copper/components/cipher.hpp>
 #include <copper/components/configuration.hpp>
 #include <copper/components/fields.hpp>
+#include <copper/components/invoke.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/logger.hpp>
 #include <copper/components/router.hpp>
@@ -102,8 +104,6 @@ int run(int argc, const char *argv[]) {
 
   boost::asio::io_context _ioc{_threads};
 
-  auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
-
   database::setup(_ioc);
 
   if (_as == "service") {
@@ -135,6 +135,8 @@ int run(int argc, const char *argv[]) {
              });
 
   if (_as == "service") {
+    auto _task_group = boost::make_shared<task_group>(_ioc.get_executor());
+
     co_spawn(make_strand(_ioc),
              listener(_server_id, _task_group, _endpoint, _doc_root),
              _task_group->adapt([_server_id](const std::exception_ptr &e) {
@@ -188,43 +190,13 @@ int run(int argc, const char *argv[]) {
       auto _headers = _vm["headers"].as<std::string>();
       auto _body = _vm["body"].as<std::string>();
 
-      auto _verb = boost::beast::http::string_to_verb(_method);
+      co_spawn(make_strand(_ioc),
+               invoke_from_console(_method, _signature, _headers, _body),
+               boost::asio::detached);
 
-      boost::asio::io_context _client_ioc;
-      boost::asio::ip::tcp::resolver _resolver(_client_ioc);
-      boost::beast::tcp_stream _stream(_client_ioc);
+      database::instance()->stop();
 
-      auto const _results =
-          _resolver.resolve(_configuration->get()->app_host_,
-                            std::to_string(_configuration->get()->app_port_));
-
-      _stream.connect(_results);
-      {
-        boost::beast::flat_buffer _buffer;
-        boost::beast::http::response<boost::beast::http::string_body> _response;
-        request _request{_verb, _signature, 11};
-        _request.set(fields::host, _configuration->get()->app_host_);
-        _request.set(fields::user_agent, "Copper");
-        _request.set(fields::content_type, "application/json");
-        _request.body() = _body;
-        _request.prepare_payload();
-        boost::beast::http::write(_stream, _request);
-        boost::beast::http::read(_stream, _buffer, _response);
-
-        std::cout << _response << std::endl;
-
-        _buffer.clear();
-        _response.clear();
-      }
-
-      boost::system::error_code _ec;
-      _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both,
-                                _ec);
-      if (_ec && _ec != boost::system::errc::not_connected) {
-        std::cout << "Socket error: " << _ec.message() << std::endl;
-      }
-      _stream.close();
-      _client_ioc.run();
+      _ioc.run();
     }
   }
 

@@ -10,7 +10,6 @@
 
 #include <copper/components/containers.hpp>
 #include <copper/components/websocket_handler.hpp>
-#include <copper/models/request.hpp>
 
 namespace copper::components {
 
@@ -18,6 +17,8 @@ namespace copper::components {
  * Run http session
  *
  * @tparam Stream
+ * @param server_id
+ * @param session_id
  * @param stream
  * @param buffer
  * @param doc_root

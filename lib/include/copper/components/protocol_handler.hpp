@@ -15,8 +15,9 @@ namespace copper::components {
 /**
  * Detect session protocol
  *
+ * @param server_id
+ * @param session_id
  * @param stream
- * @param ctx
  * @param doc_root
  * @return async_of<void>
  */
