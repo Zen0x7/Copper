@@ -8,7 +8,6 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/json/serialize.hpp>
 #include <copper/components/controller.hpp>
 #include <copper/components/json.hpp>
 #include <copper/components/state.hpp>
