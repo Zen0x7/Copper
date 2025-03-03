@@ -35,43 +35,36 @@ You can create **controllers** using the following syntax:
 
 ```c++
 #include <copper/components/controller.hpp>
+#include <copper/components/controller_parameters.hpp>
 
 #include <copper/components/chronos.hpp>
 #include <copper/components/json.hpp>
+#include <copper/components/status_code.hpp>
 
 namespace copper::controllers::api {
-    using namespace copper::components;
-
+  /**
+   * Custom Controller
+   */
+  class custom_controller final : public controller {
     /**
-     * Custom Controller
+     * Invoke 
      */
-    class custom_controller final : public components::controller {
-    
-        /**
-         * Invoke 
-         */
-        components::containers::async_of<components::response> invoke(
-              const components::controller_parameters &parameters
-        ) override {
-            auto _now = components::chronos::now();
-            
-            const components::json::object _data = {{"timestamp", _now}};
-            
-            co_return make_response(
-                parameters,
-                components::status_code::ok,
-                serialize(_data),
-                "application/json"
-            );
-        }
+    containers::async_of<response> invoke(
+      const controller_parameters parameters
+    ) override {
+      const json::object _data = {{"timestamp", chronos::now() }};
+      co_return make_response(parameters, status_code::ok, serialize(_data), "application/json");
     }
-}
+  };
+} // namespace copper::controllers::api
 ```
 
 After that, you can push the controller to the **router**:
 
 ```c++
-router::instance()->push(
+auto _router = router::instance();
+
+_router->push(
     method::get, "/api/custom",
     boost::make_shared<custom_controller>(),
     {
@@ -96,4 +89,4 @@ Showcase more features ...
 
 ## License
 
-This software is released PARTIALLY based on his derivative source licenses and ALL OTHERS uses the repository license. 
+> This software is released **PARTIALLY** based on his derivative source licenses and **ALL OTHERS** uses the repository license. 
