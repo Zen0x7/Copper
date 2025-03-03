@@ -11,6 +11,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/websocket/stream.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
 
@@ -23,7 +24,7 @@ class websocket : public shared<websocket> {
   /**
    * ID
    */
-  uuid id_;
+  uuid id_ = boost::uuids::random_generator()();
 
   /**
    * Session ID

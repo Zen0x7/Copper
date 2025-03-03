@@ -23,7 +23,7 @@ shared<state> state::instance() {
 
 void state::connected(shared<websocket>& websocket) {
   std::lock_guard lock(mutex_);
-  websockets_.insert({websocket->id_, &websocket});
+  websockets_.try_emplace(websocket->id_, &websocket);
 }
 
 void state::disconnected(uuid id) {

@@ -31,7 +31,7 @@ class websockets_controller final : public components::controller {
       override {
     components::json::array _items;
 
-    for (auto& [_id, _websocket] :
+    for (const auto& [_id, _websocket] :
          components::state::instance()->get_websockets()) {
       _items.push_back(components::json::object{
           {"id", to_string(_id)},
