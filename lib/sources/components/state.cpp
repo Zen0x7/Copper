@@ -20,6 +20,21 @@ shared<state> state::instance() {
 
   return instance_->shared_from_this();
 }
+
+void state::connected(shared<websocket>& websocket) {
+  std::lock_guard lock(mutex_);
+  websockets_.insert({websocket->id_, &websocket});
+}
+
+void state::disconnected(uuid id) {
+  std::lock_guard lock(mutex_);
+  websockets_.erase(id);
+}
+
+containers::uuid_hash_map_of<shared<websocket>> state::get_websockets() const {
+  return websockets_;
+}
+
 // LCOV_EXCL_STOP
 
 }  // namespace copper::components

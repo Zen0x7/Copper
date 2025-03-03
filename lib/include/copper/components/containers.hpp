@@ -13,6 +13,7 @@
 #include <boost/asio/strand.hpp>
 #include <boost/optional.hpp>
 #include <copper/components/shared.hpp>
+#include <copper/components/uuid.hpp>
 #include <map>
 #include <queue>
 #include <string>
@@ -30,11 +31,17 @@ struct unordered_map_transparent_hasher {
 };
 
 /**
- * Unordered maps of strings
+ * Unordered map of strings
  */
 using unordered_map_of_strings =
     std::unordered_map<std::string, std::string,
                        unordered_map_transparent_hasher, std::equal_to<>>;
+
+/**
+ * Unordered map of identified T
+ */
+template <typename T>
+using uuid_hash_map_of = std::unordered_map<uuid, T *, boost::hash<uuid>>;
 
 /**
  * Map of strings

@@ -26,6 +26,7 @@
 #include <copper/controllers/api/auth_controller.hpp>
 #include <copper/controllers/api/up_controller.hpp>
 #include <copper/controllers/api/user_controller.hpp>
+#include <copper/controllers/api/websockets_controller.hpp>
 #include <iostream>
 #include <thread>
 
@@ -113,6 +114,9 @@ int run(int argc, const char *argv[]) {
   }
 
   router::instance()
+      ->push(method::get, "/api/websockets",
+             boost::make_shared<controllers::api::websockets_controller>(),
+             {.use_auth_ = false, .use_throttler_ = false})
       ->push(method::get, "/api/user",
              boost::make_shared<controllers::api::user_controller>(),
              {

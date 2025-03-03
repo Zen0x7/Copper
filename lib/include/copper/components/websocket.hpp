@@ -12,6 +12,7 @@
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/websocket/stream.hpp>
 #include <copper/components/shared.hpp>
+#include <copper/components/uuid.hpp>
 
 namespace copper::components {
 /**
@@ -20,15 +21,32 @@ namespace copper::components {
 class websocket : public shared<websocket> {
  public:
   /**
+   * ID
+   */
+  uuid id_;
+
+  /**
+   * Session ID
+   */
+  uuid session_id_;
+
+  /**
    * Stream
    */
   boost::beast::websocket::stream<boost::beast::tcp_stream> stream_;
 
   /**
    * Constructor
+   *
+   * @param session_id
+   * @param socket
    */
-  explicit websocket(boost::asio::ip::tcp::socket&& socket)
-      : stream_(std::move(socket)) {}
+  explicit websocket(uuid session_id, boost::asio::ip::tcp::socket&& socket);
+
+  /**
+   * Destructor
+   */
+  ~websocket();
 };
 }  // namespace copper::components
 
