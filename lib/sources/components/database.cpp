@@ -23,9 +23,11 @@ void database::stop() const {
       make_strand(pool_->get_executor()),
       [this]() -> boost::asio::awaitable<void> {
         this->pool_->cancel();
+        // LCOV_EXCL_START
         co_return;
       },
       boost::asio::detached);
+  // LCOV_EXCL_STOP
 }
 
 containers::async_of<containers::optional_of<shared<models::user>>>
