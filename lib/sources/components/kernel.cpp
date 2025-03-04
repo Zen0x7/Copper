@@ -27,6 +27,7 @@
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
 #include <iostream>
+#include <utility>
 
 namespace copper::components {
 
@@ -227,7 +228,7 @@ containers::async_of<shared<event>> kernel::handle(uuid session_id, uuid websock
         _event->data_ = {
             {"command", "ack"},
             {"message", "The given data be a valid JSON."},
-            {"status", static_cast<int>(_event->status_code_)},
+            {"status", std::to_underlying(_event->status_code_) },
         };
         co_return _event;
     }
@@ -244,7 +245,7 @@ containers::async_of<shared<event>> kernel::handle(uuid session_id, uuid websock
             {"command", "ack"},
             {"message", "The given data was invalid."},
             {"errors", _validator->errors_},
-            {"status", static_cast<int>(_event->status_code_)},
+            {"status", std::to_underlying(_event->status_code_)},
         };
 
         co_return _event;
