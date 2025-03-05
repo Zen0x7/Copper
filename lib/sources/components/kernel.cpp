@@ -124,7 +124,7 @@ kernel::call(uuid session_id, boost::beast::string_view,  // NOSONAR
       _body = boost::json::parse(request.body(), _json_error_code);
 
       if (!_json_error_code) {  // NOSONAR
-        if (auto _validator =
+        if (auto _validator = // NOSONAR
                 validator_make(_route.value().controller_->rules(), _body);
             !_validator->success_) {
           auto _error_response =
