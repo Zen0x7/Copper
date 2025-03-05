@@ -23,7 +23,7 @@ void report_for_openssl() {
   ERR_error_string_n(_error_code, _error_message.data(), _error_message.size());
   std::string _error_output = "OpenSSL error: ";
   _error_output.append(_error_message);
-  throw report_exception(_error_output.data());
+  throw report_exception(_error_output);
 }
 
 // LCOV_EXCL_STOP

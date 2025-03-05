@@ -71,7 +71,7 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
                          boost::beast::tcp_stream{std::move(_socket)},
                          doc_root),
 
-        task_group->adapt([server_id, _session_id,
+        task_group->adapt([server_id, _session_id,  // NOSONAR
                            _executor](const std::exception_ptr &e) {  // NOSONAR
           if (e) {
             try {

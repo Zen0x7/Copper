@@ -64,9 +64,9 @@ containers::vector_of<method> kernel::get_available_methods(
 
 containers::async_of<std::tuple<shared<models::request>,
                                 shared<models::response>, response_generic> >
-kernel::call(uuid session_id, boost::beast::string_view,
+kernel::call(uuid session_id, boost::beast::string_view,  // NOSONAR
              const request request,  // NOSONAR
-             const std::string ip, const uuid request_id, long start_at) const {
+             const std::string ip, const uuid request_id, long start_at) const {  // NOSONAR
   const std::string _url = url_from_request(request);
 
   auto _request =
