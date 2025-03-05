@@ -61,6 +61,9 @@ configuration::configuration() {
       dotenv::getenv("SENTRY_DSN", "https://{a}@{b}.ingest.us.sentry.io/{c}");
   values_->sentry_crashpad_handler_ = dotenv::getenv(
       "SENTRY_CRASHPAD_HANDLER", "/usr/local/bin/crashpad_handler");
+
+  values_->working_directory_ =
+      dotenv::getenv("WORKING_DIRECTORY", "/__w/Copper/Copper/bin");
 }
 
 shared<configurations> configuration::get() { return values_; }

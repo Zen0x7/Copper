@@ -52,7 +52,7 @@ TEST(Components_WebSocket_Session, Implementation) {
         {
             .use_throttler_ = false,
             .use_protector_ = false,
-            .rpm_ = 5,
+            .rpm_ = 100,
         });
 
     co_spawn(make_strand(_ioc),

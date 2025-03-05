@@ -28,7 +28,7 @@ TEST(Components_Kernel, Handle) {
   using namespace copper::components;
 
   auto _kernel = boost::make_shared<kernel>();
-  constexpr auto _threads = 16;
+  constexpr auto _threads = 4;
   boost::asio::io_context _io_context{_threads};
 
   database::setup(_io_context);
@@ -40,7 +40,6 @@ TEST(Components_Kernel, Handle) {
 
   const uuid _session_id = boost::uuids::random_generator()();
   const uuid _websocket_id = boost::uuids::random_generator()();
-
   {
     co_spawn(
         make_strand(_io_context),
@@ -63,7 +62,6 @@ TEST(Components_Kernel, Handle) {
         },
         boost::asio::detached);
   }
-
   {
     co_spawn(
         make_strand(_io_context),
@@ -88,7 +86,6 @@ TEST(Components_Kernel, Handle) {
         },
         boost::asio::detached);
   }
-
   {
     co_spawn(
         make_strand(_io_context),
@@ -114,7 +111,6 @@ TEST(Components_Kernel, Handle) {
         },
         boost::asio::detached);
   }
-
   {
     co_spawn(
         make_strand(_io_context),
@@ -139,7 +135,15 @@ TEST(Components_Kernel, Handle) {
           assert(boost::contains(_data, "headers"));
           assert(boost::contains(_data, "body"));
           assert(boost::contains(_data, "200"));
+        },
+        boost::asio::detached);
+  }
+  {
+    co_spawn(
+        make_strand(_io_context),
+        []() -> containers::async_of<void> {
           co_await cancel_context();
+          database::instance_.reset();
         },
         boost::asio::detached);
   }
@@ -147,6 +151,4 @@ TEST(Components_Kernel, Handle) {
   _io_context.run();
 
   ASSERT_TRUE(true);
-
-  database::instance_.reset();
 }

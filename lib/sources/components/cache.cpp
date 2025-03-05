@@ -50,7 +50,10 @@ containers::async_of<void> cache::set(
     const std::string key, const shared<boost::redis::connection> connection) {
   boost::redis::request _request;
   boost::redis::response<std::string> _response;
-  _request.push("SET", key, 1, "EX", 60);
+
+  auto expiration_time = configuration::instance()->get()->app_debug_ ? 5 : 60;
+
+  _request.push("SET", key, 1, "EX", expiration_time);
   co_await connection->async_exec(_request, _response, boost::asio::deferred);
 }
 
