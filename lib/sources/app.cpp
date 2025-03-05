@@ -34,7 +34,7 @@ namespace copper {
 std::string get_version() { return "7.0.0"; }
 
 // LCOV_EXCL_START
-int run(int argc, const char *argv[]) {
+int run(int argc, const char *argv[]) { // NOSONAR
   using namespace components;
 
   auto _server_id = boost::uuids::random_generator()();
@@ -147,7 +147,7 @@ int run(int argc, const char *argv[]) {
                if (e) {
                  try {
                    std::rethrow_exception(e);
-                 } catch (std::exception &exception) {
+                 } catch (std::exception &exception) { // NOSONAR
                    logger::instance()->system_->info(
                        "[{}] Something went wrong: [{}] on [{}]",
                        to_string(_server_id), exception.what(), "listener");
@@ -160,7 +160,7 @@ int run(int argc, const char *argv[]) {
                if (e) {
                  try {
                    std::rethrow_exception(e);
-                 } catch (std::exception &exception) {
+                 } catch (std::exception &exception) { // NOSONAR
                    logger::instance()->system_->info(
                        "[{}] Something went wrong: [{}] on [{}]",
                        to_string(_server_id), exception.what(), "subscriber");

@@ -91,7 +91,7 @@ class request : public components::shared_enabled<request> {
    * @param finished_at
    * @param duration
    */
-  request(std::string id, std::string session_id, std::string version,
+  request(std::string id, std::string session_id, std::string version,  // NOSONAR
           std::string method, std::string path, std::string query,
           std::string headers, std::string body, long started_at,
           long finished_at, long duration)

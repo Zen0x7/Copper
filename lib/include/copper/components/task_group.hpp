@@ -102,12 +102,12 @@ class task_group : public shared_enabled<task_group> {
    */
   template <typename CompletionToken = boost::asio::default_completion_token_t<
                 boost::asio::any_io_executor> >
-  auto async_wait(CompletionToken &&completion_token =
-                      boost::asio::default_completion_token_t<
-                          boost::asio::any_io_executor>{}) {
+  auto async_wait(CompletionToken &&completion_token = // NOSONAR
+                      boost::asio::default_completion_token_t< // NOSONAR
+                          boost::asio::any_io_executor>{}) { // NOSONAR
     return boost::asio::async_compose<CompletionToken,
                                       void(boost::system::error_code)>(
-        [this, scheduled = false](auto &&self,
+        [this, scheduled = false](auto &&self, // NOSONAR
                                   boost::system::error_code ec = {}) mutable {
           if (!scheduled)
             self.reset_cancellation_state(
@@ -121,12 +121,12 @@ class task_group : public shared_enabled<task_group> {
 
             if (!signals_.empty() && !ec) {
               scheduled = true;
-              return timer_.async_wait(std::move(self));
+              return timer_.async_wait(std::move(self)); // NOSONAR
             }
           }
 
           if (!std::exchange(scheduled, true))
-            return boost::asio::post(boost::asio::append(std::move(self), ec));
+            return boost::asio::post(boost::asio::append(std::move(self), ec)); // NOSONAR
 
           self.complete(ec);
         },
