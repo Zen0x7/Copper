@@ -67,7 +67,7 @@ bool validator::per_rule(const json::value &value, const std::string &attribute,
 
 bool validator::per_scope_rule(const json::value &value,
                                const std::string &attribute,
-                               const std::string &rule) {
+                               const std::string_view &rule) {
   if (!value.as_object().contains(attribute) && rule != "nullable") {
     const std::string _error_message =
         "Attribute " + attribute + " is required.";

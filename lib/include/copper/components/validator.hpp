@@ -61,7 +61,7 @@ class validator : public shared_enabled<validator> {
    * @return
    */
   bool per_scope_rule(const json::value &value, const std::string &attribute,
-                      const std::string &rule);
+                      const std::string_view &rule);
 
   /**
    * On confirmation rule
