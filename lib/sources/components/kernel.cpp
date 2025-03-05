@@ -218,7 +218,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request request,
 
 containers::async_of<shared<event> > kernel::handle(uuid session_id,
                                                     uuid websocket_id,
-                                                    std::string message) {
+                                                    std::string message) const {
   const auto _event = boost::make_shared<event>();
 
   auto allowed_commands = std::vector<std::string>{

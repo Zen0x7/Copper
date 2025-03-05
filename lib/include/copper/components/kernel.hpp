@@ -93,7 +93,7 @@ class kernel : public shared_enabled<kernel> {
    * @return
    */
   containers::async_of<shared<event>> handle(uuid session_id, uuid websocket_id,
-                                             std::string message);
+                                             std::string message) const;
 };
 
 }  // namespace copper::components
