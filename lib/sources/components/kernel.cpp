@@ -11,6 +11,7 @@
 #include <copper/components/configuration.hpp>
 #include <copper/components/controller.hpp>
 #include <copper/components/header.hpp>
+#include <copper/components/invoke.hpp>
 #include <copper/components/kernel.hpp>
 #include <copper/components/mime_type.hpp>
 #include <copper/components/response_bad_request.hpp>
@@ -30,7 +31,6 @@
 #include <utility>
 
 namespace copper::components {
-
 containers::optional_of<kernel_result> kernel::find_on_routes(
     const method method, const std::string &url) const {
   auto _router = router::instance();
@@ -57,10 +57,11 @@ containers::vector_of<method> kernel::get_available_methods(
   return _methods;
   // LCOV_EXCL_START
 }
+
 // LCOV_EXCL_STOP
 
 containers::async_of<std::tuple<shared<models::request>,
-                                shared<models::response>, response_generic>>
+                                shared<models::response>, response_generic> >
 kernel::call(uuid session_id, boost::beast::string_view, const request request,
              const std::string ip, const uuid request_id, long start_at) const {
   const std::string _url = url_from_request(request);
@@ -215,42 +216,104 @@ kernel::call(uuid session_id, boost::beast::string_view, const request request,
   co_return std::make_tuple(_request, _response, _service_response);
 }
 
-containers::async_of<shared<event>> kernel::handle(uuid session_id, uuid websocket_id, std::string message) {
+containers::async_of<shared<event> > kernel::handle(uuid session_id,
+                                                    uuid websocket_id,
+                                                    std::string message) {
+  const auto _event = boost::make_shared<event>();
 
-    const auto _event = boost::make_shared<event>();
+  auto allowed_commands = std::vector<std::string>{
+      "up",
+      "down",
+      "invoke",
+  };
 
-    boost::system::error_code _ec;
+  boost::system::error_code _ec;
 
-    const auto _value = boost::json::parse(message, _ec);
+  const auto _value = boost::json::parse(message, _ec);
 
-    if (_ec) {
-        _event->status_code_ = status_code::unprocessable_entity;
-        _event->data_ = {
-            {"command", "ack"},
-            {"message", "The given data be a valid JSON."},
-            {"status", std::to_underlying(_event->status_code_) },
-        };
-        co_return _event;
-    }
+  if (_ec) {
+    _event->status_code_ = status_code::unprocessable_entity;
+    _event->data_ = {
+        {"command", "ack"},
+        {"message", "The given data was an invalid JSON."},
+        {"status", std::to_underlying(_event->status_code_)},
+    };
+    co_return _event;
+  }
 
-    containers::map_of_strings _rules = {
-        {"*", "is_object"},
-        {"id", "is_uuid"},
-        {"command", "is_string"},
+  containers::map_of_strings _rules = {
+      {"*", "is_object"},
+      {"id", "is_uuid"},
+      {"command", "is_string"},
+  };
+
+  if (const auto _validator = validator_make(_rules, _value);
+      !_validator->success_) {
+    _event->status_code_ = status_code::unprocessable_entity;
+    _event->data_ = {
+        {"command", "ack"},
+        {"message", "The given data was invalid."},
+        {"errors", _validator->errors_},
+        {"status", std::to_underlying(_event->status_code_)},
     };
 
-    if (const auto _validator = validator_make(_rules, _value); !_validator->success_) {
-        _event->status_code_ = status_code::unprocessable_entity;
-        _event->data_ = {
-            {"command", "ack"},
-            {"message", "The given data was invalid."},
-            {"errors", _validator->errors_},
-            {"status", std::to_underlying(_event->status_code_)},
-        };
+    co_return _event;
+  }
 
-        co_return _event;
-    }
+  const std::string _command{_value.as_object().at("command").as_string()};
+
+  if (std::ranges::find(allowed_commands, _command) == allowed_commands.end()) {
+    _event->status_code_ = status_code::not_found;
+    _event->data_ = {
+        {"command", "ack"},
+        {"message", "The requested command doesn't exists."},
+        {"status", std::to_underlying(_event->status_code_)},
+    };
 
     co_return _event;
+  }
+
+  if (_command == "invoke") {
+    _rules = {
+        {"method", "is_string"},
+        {"signature", "is_string"},
+        {"headers", "nullable,is_string"},
+        {"body", "nullable,is_string"},
+    };
+
+    if (const auto _validator = validator_make(_rules, _value);
+        _validator->success_) {
+      const std::string _method{_value.as_object().at("method").as_string()};
+      const std::string _signature{
+          _value.as_object().at("signature").as_string()};
+      const std::string _headers{
+          _value.as_object().contains("headers")
+              ? _value.as_object().at("headers").as_string()
+              : "{}"};
+      const std::string _body{_value.as_object().contains("body")
+                                  ? _value.as_object().at("body").as_string()
+                                  : "{}"};
+
+      auto [_request, _response, _message] =
+          co_await invoke(_method, _signature, _headers, _body);
+
+      _event->status_code_ =
+          boost::beast::http::int_to_status(_response->status_code_);
+      _event->data_ = {
+          {"command", "ack"},
+          {"data",
+           {
+               {"headers", _response->headers_},
+               {"body", _response->body_},
+           }},
+          {"status", std::to_underlying(_event->status_code_)},
+      };
+
+      co_return _event;
+    }
+  }
+
+  _event->status_code_ = status_code::unprocessable_entity;
+  co_return _event;
 }
 }  // namespace copper::components

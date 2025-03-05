@@ -52,7 +52,11 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
         _scoped_rules.push_back(_rule.substr(_start));
 
         for (const std::string &_scoped_rule : _scoped_rules) {
-          if (_scoped_rule == "is_string") {
+          if (_scoped_rule == "nullable") {
+            if (!value.as_object().contains(_attribute)) {
+              break;
+            }
+          } else if (_scoped_rule == "is_string") {
             if (!value.as_object().at(_attribute).is_string()) {
               std::string _error_message =
                   "Attribute " + _attribute + " must be string.";

@@ -9,13 +9,13 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <copper/components/containers.hpp>
+#include <copper/components/event.hpp>
 #include <copper/components/normalized_path.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/response_generic.hpp>
 #include <copper/components/route.hpp>
 #include <copper/components/shared.hpp>
 #include <copper/components/uuid.hpp>
-#include <copper/components/event.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
 
@@ -92,7 +92,8 @@ class kernel : public shared_enabled<kernel> {
    * @param message
    * @return
    */
-  containers::async_of<shared<event>> handle(uuid session_id, uuid websocket_id, std::string message);
+  containers::async_of<shared<event>> handle(uuid session_id, uuid websocket_id,
+                                             std::string message);
 };
 
 }  // namespace copper::components
