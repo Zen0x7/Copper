@@ -41,6 +41,84 @@ class validator : public shared_enabled<validator> {
    * Constructor
    */
   validator() = default;
+
+  /**
+   * Per rule
+   *
+   * @param value
+   * @param attribute
+   * @param rule
+   */
+  bool per_rule(const json::value &value, const std::string &attribute,
+                const std::string &rule);
+
+  /**
+   * Per scope rule
+   *
+   * @param value
+   * @param attribute
+   * @param rule
+   * @return
+   */
+  bool per_scope_rule(const json::value &value, const std::string &attribute,
+                      const std::string_view &rule);
+
+  /**
+   * On confirmation rule
+   *
+   * @param value
+   * @param attribute
+   */
+  void on_confirmation_rule(const json::value &value,
+                            const std::string &attribute);
+
+  /**
+   * On array of strings rule
+   * @param value
+   * @param attribute
+   */
+  void on_array_of_strings_rule(const json::value &value,
+                                const std::string &attribute);
+
+  /**
+   * On array of strings per element rule
+   * @param value
+   * @param attribute
+   */
+  void on_array_of_strings_per_element_rule(const json::value &value,
+                                            const std::string &attribute);
+
+  /**
+   * On number rule
+   *
+   * @param value
+   * @param attribute
+   */
+  void on_number_rule(const json::value &value, const std::string &attribute);
+
+  /**
+   * On object rule
+   *
+   * @param value
+   * @param attribute
+   */
+  void on_object_rule(const json::value &value, const std::string &attribute);
+
+  /**
+   * On uuid rule
+   *
+   * @param value
+   * @param attribute
+   */
+  void on_uuid_rule(const json::value &value, const std::string &attribute);
+
+  /**
+   * On string rule
+   *
+   * @param value
+   * @param attribute
+   */
+  void on_string_rule(const json::value &value, const std::string &attribute);
 };
 
 /**

@@ -28,119 +28,167 @@ shared<validator> validator_make(const containers::map_of_strings &rules,
   auto _response = boost::make_shared<validator>();
 
   for (const auto &[_attribute, _rule] : rules) {
-    if (_attribute == "*") {
-      if (!value.is_object()) {
-        const std::string _error_message = "Message must be an JSON object.";
-        _response->insert_or_push(_attribute, _error_message);
-        break;
-      }
-    } else {
-      containers::vector_of<std::string> _scoped_rules;
-      split(_scoped_rules, _rule, boost::is_any_of(","),
-            boost::token_compress_off);
-
-      for (const std::string &_scoped_rule : _scoped_rules) {
-        if (!value.as_object().contains(_attribute) &&
-            _scoped_rule != "nullable") {
-          std::string _error_message =
-              "Attribute " + _attribute + " is required.";
-          _response->insert_or_push(_attribute, _error_message);
-          break;
-        }
-
-        if (_scoped_rule == "is_string") {
-          if (!value.as_object().at(_attribute).is_string()) {
-            std::string _error_message =
-                "Attribute " + _attribute + " must be string.";
-            _response->insert_or_push(_attribute, _error_message);
-          }
-        } else if (_scoped_rule == "is_uuid") {
-          if (!value.as_object().at(_attribute).is_string()) {
-            std::string _error_message =
-                "Attribute " + _attribute + " must be string.";
-            _response->insert_or_push(_attribute, _error_message);
-          } else {
-            try {
-              boost::lexical_cast<boost::uuids::uuid>(
-                  value.as_object().at(_attribute).as_string().data());
-            } catch (boost::bad_lexical_cast & /* exception */) {
-              std::string _error_message =
-                  "Attribute " + _attribute + " must be uuid.";
-              _response->insert_or_push(_attribute, _error_message);
-            }
-          }
-        } else if (_scoped_rule == "confirmed") {
-          if (!value.as_object().contains(_attribute + "_confirmation")) {
-            std::string _error_message = "Attribute " + _attribute +
-                                         "_confirmation" + " must be present.";
-            _response->insert_or_push(_attribute, _error_message);
-          } else {
-            if (!value.as_object()
-                     .at(_attribute + "_confirmation")
-                     .is_string()) {
-              std::string _error_message = "Attribute " + _attribute +
-                                           "_confirmation" + " must be string.";
-              _response->insert_or_push(_attribute, _error_message);
-            } else {
-              const std::string value_{
-                  value.as_object().at(_attribute).as_string()};
-              const std::string value_confirmation_{
-                  value.as_object()
-                      .at(_attribute + "_confirmation")
-                      .as_string()};
-              if (value_ != value_confirmation_) {
-                std::string _error_message =
-                    "Attribute " + _attribute + " and " + _attribute +
-                    "_confirmation" + " must be equals.";
-                _response->insert_or_push(_attribute, _error_message);
-              }
-            }
-          }
-        } else if (_scoped_rule == "is_object") {
-          if (!value.as_object().at(_attribute).is_object()) {
-            std::string _error_message =
-                "Attribute " + _attribute + " must be an object.";
-            _response->insert_or_push(_attribute, _error_message);
-          }
-        } else if (_scoped_rule == "is_number") {
-          if (!value.as_object().at(_attribute).is_int64()) {
-            std::string _error_message =
-                "Attribute " + _attribute + " must be a number.";
-            _response->insert_or_push(_attribute, _error_message);
-          }
-        } else if (_scoped_rule == "is_array_of_strings") {
-          if (!value.as_object().at(_attribute).is_array()) {
-            std::string _error_message =
-                "Attribute " + _attribute + " must be an array.";
-            _response->insert_or_push(_attribute, _error_message);
-          } else {
-            if (auto _elements = value.as_object().at(_attribute).as_array();
-                _elements.empty()) {
-              std::string _error_message =
-                  "Attribute " + _attribute + " cannot be empty.";
-              _response->insert_or_push(_attribute, _error_message);
-            } else {
-              size_t _i = 0;
-              for (const auto &_element : _elements) {
-                if (!_element.is_string()) {
-                  std::string _error_message =
-                      fmt::format("Attribute {} at position {} must be string.",
-                                  _attribute, _i);
-                  _response->insert_or_push(_attribute, _error_message);
-                }
-                _i++;
-              }
-            }
-          }
-        }
-      }
-    }
+    if (auto const should_break = _response->per_rule(value, _attribute, _rule);
+        should_break)
+      break;
   }
 
   _response->success_ = _response->errors_.empty();
 
   return _response;
   // LCOV_EXCL_START
+}
+
+bool validator::per_rule(const json::value &value, const std::string &attribute,
+                         const std::string &rule) {
+  if (attribute == "*") {
+    if (!value.is_object()) {
+      const std::string _error_message = "Message must be an JSON object.";
+      this->insert_or_push(attribute, _error_message);
+      return true;
+    }
+    return false;
+  }
+
+  containers::vector_of<std::string> _scoped_rules;
+  split(_scoped_rules, rule, boost::is_any_of(","), boost::token_compress_off);
+
+  for (const std::string &_scoped_rule : _scoped_rules) {
+    if (const auto should_break =
+            this->per_scope_rule(value, attribute, _scoped_rule);
+        should_break) {
+      break;
+    }
+  }
+  return false;
+}
+
+bool validator::per_scope_rule(const json::value &value,
+                               const std::string &attribute,
+                               const std::string_view &rule) {
+  if (!value.as_object().contains(attribute) && rule != "nullable") {
+    const std::string _error_message =
+        "Attribute " + attribute + " is required.";
+    this->insert_or_push(attribute, _error_message);
+    return true;
+  }
+
+  if (rule == "is_string") {
+    this->on_string_rule(value, attribute);
+  } else if (rule == "is_uuid") {
+    this->on_uuid_rule(value, attribute);
+  } else if (rule == "confirmed") {
+    this->on_confirmation_rule(value, attribute);
+  } else if (rule == "is_object") {
+    this->on_object_rule(value, attribute);
+  } else if (rule == "is_number") {
+    this->on_number_rule(value, attribute);
+  } else if (rule == "is_array_of_strings") {
+    this->on_array_of_strings_rule(value, attribute);
+  }
+
+  return false;
+}
+
+void validator::on_confirmation_rule(const json::value &value,
+                                     const std::string &attribute) {
+  if (!value.as_object().contains(attribute + "_confirmation")) {
+    const std::string _error_message =
+        "Attribute " + attribute + "_confirmation" + " must be present.";
+    this->insert_or_push(attribute, _error_message);
+  } else {
+    if (!value.as_object().at(attribute + "_confirmation").is_string()) {
+      const std::string _error_message =
+          "Attribute " + attribute + "_confirmation" + " must be string.";
+      this->insert_or_push(attribute, _error_message);
+    } else {
+      const std::string value_{value.as_object().at(attribute).as_string()};
+      const std::string value_confirmation_{
+          value.as_object().at(attribute + "_confirmation").as_string()};
+      if (value_ != value_confirmation_) {
+        const std::string _error_message = "Attribute " + attribute + " and " +
+                                           attribute + "_confirmation" +
+                                           " must be equals.";
+        this->insert_or_push(attribute, _error_message);
+      }
+    }
+  }
+}
+
+void validator::on_array_of_strings_rule(const json::value &value,
+                                         const std::string &attribute) {
+  if (!value.as_object().at(attribute).is_array()) {
+    const std::string _error_message =
+        "Attribute " + attribute + " must be an array.";
+    this->insert_or_push(attribute, _error_message);
+  } else {
+    this->on_array_of_strings_per_element_rule(value, attribute);
+  }
+}
+
+void validator::on_array_of_strings_per_element_rule(
+    const json::value &value, const std::string &attribute) {
+  if (auto _elements = value.as_object().at(attribute).as_array();
+      _elements.empty()) {
+    const std::string _error_message =
+        "Attribute " + attribute + " cannot be empty.";
+    this->insert_or_push(attribute, _error_message);
+  } else {
+    size_t _i = 0;
+    for (const auto &_element : _elements) {
+      if (!_element.is_string()) {
+        std::string _error_message = fmt::format(
+            "Attribute {} at position {} must be string.", attribute, _i);
+        this->insert_or_push(attribute, _error_message);
+      }
+      _i++;
+    }
+  }
+}
+
+void validator::on_number_rule(const json::value &value,
+                               const std::string &attribute) {
+  if (!value.as_object().at(attribute).is_int64()) {
+    const std::string _error_message =
+        "Attribute " + attribute + " must be a number.";
+    this->insert_or_push(attribute, _error_message);
+  }
+}
+
+void validator::on_object_rule(const json::value &value,
+                               const std::string &attribute) {
+  if (!value.as_object().at(attribute).is_object()) {
+    const std::string _error_message =
+        "Attribute " + attribute + " must be an object.";
+    this->insert_or_push(attribute, _error_message);
+  }
+}
+
+void validator::on_uuid_rule(const json::value &value,
+                             const std::string &attribute) {
+  if (!value.as_object().at(attribute).is_string()) {
+    const std::string _error_message =
+        "Attribute " + attribute + " must be string.";
+    this->insert_or_push(attribute, _error_message);
+  } else {
+    try {
+      boost::lexical_cast<boost::uuids::uuid>(
+          value.as_object().at(attribute).as_string().data());
+    } catch (boost::bad_lexical_cast & /* exception */) {
+      const std::string _error_message =
+          "Attribute " + attribute + " must be uuid.";
+      this->insert_or_push(attribute, _error_message);
+    }
+  }
+}
+
+void validator::on_string_rule(const json::value &value,
+                               const std::string &attribute) {
+  if (!value.as_object().at(attribute).is_string()) {
+    const std::string _error_message =
+        "Attribute " + attribute + " must be string.";
+    this->insert_or_push(attribute, _error_message);
+  }
 }
 // LCOV_EXCL_STOP
 

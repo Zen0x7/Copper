@@ -157,6 +157,11 @@ class configurations : public shared_enabled<configurations> {
    * Sentry crashpad handler
    */
   std::string sentry_crashpad_handler_;
+
+  /**
+   * Working directory
+   */
+  std::string working_directory_;
 };
 
 /**

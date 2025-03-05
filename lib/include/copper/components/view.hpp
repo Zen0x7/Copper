@@ -8,6 +8,8 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/filesystem.hpp>
+#include <copper/components/configuration.hpp>
 #include <copper/components/shared.hpp>
 #include <inja/inja.hpp>
 
@@ -36,7 +38,9 @@ class view : public shared_enabled<view> {
    */
   view(const std::string &path, const shared<inja::Environment> &environment)
       : path_(path) {
-    template_ = environment->parse_template("views/" + path_ + ".html");
+    template_ = environment->parse_template(
+        configuration::instance()->get()->working_directory_ + "/views/" +
+        path_ + ".html");
   }
 };
 }  // namespace copper::components
