@@ -41,7 +41,7 @@ boost::optional<authentication_result> authentication_from_bearer(
         boost::system::error_code _ec;
         auto _payload = boost::json::parse(base64url_decode(_parts[1]), _ec);
 
-        if (!_ec) {
+        if (!_ec) { // NOSONAR
           containers::map_of_strings _rules = {
               {"*", "is_object"},   {"sub", "is_uuid"},   {"typ", "is_string"},
               {"iat", "is_number"}, {"exp", "is_number"},

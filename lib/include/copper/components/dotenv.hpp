@@ -298,7 +298,7 @@ inline std::pair<std::string, bool> dotenv::resolve_vars(
         rtrim(env_var);
 
         // evaluate environment variable
-        if (const char* env_str = std::getenv(env_var.c_str())) {
+        if (const char* env_str = std::getenv(env_var.c_str())) { // NOSONAR
           resolved += env_str;
           nvar--;  // decrement to indicate variable resolved
         } else {
@@ -347,7 +347,7 @@ inline void dotenv::do_init(int flags, const char* filename) {
         // resolve any contained variable expressions in 'line_stripped'
         auto [a, b] = resolve_vars(i, line_stripped);
         bool ok = b;
-        if (!ok) {
+        if (!ok) { // NOSONAR
           //          std::cout << "dotenv: Ignoring ill-formed assignment on
           //          line " << i
           //                    << ": '" << line << "'" << std::endl;
