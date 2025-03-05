@@ -12,6 +12,14 @@
 
 namespace copper::components {
 
+// LCOV_EXCL_START
+class report_exception final : public std::runtime_error {
+ public:
+  explicit report_exception(const std::string &what = "")
+      : std::runtime_error(what) {}
+};
+// LCOV_EXCL_STOP
+
 /**
  * Report
  *

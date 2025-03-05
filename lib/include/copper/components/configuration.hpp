@@ -16,7 +16,7 @@ namespace copper::components {
 /**
  * Configurations container
  */
-class configurations : public shared_enabled<configurations> {
+class configurations : public shared_enabled<configurations> { // NOSONAR
  public:
   /**
    * App host

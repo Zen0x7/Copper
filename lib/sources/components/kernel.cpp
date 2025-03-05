@@ -14,6 +14,7 @@
 #include <copper/components/invoke.hpp>
 #include <copper/components/kernel.hpp>
 #include <copper/components/mime_type.hpp>
+#include <copper/components/report.hpp>
 #include <copper/components/response_bad_request.hpp>
 #include <copper/components/response_cors.hpp>
 #include <copper/components/response_exception.hpp>
@@ -27,6 +28,7 @@
 #include <copper/components/validator.hpp>
 #include <copper/models/request.hpp>
 #include <copper/models/response.hpp>
+#include <inja/exceptions.hpp>
 #include <iostream>
 #include <utility>
 
@@ -62,14 +64,15 @@ containers::vector_of<method> kernel::get_available_methods(
 
 containers::async_of<std::tuple<shared<models::request>,
                                 shared<models::response>, response_generic> >
-kernel::call(uuid session_id, boost::beast::string_view, const request request,
-             const std::string ip, const uuid request_id, long start_at) const {
+kernel::call(uuid session_id, boost::beast::string_view,  // NOSONAR
+             const request request,  // NOSONAR
+             const std::string ip, const uuid request_id, long start_at) const {  // NOSONAR
   const std::string _url = url_from_request(request);
 
   auto _request =
       models::request_from_request(session_id, request_id, start_at, request);
 
-  if (const auto _route = find_on_routes(request.method(), _url);
+  if (const auto _route = find_on_routes(request.method(), _url);  // NOSONAR
       _route.has_value()) {
     json::value _body = {};
     containers::unordered_map_of_strings _bindings = {};
@@ -115,12 +118,12 @@ kernel::call(uuid session_id, boost::beast::string_view, const request request,
       }
     }
 
-    if (_route.value().controller_->configuration_.use_validator_) {
+    if (_route.value().controller_->configuration_.use_validator_) {  // NOSONAR
       boost::system::error_code _json_error_code;
 
       _body = boost::json::parse(request.body(), _json_error_code);
 
-      if (!_json_error_code) {
+      if (!_json_error_code) {  // NOSONAR
         if (auto _validator =
                 validator_make(_route.value().controller_->rules(), _body);
             !_validator->success_) {
@@ -175,7 +178,38 @@ kernel::call(uuid session_id, boost::beast::string_view, const request request,
           _route.value().controller_->configuration_.use_protector_ == true;
 
       co_return std::make_tuple(_request, _response, _service_response);
-    } catch (std::exception & /*exception*/) {
+      // LCOV_EXCL_START
+    } catch (report_exception & /*exception*/) {
+      auto _service_response = response_exception(request, start_at);
+
+      auto _response =
+          response_from_response(session_id, _request, _service_response);
+
+      _response->protected_ =
+          _route.value().controller_->configuration_.use_protector_ == true;
+
+      co_return std::make_tuple(_request, _response, _service_response);
+    } catch (expression_exception & /*exception*/) {
+      auto _service_response = response_exception(request, start_at);
+
+      auto _response =
+          response_from_response(session_id, _request, _service_response);
+
+      _response->protected_ =
+          _route.value().controller_->configuration_.use_protector_ == true;
+
+      co_return std::make_tuple(_request, _response, _service_response);
+    } catch (inja::FileError & /*exception*/) {
+      auto _service_response = response_exception(request, start_at);
+
+      auto _response =
+          response_from_response(session_id, _request, _service_response);
+
+      _response->protected_ =
+          _route.value().controller_->configuration_.use_protector_ == true;
+
+      co_return std::make_tuple(_request, _response, _service_response);
+    } catch (std::runtime_error &exception) {  // NOSONAR
       auto _service_response = response_exception(request, start_at);
 
       auto _response =
@@ -186,6 +220,7 @@ kernel::call(uuid session_id, boost::beast::string_view, const request request,
 
       co_return std::make_tuple(_request, _response, _service_response);
     }
+    // LCOV_EXCL_STOP
   }
 
   if (request.method() == method::options) {

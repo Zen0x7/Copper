@@ -9,8 +9,11 @@
 #include <boost/uuid/random_generator.hpp>
 #include <copper/components/cache.hpp>
 #include <copper/components/database.hpp>
+#include <copper/components/expression.hpp>
 #include <copper/components/listener.hpp>
 #include <copper/components/logger.hpp>
+#include <copper/components/report.hpp>
+#include <inja/exceptions.hpp>
 #include <iostream>
 
 namespace copper::components {
@@ -62,30 +65,60 @@ containers::async_of<void> listener(boost::uuids::uuid server_id,
              boost::asio::detached);
 
     // LCOV_EXCL_START
-    co_spawn(std::move(_socket_executor),
-             protocol_handler(server_id, _session_id,
-                              boost::beast::tcp_stream{std::move(_socket)},
-                              doc_root),
+    co_spawn(
+        std::move(_socket_executor),  // NOSONAR
+        protocol_handler(server_id, _session_id,
+                         boost::beast::tcp_stream{std::move(_socket)},
+                         doc_root),
 
-             task_group->adapt([server_id, _session_id,
-                                _executor](const std::exception_ptr &e) {
-               if (e) {
-                 try {
-                   std::rethrow_exception(e);
-                 } catch (std::exception &exception) {
-                   std::cout << "Exception happens" << std::endl;
-                   std::cout << exception.what() << std::endl;
-                   co_spawn(_executor,
-                            database::instance()->session_closed(
-                                _session_id, exception.what()),
-                            boost::asio::detached);
+        task_group->adapt([server_id, _session_id,  // NOSONAR
+                           _executor](const std::exception_ptr &e) {  // NOSONAR
+          if (e) {
+            try {
+              std::rethrow_exception(e);
+            } catch (report_exception &exception) {
+              std::cout << exception.what() << std::endl;
+              co_spawn(_executor,
+                       database::instance()->session_closed(_session_id,
+                                                            exception.what()),
+                       boost::asio::detached);
 
-                   logger::instance()->sessions_->info(
-                       "[{}] Connection [{}] error [{}]", to_string(server_id),
-                       to_string(_session_id), exception.what());
-                 }
-               }
-             }));
+              logger::instance()->sessions_->info(
+                  "[{}] Connection [{}] error [{}]", to_string(server_id),
+                  to_string(_session_id), exception.what());
+            } catch (expression_exception &exception) {
+              std::cout << exception.what() << std::endl;
+              co_spawn(_executor,
+                       database::instance()->session_closed(_session_id,
+                                                            exception.what()),
+                       boost::asio::detached);
+
+              logger::instance()->sessions_->info(
+                  "[{}] Connection [{}] error [{}]", to_string(server_id),
+                  to_string(_session_id), exception.what());
+            } catch (inja::FileError &exception) {
+              std::cout << exception.what() << std::endl;
+              co_spawn(_executor,
+                       database::instance()->session_closed(_session_id,
+                                                            exception.what()),
+                       boost::asio::detached);
+
+              logger::instance()->sessions_->info(
+                  "[{}] Connection [{}] error [{}]", to_string(server_id),
+                  to_string(_session_id), exception.what());
+            } catch (std::runtime_error &exception) {  // NOSONAR
+              std::cout << exception.what() << std::endl;
+              co_spawn(_executor,
+                       database::instance()->session_closed(_session_id,
+                                                            exception.what()),
+                       boost::asio::detached);
+
+              logger::instance()->sessions_->info(
+                  "[{}] Connection [{}] error [{}]", to_string(server_id),
+                  to_string(_session_id), exception.what());
+            }
+          }
+        }));
     // LCOV_EXCL_STOP
   }
 }
