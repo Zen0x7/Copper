@@ -146,10 +146,8 @@ TEST(Components_Kernel, Handle) {
           }));
           const auto _event =
               co_await _kernel->handle(_session_id, _websocket_id, _message);
-
           std::cout << "On [" << _message << "] kernel respond: ["
                     << _event->data_ << "]" << std::endl;
-
           assert(_event->status_code_ == status_code::ok);
           const auto _data = serialize(_event->data_);
           assert(boost::contains(_data, "command"));
@@ -157,7 +155,6 @@ TEST(Components_Kernel, Handle) {
           assert(boost::contains(_data, "headers"));
           assert(boost::contains(_data, "body"));
           assert(boost::contains(_data, "200"));
-
           co_await cancel_context();
         },
         boost::asio::detached);
@@ -166,4 +163,6 @@ TEST(Components_Kernel, Handle) {
   _io_context.run();
 
   ASSERT_TRUE(true);
+
+  database::instance_.reset();
 }
