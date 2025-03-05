@@ -23,7 +23,7 @@ std::string expression_result::get(const std::string &name) const {
   std::string _error_output = "Expression error: Parameter ";
   _error_output.append(name);
   _error_output.append(" doesn't has.");
-  throw std::runtime_error(_error_output.c_str());
+  throw expression_exception(_error_output.c_str());
 }
 // LCOV_EXCL_STOP
 
@@ -72,7 +72,7 @@ shared<expression> expression_make(const std::string &input) {
       std::string error_output = "Expression error: Argument ";
       error_output.append(_value);
       error_output.append(" already has.");
-      throw std::runtime_error(error_output.c_str());
+      throw expression_exception(error_output.c_str());
     }
     // LCOV_EXCL_STOP
 

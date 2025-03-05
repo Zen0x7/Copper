@@ -17,6 +17,14 @@
 
 namespace copper::components {
 
+// LCOV_EXCL_START
+class expression_exception final : public std::runtime_error {
+ public:
+  explicit expression_exception(const std::string &what = "")
+      : std::runtime_error(what) {}
+};
+// LCOV_EXCL_STOP
+
 /**
  * Expression result
  */
