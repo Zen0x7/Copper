@@ -54,8 +54,6 @@ bool validator::per_rule(const json::value &value, const std::string &attribute,
   split(_scoped_rules, rule, boost::is_any_of(","), boost::token_compress_off);
 
   for (const std::string &_scoped_rule : _scoped_rules) {
-    std::cout << attribute << "|" << _scoped_rule << std::endl;
-
     if (const auto should_break =
             this->per_scope_rule(value, attribute, _scoped_rule);
         should_break) {
