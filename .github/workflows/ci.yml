@@ -65,6 +65,7 @@ jobs:
           cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
           make -j4
           cd ../bin
+          pwd
           ./tests
           cd ..
           lcov --capture --directory . --output-file coverage.info --no-external
