@@ -116,10 +116,10 @@ class dotenv {
   static void rtrim(std::string& s);
   static void trim(std::string& s);
   static std::string trim_copy(std::string s);
-  static size_t find_var_start(const std::string& str, size_t pos,
+  static size_t find_var_start(const std::string_view& str, size_t pos,
                                std::string& start_tag);
-  static size_t find_var_end(const std::string& str, size_t pos,
-                             const std::string& start_tag);
+  static size_t find_var_end(const std::string_view& str, size_t pos,
+                             const std::string_view& start_tag);
 };
 
 ///
@@ -188,12 +188,12 @@ inline int setenv(const char* name, const char* value, int overwrite) {
 ///
 /// \param str  in:  string to search in
 /// \param pos  in:  search from position
-/// \param pos  out: start tag found
+/// \param start_tag  out: start tag found
 ///
 /// \returns The start position of next variable expression or std::string::npos
 /// if not found
 ///
-inline size_t dotenv::find_var_start(const std::string& str, size_t pos,
+inline size_t dotenv::find_var_start(const std::string_view& str, size_t pos,
                                      std::string& start_tag) {
   size_t p1 = str.find('$', pos);
   size_t p2 = str.find("${", pos);
@@ -208,13 +208,13 @@ inline size_t dotenv::find_var_start(const std::string& str, size_t pos,
 ///
 /// \param str  in:  string to search in
 /// \param pos  in:  search from position (result from find_var_start)
-/// \param pos  in:  start tag
+/// \param start_tag  in:  start tag
 ///
 /// \returns The next end position of variable expression or std::string::npos
 /// if not found
 ///
-inline size_t dotenv::find_var_end(const std::string& str, size_t pos,
-                                   const std::string& start_tag) {
+inline size_t dotenv::find_var_end(const std::string_view& str, size_t pos,
+                                   const std::string_view& start_tag) {
   char end_tag = (start_tag == "${") ? '}' : ' ';
   size_t pos_end = str.find(end_tag, pos);
   // special case when $VARIABLE is at end of str with no trailing whitespace
@@ -224,8 +224,9 @@ inline size_t dotenv::find_var_end(const std::string& str, size_t pos,
 
 // trim whitespace from left (in place)
 inline void dotenv::ltrim(std::string& s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-                                  [](int c) { return !std::isspace(c); }));
+  s.erase(s.begin(), std::ranges::find_if(s, [](const unsigned char c) {
+            return !std::isspace(c);
+          }));
 }
 
 // trim whitespace from right (in place)
@@ -335,9 +336,7 @@ inline void dotenv::do_init(int flags, const char* filename) {
     unsigned int i = 1;
 
     while (getline(file, line)) {
-      const auto pos = line.find("=");
-
-      if (pos == std::string::npos) {
+      if (const auto pos = line.find("="); pos == std::string::npos) {
         //        std::cout << "dotenv: Ignoring ill-formed assignment on line "
         //        << i
         //                  << ": '" << line << "'" << std::endl;
@@ -346,15 +345,15 @@ inline void dotenv::do_init(int flags, const char* filename) {
         auto line_stripped = strip_quotes(trim_copy(line.substr(pos + 1)));
 
         // resolve any contained variable expressions in 'line_stripped'
-        auto p = resolve_vars(i, line_stripped);
-        bool ok = p.second;
+        auto [a, b] = resolve_vars(i, line_stripped);
+        bool ok = b;
         if (!ok) {
           //          std::cout << "dotenv: Ignoring ill-formed assignment on
           //          line " << i
           //                    << ": '" << line << "'" << std::endl;
         } else {
           // variable resolved ok, set as environment variable
-          const auto& val = p.first;
+          const auto& val = a;
           setenv(name.c_str(), val.c_str(), ~flags & dotenv::Preserve);
         }
       }
@@ -369,9 +368,9 @@ inline std::string dotenv::strip_quotes(const std::string& str) {
   if (len < 2) return str;
 
   const char first = str[0];
-  const char last = str[len - 1];
 
-  if (first == last && ('"' == first || '\'' == first))
+  if (const char last = str[len - 1];
+      first == last && ('"' == first || '\'' == first))
     return str.substr(1, len - 2);
 
   return str;
