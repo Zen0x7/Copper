@@ -33,26 +33,10 @@ TEST(Components_Kernel, Handle) {
 
   database::setup(_io_context);
 
-  router::instance()
-      ->push(method::get, "/api/up",
-             boost::make_shared<copper::controllers::api::up_controller>(),
-             {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 5})
-      ->push(method::get, "/api/user",
-             boost::make_shared<copper::controllers::api::user_controller>(),
-             {
-                 .use_auth_ = true,
-                 .use_throttler_ = true,
-                 .use_protector_ = false,
-                 .rpm_ = 5,
-             })
-      ->push(method::post, "/api/auth",
-             boost::make_shared<copper::controllers::api::auth_controller>(),
-             {
-                 .use_throttler_ = true,
-                 .use_validator_ = true,
-                 .use_protector_ = true,
-                 .rpm_ = 5,
-             });
+  router::instance()->push(
+      method::get, "/api/is_alive",
+      boost::make_shared<copper::controllers::api::up_controller>(),
+      {.use_throttler_ = true, .use_protector_ = false, .rpm_ = 100});
 
   const uuid _session_id = boost::uuids::random_generator()();
   const uuid _websocket_id = boost::uuids::random_generator()();
@@ -140,7 +124,7 @@ TEST(Components_Kernel, Handle) {
               {"id", to_string(boost::uuids::random_generator()())},
               {"command", "invoke"},
               {"method", "GET"},
-              {"signature", "/api/up"},
+              {"signature", "/api/is_alive"},
               {"headers", "{}"},
               {"body", "{}"},
           }));
