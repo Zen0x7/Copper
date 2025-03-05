@@ -35,7 +35,7 @@ TEST(Components_Validator, OnEmptiness) {
       {"*", "is_object"},      {"uuid", "is_uuid"},
       {"string", "is_string"}, {"string", "confirmed"},
       {"number", "is_number"}, {"array_of_strings", "is_array_of_strings"},
-      {"object", "is_object"},
+      {"object", "is_object"}, {"optional", "nullable"},
   };
 
   const std::string _valid_object = R"({})";

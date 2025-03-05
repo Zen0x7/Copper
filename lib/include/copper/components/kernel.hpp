@@ -9,6 +9,7 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <copper/components/containers.hpp>
+#include <copper/components/event.hpp>
 #include <copper/components/normalized_path.hpp>
 #include <copper/components/request.hpp>
 #include <copper/components/response_generic.hpp>
@@ -82,6 +83,17 @@ class kernel : public shared_enabled<kernel> {
   containers::async_of<kernel_call_result> call(
       uuid session_id, boost::beast::string_view /* root */, request request,
       std::string ip, uuid request_id, long start_at) const;
+
+  /**
+   * Handle
+   *
+   * @param session_id
+   * @param websocket_id
+   * @param message
+   * @return
+   */
+  containers::async_of<shared<event>> handle(uuid session_id, uuid websocket_id,
+                                             std::string message) const;
 };
 
 }  // namespace copper::components
