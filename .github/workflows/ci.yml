@@ -72,7 +72,7 @@ jobs:
           ctest
           cd ..
           gcovr --filter='lib/' --print-summary --sort-percentage
-          gcovr --filter='lib/' -r . --xml-pretty -o coverage.xml
+          gcovr --filter='lib/' -r . --sonarqube -o coverage.xml
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.1.0.4889-linux-x64.zip
           unzip sonar-scanner-cli-7.1.0.4889-linux-x64.zip
           export PATH="$PWD/sonar-scanner-7.1.0.4889-linux-x64/bin:$PATH"
