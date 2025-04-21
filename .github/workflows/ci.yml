@@ -65,7 +65,7 @@ jobs:
           find . -name '*.gcno' -delete
           find . -name '*.gcov' -delete
           cd build
-          wget https://binaries.sonarsource.com/Distribution/build-wrapper-linux-x86/build-wrapper-linux-x86.zip
+          wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
           cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXECUTABLE=OFF
           ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../build_wrapper_output make -j4
