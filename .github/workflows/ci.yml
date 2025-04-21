@@ -73,6 +73,9 @@ jobs:
           cd ..
           gcovr --filter='lib/' --print-summary --sort-percentage
           gcovr --filter='lib/' -r . --xml-pretty -o coverage.xml
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.1.0.4889-linux-x64.zip
+          export PATH="$PWD/sonar-scanner-cli-7.1.0.4889-linux-x64/bin:$PATH"
+          sonar-scanner
         env:
           APP_KEY: pPSYHIu2gUrjVZTv2ti/t7DFxBxSrwszHcxTooirYBY=
           APP_HOST: 0.0.0.0
@@ -91,14 +94,7 @@ jobs:
           REDIS_RECONNECTION_WAIT_INTERVAL: 5
           REDIS_CLIENT_NAME: Copper
           WORKING_DIRECTORY: /__w/Copper/Copper/bin
-
-      - name: Run SonarQube analysis
-        env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.1.0.4889-linux-x64.zip
-          export PATH="$PWD/sonar-scanner-5.0.1.3006-linux/bin:$PATH"
-          sonar-scanner
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
