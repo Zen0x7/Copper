@@ -11,7 +11,6 @@ set(BUILD_SHARED_LIBS OFF)
 set(ZLIB_USE_STATIC_LIBS ON)
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 
-# Detectar arquitectura y ajustar rutas
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     set(ARCH_LIB_DIR "/usr/lib/aarch64-linux-gnu")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")

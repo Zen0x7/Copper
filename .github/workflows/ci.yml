@@ -88,3 +88,11 @@ jobs:
           REDIS_RECONNECTION_WAIT_INTERVAL: 5
           REDIS_CLIENT_NAME: Copper
           WORKING_DIRECTORY: /__w/Copper/Copper/bin
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          fail_ci_if_error: true
+          files: ./coverage.info
