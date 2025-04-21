@@ -72,7 +72,7 @@ jobs:
           ctest
           cd ..
           gcovr --filter='lib/' --print-summary --sort-percentage
-          gcovr -r . --xml-pretty -o coverage.xml
+          gcovr --filter='lib/' -r . --xml-pretty -o coverage.xml
         env:
           APP_KEY: pPSYHIu2gUrjVZTv2ti/t7DFxBxSrwszHcxTooirYBY=
           APP_HOST: 0.0.0.0
@@ -99,6 +99,8 @@ jobs:
           curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
           apt-get install -y nodejs
           npm install -g sonar-scanner
+          chmod +x /usr/lib/node_modules/sonar-scanner/bin/sonar-scanner
+          ln -s /usr/lib/node_modules/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
           sonar-scanner
 
       - name: Upload coverage to Codecov
