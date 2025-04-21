@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'lib/**'
+      - 'deps/**'
+      - 'tests/**'
+      - 'CMakeLists.txt'
+      - 'dump.sql'
+      - 'main.cpp'
+      - 'bin/.env.example'
+      - 'bin/views/**'
+      - 'bin/logs/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+
+    container:
+      image: iantorres/boosted:1.87.0-debug
+
+
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: copper
+          MYSQL_USER: user
+          MYSQL_PASSWORD: user_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      redis:
+        image: bitnami/redis:latest
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          ALLOW_EMPTY_PASSWORD: yes
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: |
+          apt update
+          apt install -y lcov iputils-ping netcat-traditional default-mysql-client
+          ping -c 4 127.0.0.1
+          ping -c 4 redis
+          ping -c 4 mysql 
+          nc -zv redis 6379
+          mysql -u user -p'user_password' -h mysql -P 3306 -D copper -e "exit"
+          mysql -u user -p'user_password' -h mysql -P 3306 -D copper < dump.sql
+          curl -Os https://cli.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          mkdir -p build
+          find . -name '*.gcda' -delete
+          find . -name '*.gcno' -delete
+          find . -name '*.gcov' -delete
+          cd build
+          cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXECUTABLE=OFF
+          make -j4
+          ctest
+          cd ..
+          gcovr --filter='lib/' --print-summary --sort-percentage
+        env:
+          APP_KEY: pPSYHIu2gUrjVZTv2ti/t7DFxBxSrwszHcxTooirYBY=
+          APP_HOST: 0.0.0.0
+          APP_THREADS: 4
+          APP_DEBUG: ON
+          HTTP_BODY_LIMIT: 10000
+          DATABASE_HOST: mysql
+          DATABASE_USER: user
+          DATABASE_PASSWORD: user_password
+          DATABASE_NAME: copper
+          DATABASE_PORT: 3306
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
+          REDIS_HEALTH_CHECK_INTERVAL: 60
+          REDIS_CONNECTION_TIMEOUT: 60
+          REDIS_RECONNECTION_WAIT_INTERVAL: 5
+          REDIS_CLIENT_NAME: Copper
+          WORKING_DIRECTORY: /__w/Copper/Copper/bin
