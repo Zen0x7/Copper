@@ -65,11 +65,14 @@ jobs:
           find . -name '*.gcno' -delete
           find . -name '*.gcov' -delete
           cd build
+          wget https://binaries.sonarsource.com/Distribution/build-wrapper-linux-x86/build-wrapper-linux-x86.zip
+          unzip build-wrapper-linux-x86.zip
           cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXECUTABLE=OFF
-          make -j4
+          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../build_wrapper_output make -j4
           ctest
           cd ..
           gcovr --filter='lib/' --print-summary --sort-percentage
+          gcovr -r . --xml-pretty -o coverage.xml
         env:
           APP_KEY: pPSYHIu2gUrjVZTv2ti/t7DFxBxSrwszHcxTooirYBY=
           APP_HOST: 0.0.0.0
@@ -88,6 +91,15 @@ jobs:
           REDIS_RECONNECTION_WAIT_INTERVAL: 5
           REDIS_CLIENT_NAME: Copper
           WORKING_DIRECTORY: /__w/Copper/Copper/bin
+
+      - name: Run SonarQube analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+          apt-get install -y nodejs
+          npm install -g sonar-scanner
+          sonar-scanner
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
