@@ -96,11 +96,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-          apt-get install -y nodejs
-          npm install -g sonar-scanner
-          chmod +x /usr/lib/node_modules/sonar-scanner/bin/sonar-scanner
-          ln -s /usr/lib/node_modules/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.1.0.4889-linux-x64.zip
+          export PATH="$PWD/sonar-scanner-5.0.1.3006-linux/bin:$PATH"
           sonar-scanner
 
       - name: Upload coverage to Codecov
