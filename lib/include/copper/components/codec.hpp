@@ -509,7 +509,11 @@ inline shared<stream> codec_parse(const unsigned char* data) {
   _stream->crc_ = static_cast<int>(four_bytes(data, _pos));
 
   if (_stream->crc_ == _crc_result) {
+    // This should be implemented in future
+    // We're going to need to make a db query
+    // if this happens
   } else {
+    // Otherwise, this isn't a valid stream
   }
 
   return _stream;

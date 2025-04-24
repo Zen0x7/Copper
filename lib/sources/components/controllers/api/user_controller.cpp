@@ -18,9 +18,9 @@
 
 namespace copper::components::controllers::api {
 void user_controller::invoke(const shared<core>& core,
-                             const shared<controller_parameters> parameters,
-                             const callback_of<res> on_success,
-                             const callback_of<std::exception_ptr> on_error) {
+                             const shared<controller_parameters>& parameters,
+                             const callback_of<res>& on_success,
+                             const callback_of<std::exception_ptr>& on_error) {
   LOG("[user_controller@invoke] scope_in");
   try {
     const auto user_id = parameters->get_auth().value().id_;

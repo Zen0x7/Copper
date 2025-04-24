@@ -165,16 +165,10 @@ int run(int argc, const char* argv[]) {
     boost::make_shared<websocket_listener>(_ioc, _core, _server_id,
                                            _websocket_endpoint)
         ->run();
-    // co_spawn(_ioc, tcp_listener(_core, _server_id, _tcp_endpoint),
-    // boost::asio::detached);
-    // co_spawn(_ioc, http_listener(_core, _server_id, _http_endpoint),
-    // boost::asio::detached);
-    // co_spawn(_ioc, websocket_listener(_core, _server_id,
-    // _websocket_endpoint), boost::asio::detached);
 
-    // subscriber::start(_core, _server_id);
+    subscriber::start(_core, _server_id);
 
-    vector_of<std::thread> _threads_container;
+    vector_of<std::jthread> _threads_container;
     _threads_container.reserve(_threads - 1);
     for (auto _i = _threads - 1; _i > 0; --_i)
       _threads_container.emplace_back([&_ioc] { _ioc.run(); });

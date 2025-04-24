@@ -18,9 +18,9 @@
 
 namespace copper::components::controllers::api {
 void auth_controller::invoke(const shared<core>& core,
-                             const shared<controller_parameters> parameters,
-                             const callback_of<res> on_success,
-                             const callback_of<std::exception_ptr> on_error) {
+                             const shared<controller_parameters>& parameters,
+                             const callback_of<res>& on_success,
+                             const callback_of<std::exception_ptr>& on_error) {
   try {
     const auto& body = parameters->get_body().as_object();
     const std::string email{body.at("email").as_string()};

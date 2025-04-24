@@ -1,5 +1,5 @@
-#ifndef COPPER_MODELS_STREAM
-#define COPPER_MODELS_STREAM
+#ifndef COPPER_COMPONENTS_STREAM
+#define COPPER_COMPONENTS_STREAM
 
 #pragma once
 
@@ -33,37 +33,37 @@ class stream : public shared_enabled<stream> {
   /**
    * ID
    */
-  uuid id_;
+  uuid id_ = boost::uuids::random_generator()();
 
   /**
    * Valid
    */
-  bool valid_;
+  bool valid_ = false;
 
   /**
    * Data field length
    */
-  std::uint32_t data_field_length_;
+  std::uint32_t data_field_length_ = 0;
 
   /**
    * Codec ID
    */
-  int codec_id_;
+  int codec_id_ = 0;
 
   /**
    * Number of data 1
    */
-  std::size_t number_of_data_1_;
+  std::size_t number_of_data_1_ = 0;
 
   /**
    * Number of data 2
    */
-  std::size_t number_of_data_2_;
+  std::size_t number_of_data_2_ = 0;
 
   /**
    * CRC
    */
-  int crc_;
+  int crc_ = 0;
 
   /**
    * Records
@@ -73,14 +73,7 @@ class stream : public shared_enabled<stream> {
   /**
    * Constructor
    */
-  stream()
-      : id_(boost::uuids::random_generator()()),
-        valid_(false),
-        data_field_length_(0),
-        codec_id_(0),
-        number_of_data_1_(0),
-        number_of_data_2_(0),
-        crc_(0) {}
+  stream() = default;
 };
 
 }  // namespace copper::components

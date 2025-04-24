@@ -48,22 +48,26 @@
 using namespace copper::components;
 class templated_controller final : public controller {
  public:
-  void invoke(const shared<core>& core_,
-              const shared<controller_parameters> parameters_,
-              const callback_of<res> on_success,
-              const callback_of<std::exception_ptr>) override {
+  void invoke(const shared<core>& core,
+              const shared<controller_parameters>& parameters,
+              const callback_of<res>& on_success,
+              const callback_of<std::exception_ptr>& on_error) override {
+    boost::ignore_unused(on_error);
+
     const json::json data_;
-    on_success(make_view(core_, parameters_, status_code::ok, "template", data_,
+    on_success(make_view(core, parameters, status_code::ok, "template", data_,
                          "text/html"));
   }
 };
 
 class exception_controller final : public controller {
  public:
-  void invoke(const shared<core>&,
-              const shared<controller_parameters>,
-              const callback_of<res>,
-              const callback_of<std::exception_ptr> on_error) override {
+  void invoke(const shared<core>& core,
+              const shared<controller_parameters>& parameters,
+              const callback_of<res>& on_success,
+              const callback_of<std::exception_ptr>& on_error) override {
+    boost::ignore_unused(core, parameters, on_success);
+
     on_error(
         std::make_exception_ptr(std::runtime_error("Something went wrong")));
   }
@@ -71,17 +75,19 @@ class exception_controller final : public controller {
 
 class params_controller final : public controller {
  public:
-  void invoke(const shared<core>& core_,
-              const shared<controller_parameters> parameters_,
-              const callback_of<res> on_success,
-              const callback_of<std::exception_ptr>) override {
+  void invoke(const shared<core>& core,
+              const shared<controller_parameters>& parameters,
+              const callback_of<res>& on_success,
+              const callback_of<std::exception_ptr>& on_error) override {
+    boost::ignore_unused(on_error);
+
     const auto now_ = chronos::now();
     const json::object response_data_ = {
         {"message", "Request has been processed."},
-        {"data", parameters_->get_bindings().at("name")},
+        {"data", parameters->get_bindings().at("name")},
         {"timestamp", now_},
         {"status", 200}};
-    on_success(make_response(core_, parameters_, status_code::ok,
+    on_success(make_response(core, parameters, status_code::ok,
                              serialize(response_data_), "application/json"));
   }
 };
