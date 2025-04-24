@@ -454,8 +454,6 @@ inline shared<stream> codec_parse(const unsigned char* data) {
       _pos += 2;
 
       _record->extras_[codec_io_id_to_string(_io_id)] = _io_value;
-      // record->two_bytes_fields_.emplace(io_id,
-      // io_value);
     }
 
     const std::size_t _n_f_b_i = two_bytes(data, _pos);
@@ -469,8 +467,6 @@ inline shared<stream> codec_parse(const unsigned char* data) {
       _pos += 4;
 
       _record->extras_[codec_io_id_to_string(_io_id)] = _io_value;
-      // record->four_bytes_fields_.emplace(io_id,
-      // io_value);
     }
 
     const std::size_t _n_e_b_i = two_bytes(data, _pos);
@@ -485,8 +481,6 @@ inline shared<stream> codec_parse(const unsigned char* data) {
       _pos += 8;
 
       _record->extras_[codec_io_id_to_string(io_id)] = io_value;
-      // record->eight_bytes_fields_.emplace(io_id,
-      // io_value);
     }
     // LCOV_EXCL_STOP
 
@@ -495,20 +489,12 @@ inline shared<stream> codec_parse(const unsigned char* data) {
 
     // LCOV_EXCL_START
     for (std::size_t _n_b_i = 0; _n_b_i < _n_n_b_i; _n_b_i++) {
-      // const auto io_id =
-      // static_cast<int>(Binaries::get_two_bytes(data,
-      // pos));
       _pos += 2;
 
       const auto _len = static_cast<int>(two_bytes(data, _pos));
       _pos += 2;
 
-      // record->extras_[io_id_to_string(io_id)] =
-      // io_value; const auto io_value =
-      // Binaries::get_n_bytes(data, pos, io_length);
       _pos += _len;
-
-      // record->n_bytes_fields_.emplace(io_id, io_value);
     }
     // LCOV_EXCL_STOP
 
@@ -521,7 +507,6 @@ inline shared<stream> codec_parse(const unsigned char* data) {
   const auto _crc_result = calculate_crc(data, _pos - 8);
 
   _stream->crc_ = static_cast<int>(four_bytes(data, _pos));
-  _pos += 4;
 
   if (_stream->crc_ == _crc_result) {
   } else {
