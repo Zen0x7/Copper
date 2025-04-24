@@ -1,5 +1,5 @@
-#ifndef COPPER_CONTROLLERS_API_REGISTER_CONTROLLER_HPP
-#define COPPER_CONTROLLERS_API_REGISTER_CONTROLLER_HPP
+#ifndef COPPER_COMPONENTS_CONTROLLERS_API_REGISTER_CONTROLLER_HPP
+#define COPPER_COMPONENTS_CONTROLLERS_API_REGISTER_CONTROLLER_HPP
 
 #pragma once
 
@@ -55,9 +55,9 @@ class register_controller final : public controller {
    * @return void
    */
   void invoke(const shared<core>& core,
-              shared<controller_parameters> parameters,
-              callback_of<res> on_success,
-              callback_of<std::exception_ptr> on_error) override;
+              const shared<controller_parameters>& parameters,
+              const callback_of<res>& on_success,
+              const callback_of<std::exception_ptr>& on_error) override;
 };
 
 }  // namespace copper::components::controllers::api

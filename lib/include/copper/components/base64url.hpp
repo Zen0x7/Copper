@@ -33,7 +33,7 @@ const std::string base64url_charset_ =
 /**
  * Base64url charset as map
  */
-inline const containers::map_of<char, int> base64url_map_charset_ = {
+inline const map_of<char, int> base64url_map_charset_ = {
     {'A', 0},  {'B', 1},  {'C', 2},  {'D', 3},  {'E', 4},  {'F', 5},  {'G', 6},
     {'H', 7},  {'I', 8},  {'J', 9},  {'K', 10}, {'L', 11}, {'M', 12}, {'N', 13},
     {'O', 14}, {'P', 15}, {'Q', 16}, {'R', 17}, {'S', 18}, {'T', 19}, {'U', 20},

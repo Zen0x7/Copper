@@ -24,7 +24,6 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
-using namespace containers;
 
 /**
  * Forward configuration

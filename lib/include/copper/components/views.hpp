@@ -34,23 +34,22 @@ class views : public shared_enabled<views> {
   /**
    * Environment
    */
-  shared<inja::Environment> environment_;
+  shared<inja::Environment> environment_ =
+      boost::make_shared<inja::Environment>();
 
   /**
    * Items
    */
-  containers::map_of<std::string, shared<view>> items_;
+  map_of<std::string, shared<view>> items_;
 
  public:
   /**
    * Constructor
    */
-  views() : environment_(boost::make_shared<inja::Environment>()) {}
+  views() = default;
 
-  shared<views> push(std::string name, std::string path) {
-    items_.insert(
-        std::make_pair(name, boost::make_shared<view>(path, environment_)));
-
+  shared<views> push(const std::string& name, const std::string& path) {
+    items_.try_emplace(name, boost::make_shared<view>(path, environment_));
     return shared_from_this();
   }
 

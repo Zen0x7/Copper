@@ -1,5 +1,5 @@
-#ifndef COPPER_CONTROLLERS_API_AUTH_CONTROLLER_HPP
-#define COPPER_CONTROLLERS_API_AUTH_CONTROLLER_HPP
+#ifndef COPPER_COMPONENTS_CONTROLLERS_API_AUTH_CONTROLLER_HPP
+#define COPPER_COMPONENTS_CONTROLLERS_API_AUTH_CONTROLLER_HPP
 
 #pragma once
 
@@ -39,7 +39,7 @@ class auth_controller final : public controller {
    *
    * @return map_of_strings
    */
-  containers::map_of_strings rules() const override {
+  map_of_strings rules() const override {
     return {
         {"*", "is_object"},
         {"email", "is_string"},
@@ -57,9 +57,9 @@ class auth_controller final : public controller {
    * @return void
    */
   void invoke(const shared<core>& core,
-              shared<controller_parameters> parameters,
-              callback_of<res> on_success,
-              callback_of<std::exception_ptr> on_error) override;
+              const shared<controller_parameters>& parameters,
+              const callback_of<res>& on_success,
+              const callback_of<std::exception_ptr>& on_error) override;
 };
 
 }  // namespace copper::components::controllers::api

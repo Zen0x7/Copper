@@ -26,7 +26,6 @@
 #include <boost/beast/websocket/stream.hpp>
 
 namespace copper::components {
-using namespace containers;
 
 /**
  * Forward core

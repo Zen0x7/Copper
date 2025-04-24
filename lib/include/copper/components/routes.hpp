@@ -22,7 +22,6 @@
 #include <copper/components/controller.hpp>
 
 namespace copper::components {
-using namespace containers;
 
 /**
  * Routes

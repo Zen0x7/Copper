@@ -82,7 +82,7 @@ class validator final : public shared_enabled<validator> {
       return false;
     }
 
-    containers::vector_of<std::string> _scoped_rules;
+    vector_of<std::string> _scoped_rules;
     split(_scoped_rules, rule, boost::is_any_of(","),
           boost::token_compress_off);
 
@@ -276,7 +276,7 @@ class validator final : public shared_enabled<validator> {
  * @param value
  * @return boost::shared_ptr<validator> validator
  */
-inline shared<validator> validator_make(const containers::map_of_strings& rules,
+inline shared<validator> validator_make(const map_of_strings& rules,
                                         const json::value& value) {
   auto _response = boost::make_shared<validator>();
 

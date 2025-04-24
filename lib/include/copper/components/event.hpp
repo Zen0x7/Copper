@@ -25,7 +25,6 @@
 #include <copper/components/uuid.hpp>
 
 namespace copper::components {
-using namespace containers;
 
 /**
  * Event

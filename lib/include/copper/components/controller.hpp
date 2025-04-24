@@ -31,7 +31,6 @@
 #include <copper/components/uuid.hpp>
 
 namespace copper::components {
-using namespace containers;
 
 class core;
 
@@ -72,9 +71,9 @@ class controller : public shared_enabled<controller> {
    */
   // LCOV_EXCL_START
   virtual void invoke(const shared<core>& /*core*/,
-                      const shared<controller_parameters> /*parameters*/,
-                      const callback_of<res> on_success,
-                      const callback_of<std::exception_ptr> /*on_error*/) {
+                      const shared<controller_parameters>& /*parameters*/,
+                      const callback_of<res>& on_success,
+                      const callback_of<std::exception_ptr>& /*on_error*/) {
     const res _res;
     on_success(_res);
   }

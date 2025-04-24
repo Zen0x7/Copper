@@ -30,7 +30,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace copper::components::containers {
+namespace copper::components {
 
 /**
  * Unordered map transparent hasher
@@ -116,6 +116,6 @@ using callback_of = std::function<void(T...)>;
  */
 using callback = std::function<void()>;
 
-}  // namespace copper::components::containers
+}  // namespace copper::components
 
 #endif

@@ -53,7 +53,7 @@ class expression_result : public shared_enabled<expression_result> {
   /**
    * Bindings
    */
-  containers::unordered_map_of_strings bindings_;
+  unordered_map_of_strings bindings_;
 
   /**
    * Constructor
@@ -62,7 +62,7 @@ class expression_result : public shared_enabled<expression_result> {
    * @param bindings
    */
   expression_result(const bool matches,
-                    const containers::unordered_map_of_strings& bindings)
+                    const unordered_map_of_strings& bindings)
       : matches_(matches), bindings_(bindings){};
 
   /**
@@ -77,9 +77,7 @@ class expression_result : public shared_enabled<expression_result> {
    *
    * @return unordered_map_of_strings
    */
-  containers::unordered_map_of_strings get_bindings() const {
-    return bindings_;
-  }
+  unordered_map_of_strings get_bindings() const { return bindings_; }
 
   /**
    * Retrieves the value of attribute
@@ -107,7 +105,7 @@ class expression : public shared_enabled<expression> {
   /**
    * Arguments
    */
-  containers::vector_of<std::string> arguments_;
+  vector_of<std::string> arguments_;
 
  public:
   /**
@@ -116,8 +114,7 @@ class expression : public shared_enabled<expression> {
    * @param regex
    * @param arguments
    */
-  expression(std::string regex,
-             const containers::vector_of<std::string>& arguments)
+  expression(std::string regex, const vector_of<std::string>& arguments)
       : regex_(std::move(regex)), pattern_(regex_), arguments_(arguments){};
 
   /**
@@ -125,9 +122,7 @@ class expression : public shared_enabled<expression> {
    *
    * @return vector<string>
    */
-  containers::vector_of<std::string> get_arguments() const {
-    return arguments_;
-  };
+  vector_of<std::string> get_arguments() const { return arguments_; };
 
   /**
    * Retrieves regex expression

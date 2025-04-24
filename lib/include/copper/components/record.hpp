@@ -1,5 +1,5 @@
-#ifndef COPPER_MODELS_RECORD_HPP
-#define COPPER_MODELS_RECORD_HPP
+#ifndef COPPER_COMPONENTS_RECORD_HPP
+#define COPPER_COMPONENTS_RECORD_HPP
 
 #pragma once
 
@@ -37,52 +37,52 @@ class record : public shared_enabled<record> {
   /**
    * Timestamp
    */
-  std::uint64_t timestamp_;
+  std::uint64_t timestamp_ = 0;
 
   /**
    * Priority
    */
-  int priority_;
+  int priority_ = 0;
 
   /**
    * Longitude
    */
-  float longitude_;
+  float longitude_ = 0;
 
   /**
    * Latitude
    */
-  float latitude_;
+  float latitude_ = 0;
 
   /**
    * Altitude
    */
-  long altitude_;
+  long altitude_ = 0;
 
   /**
    * Angle
    */
-  long angle_;
+  long angle_ = 0;
 
   /**
    * Satellites
    */
-  int satellites_;
+  int satellites_ = 0;
 
   /**
    * Speed
    */
-  long speed_;
+  long speed_ = 0;
 
   /**
    * Event IO ID
    */
-  long event_io_id_;
+  long event_io_id_ = 0;
 
   /**
    * Number of Total ID
    */
-  long number_of_total_id_;
+  long number_of_total_id_ = 0;
 
   /**
    * Extras
@@ -92,17 +92,7 @@ class record : public shared_enabled<record> {
   /**
    * Constructor
    */
-  record()
-      : timestamp_(0),
-        priority_(0),
-        longitude_(0),
-        latitude_(0),
-        altitude_(0),
-        angle_(0),
-        satellites_(0),
-        speed_(0),
-        event_io_id_(0),
-        number_of_total_id_(0) {}
+  record() = default;
 };
 
 }  // namespace copper::components

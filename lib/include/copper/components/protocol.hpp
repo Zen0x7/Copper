@@ -1,5 +1,5 @@
-#ifndef COPPER_PROTOCOL_HPP
-#define COPPER_PROTOCOL_HPP
+#ifndef COPPER_COMPONENTS_PROTOCOL_HPP
+#define COPPER_COMPONENTS_PROTOCOL_HPP
 
 #pragma once
 
@@ -25,7 +25,6 @@
 #include <copper/components/shared.hpp>
 
 namespace copper::components {
-using namespace containers;
 
 /**
  * Protocol response

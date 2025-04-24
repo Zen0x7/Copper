@@ -37,7 +37,7 @@ struct route_result {
   /**
    * Bindings
    */
-  containers::unordered_map_of_strings bindings_;
+  unordered_map_of_strings bindings_;
 };
 
 /**
