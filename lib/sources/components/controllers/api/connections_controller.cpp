@@ -22,6 +22,8 @@ void connections_controller::invoke(
     const shared<controller_parameters>& parameters,
     const callback_of<res>& on_success,
     const callback_of<std::exception_ptr>& on_error) {
+  boost::ignore_unused(on_error);
+
   json::array items;
 
   auto state_subscriptions = core->state_->get_subscriptions();
