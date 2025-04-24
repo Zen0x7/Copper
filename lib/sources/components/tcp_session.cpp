@@ -27,8 +27,6 @@
 
 namespace copper::components {
 
-using namespace containers;
-
 tcp_session::tcp_session(const shared<core>& core,
                          const uuid& server_id,
                          const shared<connection>& connection)

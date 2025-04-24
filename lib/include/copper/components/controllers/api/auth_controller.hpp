@@ -39,7 +39,7 @@ class auth_controller final : public controller {
    *
    * @return map_of_strings
    */
-  containers::map_of_strings rules() const override {
+  map_of_strings rules() const override {
     return {
         {"*", "is_object"},
         {"email", "is_string"},

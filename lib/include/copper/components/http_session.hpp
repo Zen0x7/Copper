@@ -27,7 +27,6 @@
 #include <boost/beast/http/string_body.hpp>
 
 namespace copper::components {
-using namespace containers;
 
 /**
  * Forward core

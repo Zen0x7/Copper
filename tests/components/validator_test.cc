@@ -22,7 +22,7 @@
 using namespace copper::components;
 
 TEST(Components_Validator, OnSuccess) {
-  const containers::map_of_strings _rules = {
+  const map_of_strings _rules = {
       {"*", "is_object"},      {"uuid", "is_uuid"},
       {"string", "is_string"}, {"string", "confirmed"},
       {"number", "is_number"}, {"array_of_strings", "is_array_of_strings"},
@@ -38,7 +38,7 @@ TEST(Components_Validator, OnSuccess) {
 }
 
 TEST(Components_Validator, OnEmptiness) {
-  const containers::map_of_strings _rules = {
+  const map_of_strings _rules = {
       {"*", "is_object"},      {"uuid", "is_uuid"},
       {"string", "is_string"}, {"string", "confirmed"},
       {"number", "is_number"}, {"array_of_strings", "is_array_of_strings"},
@@ -57,7 +57,7 @@ TEST(Components_Validator, OnEmptiness) {
 }
 
 TEST(Components_Validator, OnErrors) {
-  const containers::map_of_strings _rules = {
+  const map_of_strings _rules = {
       {"*", "is_object"},
       {"uuid", "is_string,is_uuid"},
       {"uuid_v4", "is_uuid"},
@@ -86,8 +86,7 @@ TEST(Components_Validator, OnErrors) {
 }
 
 TEST(Components_Validator, RejectsPrimitiveInsteadOfObject) {
-  const containers::map_of_strings _rules = {{"*", "is_object"},
-                                             {"id", "is_uuid"}};
+  const map_of_strings _rules = {{"*", "is_object"}, {"id", "is_uuid"}};
 
   const std::string _input = R"([1, 2, 3])";
   const auto _value = boost::json::parse(_input);
@@ -97,8 +96,7 @@ TEST(Components_Validator, RejectsPrimitiveInsteadOfObject) {
 }
 
 TEST(Components_Validator, ConfirmsNullableAttribute) {
-  const containers::map_of_strings _rules = {{"*", "is_object"},
-                                             {"comment", "nullable"}};
+  const map_of_strings _rules = {{"*", "is_object"}, {"comment", "nullable"}};
 
   const std::string _input = R"({"comment": null})";
   const auto _value = boost::json::parse(_input);
@@ -108,8 +106,7 @@ TEST(Components_Validator, ConfirmsNullableAttribute) {
 }
 
 TEST(Components_Validator, NullableMissingIsValid) {
-  const containers::map_of_strings _rules = {{"*", "is_object"},
-                                             {"note", "nullable"}};
+  const map_of_strings _rules = {{"*", "is_object"}, {"note", "nullable"}};
 
   const std::string _input = R"({})";
   const auto _value = boost::json::parse(_input);

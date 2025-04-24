@@ -25,7 +25,7 @@ namespace copper::components {
 std::string query_from_request(const req& request) {
   json::object _object;
 
-  containers::map_of<std::string, containers::vector_of<std::string>> _map;
+  map_of<std::string, vector_of<std::string>> _map;
 
   const size_t _symbol = request.target().find('?');
   const bool _has_params = _symbol != std::string::npos;

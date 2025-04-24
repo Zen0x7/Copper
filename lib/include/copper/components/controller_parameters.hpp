@@ -39,12 +39,12 @@ class controller_parameters : public shared_enabled<controller_parameters> {
   /**
    * Auth
    */
-  containers::optional_of<authentication_result> auth_;
+  optional_of<authentication_result> auth_;
 
   /**
    * Bindings
    */
-  containers::unordered_map_of_strings bindings_;
+  unordered_map_of_strings bindings_;
 
   /**
    * Start at
@@ -55,12 +55,11 @@ class controller_parameters : public shared_enabled<controller_parameters> {
   /**
    * Constructor
    */
-  controller_parameters(
-      req request,
-      json::value body,
-      const containers::optional_of<authentication_result>& auth,
-      containers::unordered_map_of_strings bindings,
-      const long& start_at)
+  controller_parameters(req request,
+                        json::value body,
+                        const optional_of<authentication_result>& auth,
+                        unordered_map_of_strings bindings,
+                        const long& start_at)
       : request_(std::move(request)),
         body_(std::move(body)),
         auth_(auth),
@@ -86,18 +85,14 @@ class controller_parameters : public shared_enabled<controller_parameters> {
    *
    * @return optional_of<authentication_result>
    */
-  const containers::optional_of<authentication_result>& get_auth() const {
-    return auth_;
-  }
+  const optional_of<authentication_result>& get_auth() const { return auth_; }
 
   /**
    * Get bindings
    *
    * @return unordered_map_of_strings
    */
-  const containers::unordered_map_of_strings& get_bindings() const {
-    return bindings_;
-  }
+  const unordered_map_of_strings& get_bindings() const { return bindings_; }
 
   /**
    * Get start at

@@ -26,6 +26,7 @@
 #include <copper/components/chronos.hpp>
 #include <copper/components/cipher.hpp>
 #include <copper/components/containers.hpp>
+#include <copper/components/json.hpp>
 #include <copper/components/logger.hpp>
 #include <copper/components/uuid.hpp>
 #include <copper/components/validator.hpp>
@@ -49,80 +50,141 @@ struct authentication_result {
 };
 
 /**
+ * Extract token from bearer
+ *
+ * @param bearer
+ * @return std::string
+ */
+inline std::string authentication_extract_token(const std::string& bearer) {
+  return boost::starts_with(bearer, "Bearer ") ? bearer.substr(7) : bearer;
+}
+
+/**
+ * Split token
+ *
+ * @param token
+ * @return vector_of<string>
+ */
+inline vector_of<std::string> authentication_split_token(std::string token) {
+  vector_of<std::string> parts;
+  std::size_t position = 0;
+  while ((position = token.find('.')) != std::string::npos) {
+    parts.push_back(token.substr(0, position));
+    token.erase(0, position + 1);
+  }
+  parts.push_back(token);
+  return parts;
+}
+
+/**
+ * Verify signature
+ *
+ * @param parts
+ * @param app_key
+ * @return bool
+ */
+inline bool authentication_verify_signature(const vector_of<std::string>& parts,
+                                            const std::string& app_key) {
+  const std::string merged = parts[0] + "." + parts[1];
+  const std::string signature =
+      base64url_encode(cipher_hmac(merged, app_key), false);
+  return signature == parts[2];
+}
+
+/**
+ * Parse payload
+ *
+ * @param encoded
+ * @return optional_of<json::value>
+ */
+inline optional_of<json::value> authentication_parse_payload(
+    const std::string& encoded) {
+  boost::system::error_code ec;
+  auto parsed = boost::json::parse(base64url_decode(encoded), ec);
+  if (ec)
+    return boost::none;
+  return parsed;
+}
+
+/**
+ * Validate payload
+ *
+ * @param payload
+ * @return bool
+ */
+inline bool authentication_validate_payload(const json::value& payload) {
+  const map_of_strings rules = {
+      {"*", "is_object"},   {"sub", "is_uuid"},   {"typ", "is_string"},
+      {"iat", "is_number"}, {"exp", "is_number"},
+  };
+
+  if (const auto instance = validator_make(rules, payload); !instance->success_)
+    return false;
+
+  if (const auto expires_at = payload.as_object().at("exp").as_int64();
+      chronos::now() > expires_at)
+    return false;
+
+  return true;
+}
+
+inline optional_of<authentication_result> authentication_extract_result(
+    const json::value& payload) {
+  const std::string id{payload.as_object().at("sub").as_string()};
+  const std::string type{payload.as_object().at("typ").as_string()};
+
+  LOG("[authentication_from_bearer] id: " << id);
+  LOG("[authentication_from_bearer] type: " << type);
+  LOG("[authentication_from_bearer] expires_at: "
+      << payload.as_object().at("exp").as_int64());
+
+  return authentication_result{
+      .id_ = boost::lexical_cast<uuid>(id),
+      .type_ = type,
+  };
+}
+
+/**
  * Authentication from bearer
  *
  * @param bearer
  * @param app_key
  * @return boost::optional<authentication_result> Result
  */
-inline containers::optional_of<authentication_result>
-authentication_from_bearer(const std::string& bearer,
-                           const std::string& app_key) {
+inline optional_of<authentication_result> authentication_from_bearer(
+    const std::string& bearer,
+    const std::string& app_key) {
   LOG("[authentication_from_bearer] scope_in");
-  if (bearer != "") {
-    std::string _token =
-        boost::starts_with(bearer, "Bearer ") ? bearer.substr(7) : bearer;
 
-    containers::vector_of<std::string> _parts;
-    std::size_t _position = 0;
-
-    while ((_position = _token.find('.')) != std::string::npos) {
-      std::string _piece = _token.substr(0, _position);
-      _parts.push_back(_piece);
-      _token.erase(0, _position + 1);
-    }
-
-    _parts.push_back(_token);
-
-    if (_parts.size() == 3) {
-      std::string _merged = _parts[0] + "." + _parts[1];
-      if (const std::string _signature =
-              base64url_encode(cipher_hmac(_merged, app_key), false);
-          _signature == _parts[2]) {
-        boost::system::error_code _ec;
-        auto _payload = boost::json::parse(base64url_decode(_parts[1]), _ec);
-
-        if (!_ec) {
-          containers::map_of_strings _rules = {
-              {"*", "is_object"},   {"sub", "is_uuid"},   {"typ", "is_string"},
-              {"iat", "is_number"}, {"exp", "is_number"},
-          };
-
-          if (auto _instance = validator_make(_rules, _payload);
-              _instance->success_) {
-            const std::string _id{_payload.as_object().at("sub").as_string()};
-            const std::string _type{_payload.as_object().at("typ").as_string()};
-            auto _expires_at = _payload.as_object().at("exp").as_int64();
-
-            LOG("[authentication_from_bearer] id: " << _id);
-            LOG("[authentication_from_bearer] type: " << _type);
-            LOG("[authentication_from_bearer] expires_at: " << _expires_at);
-
-            auto _id_ = boost::lexical_cast<boost::uuids::uuid>(_id);
-
-            // LCOV_EXCL_START
-            if (auto _current_unix = chronos::now();
-                _current_unix > _expires_at) {
-              LOG("[authentication_from_bearer] scope_out [1 of 3]");
-
-              return boost::none;
-            }
-            // LCOV_EXCL_STOP
-
-            LOG("[authentication_from_bearer] scope_out [2 of 3]");
-
-            return authentication_result{
-                .id_ = _id_,
-                .type_ = _type,
-            };
-          }
-        }
-      }
-    }
+  if (bearer.empty()) {
+    LOG("[authentication_from_bearer] scope_out [3 of 3]");
+    return boost::none;
   }
 
-  LOG("[authentication_from_bearer] scope_out [3 of 3]");
-  return boost::none;
+  const std::string token = authentication_extract_token(bearer);
+  const auto parts = authentication_split_token(token);
+  if (parts.size() != 3) {
+    LOG("[authentication_from_bearer] scope_out [3 of 3]");
+    return boost::none;
+  }
+
+  if (!authentication_verify_signature(parts, app_key)) {
+    LOG("[authentication_from_bearer] scope_out [3 of 3]");
+    return boost::none;
+  }
+
+  auto payload = authentication_parse_payload(parts[1]);
+  if (!payload.has_value()) {
+    LOG("[authentication_from_bearer] scope_out [3 of 3]");
+    return boost::none;
+  }
+
+  if (!authentication_validate_payload(payload.value())) {
+    LOG("[authentication_from_bearer] scope_out [3 of 3]");
+    return boost::none;
+  }
+
+  return authentication_extract_result(payload.value());
 }
 
 /**
@@ -131,13 +193,13 @@ authentication_from_bearer(const std::string& bearer,
  * @param id
  * @param app_key
  * @param type
- * @return
+ * @return string
  */
 inline std::string authentication_to_bearer(
-    uuid id,
+    const uuid id,
     const std::string& app_key,
     const std::string& type = "App\\Models\\User") {
-  const boost::json::object header = {
+  const json::object header = {
       {"srv", "Copper"},
       {"aut", "Ian Torres"},
       {"alg", "HS256"},
@@ -149,7 +211,7 @@ inline std::string authentication_to_bearer(
   const auto expires_at = now + std::chrono::days(7);
   const auto iat = chronos::to_timestamp(now);
   const auto exp = chronos::to_timestamp(expires_at);
-  const boost::json::object payload = {
+  const json::object payload = {
       {"sub", id_},
       {"typ", type},
       {"iat", iat},

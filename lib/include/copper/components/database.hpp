@@ -27,7 +27,6 @@
 #include <copper/components/user.hpp>
 
 namespace copper::components {
-using namespace containers;
 
 /**
  * Forward core

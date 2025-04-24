@@ -34,8 +34,7 @@ void state::disconnected(const uuid id) {
   connections_.erase(id);
 }
 
-containers::uuid_hash_map_of<weaker<connection>> state::get_connections()
-    const {
+uuid_hash_map_of<weaker<connection>> state::get_connections() const {
   return connections_;
 }
 
@@ -73,7 +72,7 @@ bool state::is_subscribed(const uuid& id, const std::string& channel) {
   return false;
 }
 
-void state::broadcast(const containers::vector_of<std::string>& channels,
+void state::broadcast(const vector_of<std::string>& channels,
                       const std::string& message) {
   const auto& _index = subscriptions_.get<subscriptions::by_channel_name>();
   std::set<uuid> _receivers;

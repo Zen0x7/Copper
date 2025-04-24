@@ -31,13 +31,6 @@ configuration::configuration() {
       std::stoi(dotenv::getenv("WEBSOCKET_PORT", "11000"));
   values_->app_threads_ = std::stoi(dotenv::getenv("APP_THREADS", "4"));
 
-  values_->app_public_key_ =
-      dotenv::getenv("APP_PUBLIC_KEY", "./certificates/public.pem");
-  values_->app_private_key_ =
-      dotenv::getenv("APP_PRIVATE_KEY", "./certificates/private.pem");
-  values_->app_dh_params_ =
-      dotenv::getenv("APP_DH_PARAMS", "./certificates/params.pem");
-
   values_->database_host_ = dotenv::getenv("DATABASE_HOST", "127.0.0.1");
   values_->database_port_ = std::stoi(dotenv::getenv("DATABASE_PORT", "3306"));
   values_->database_user_ = dotenv::getenv("DATABASE_USER", "user");
@@ -54,11 +47,6 @@ configuration::configuration() {
   values_->http_body_limit_ =
       std::stoi(dotenv::getenv("HTTP_BODY_LIMIT", "10000"));
   values_->http_allowed_origins_ = dotenv::getenv("HTTP_ALLOWED_ORIGINS", "*");
-
-  values_->sentry_dsn_ =
-      dotenv::getenv("SENTRY_DSN", "https://{a}@{b}.ingest.us.sentry.io/{c}");
-  values_->sentry_crashpad_handler_ = dotenv::getenv(
-      "SENTRY_CRASHPAD_HANDLER", "/usr/local/bin/crashpad_handler");
 
   values_->working_directory_ =
       dotenv::getenv("WORKING_DIRECTORY", "/__w/Copper/Copper/bin");

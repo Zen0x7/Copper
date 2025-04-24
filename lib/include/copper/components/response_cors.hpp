@@ -40,12 +40,12 @@ class core;
 inline res res_cors(const shared<core>& core,
                     const req& request,
                     long start_at,
-                    const containers::vector_of<method>& methods) {
+                    const vector_of<method>& methods) {
   res _response{
       methods.empty() ? status_code::method_not_allowed : status_code::ok,
       request.version()};
 
-  containers::vector_of<std::string> _authorized_methods;
+  vector_of<std::string> _authorized_methods;
   for (const auto& _verb : methods)
     _authorized_methods.push_back(to_string(_verb));
   const auto _methods_as_string = boost::join(_authorized_methods, ",");

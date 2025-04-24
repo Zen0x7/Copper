@@ -69,21 +69,6 @@ class configurations : public shared_enabled<configurations> {
   int app_threads_;
 
   /**
-   * App public key
-   */
-  std::string app_public_key_;
-
-  /**
-   * App private key
-   */
-  std::string app_private_key_;
-
-  /**
-   * App DH params
-   */
-  std::string app_dh_params_;
-
-  /**
    * Database host
    */
   std::string database_host_;
@@ -124,11 +109,6 @@ class configurations : public shared_enabled<configurations> {
   int database_pool_max_size_;
 
   /**
-   * Redis client name
-   */
-  std::string redis_client_name_;
-
-  /**
    * HTTP body limit
    */
   int http_body_limit_;
@@ -137,16 +117,6 @@ class configurations : public shared_enabled<configurations> {
    * HTTP allowed origins
    */
   std::string http_allowed_origins_;
-
-  /**
-   * Sentry DSN
-   */
-  std::string sentry_dsn_;
-
-  /**
-   * Sentry crashpad handler
-   */
-  std::string sentry_crashpad_handler_;
 
   /**
    * Working directory

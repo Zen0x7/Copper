@@ -38,7 +38,7 @@ class state : public shared_enabled<state> {
   /**
    * Websockets
    */
-  containers::uuid_hash_map_of<weaker<connection>> connections_;
+  uuid_hash_map_of<weaker<connection>> connections_;
 
   /**
    * Subscriptions
@@ -77,7 +77,7 @@ class state : public shared_enabled<state> {
    *
    * @return uuid_hash_map_of<weaker<connection>>
    */
-  containers::uuid_hash_map_of<weaker<connection>> get_connections() const;
+  uuid_hash_map_of<weaker<connection>> get_connections() const;
 
   /**
    * Get subscriptions
@@ -117,7 +117,7 @@ class state : public shared_enabled<state> {
    * @param channels
    * @param message
    */
-  void broadcast(const containers::vector_of<std::string>& channels,
+  void broadcast(const vector_of<std::string>& channels,
                  const std::string& message);
 
   /**

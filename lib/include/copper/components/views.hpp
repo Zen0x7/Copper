@@ -39,7 +39,7 @@ class views : public shared_enabled<views> {
   /**
    * Items
    */
-  containers::map_of<std::string, shared<view>> items_;
+  map_of<std::string, shared<view>> items_;
 
  public:
   /**

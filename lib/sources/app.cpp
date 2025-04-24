@@ -174,7 +174,7 @@ int run(int argc, const char* argv[]) {
 
     // subscriber::start(_core, _server_id);
 
-    containers::vector_of<std::thread> _threads_container;
+    vector_of<std::thread> _threads_container;
     _threads_container.reserve(_threads - 1);
     for (auto _i = _threads - 1; _i > 0; --_i)
       _threads_container.emplace_back([&_ioc] { _ioc.run(); });

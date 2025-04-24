@@ -27,7 +27,7 @@ std::string expression_result::get(const std::string& name) const {
 }
 
 shared<expression_result> expression::query(const std::string& input) const {
-  containers::unordered_map_of_strings _bindings;
+  unordered_map_of_strings _bindings;
   bool _matches = false;
   if (std::smatch _match; std::regex_match(input, _match, pattern_)) {
     _matches = true;
@@ -46,7 +46,7 @@ shared<expression> expression_make(const std::string& input) {
   std::size_t _close = input.find('}');
   std::size_t _position = 0;
 
-  containers::vector_of<std::string> _arguments;
+  vector_of<std::string> _arguments;
   std::string _regex;
 
   if (_open == std::string::npos && _close == std::string::npos)

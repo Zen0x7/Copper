@@ -119,7 +119,7 @@ std::string cipher_hmac(const std::string& input,
 std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
   std::pair<std::string, std::string> _output;
 
-  containers::vector_of<unsigned char> _key(CIPHER_KEY_LENGTH);
+  vector_of<unsigned char> _key(CIPHER_KEY_LENGTH);
 
   // LCOV_EXCL_START
   if (RAND_bytes(_key.data(), static_cast<int>(_key.size())) != 1) {
@@ -129,7 +129,7 @@ std::pair<std::string, std::string> cipher_generate_aes_key_iv() {
 
   _output.first.assign(_key.begin(), _key.end());
 
-  containers::vector_of<unsigned char> _iv(CIPHER_IV_LENGTH);
+  vector_of<unsigned char> _iv(CIPHER_IV_LENGTH);
   // LCOV_EXCL_START
   if (RAND_bytes(_iv.data(), static_cast<int>(_iv.size())) != 1) {
     report_for_openssl();
